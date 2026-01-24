@@ -23,11 +23,15 @@ function App() {
 
   return (
     <AuthProvider>
-      <div className="min-h-screen">
-        {/* Background Orbs */}
+      {/* Background Orbs - Fixed position container */}
+      <div className="background-container">
         <div className="background-orb orb-1"></div>
         <div className="background-orb orb-2"></div>
         <div className="background-orb orb-3"></div>
+        <div className="background-orb orb-4"></div>
+      </div>
+
+      <div className="min-h-screen relative">
 
         <Routes>
           {/* Auth Routes */}

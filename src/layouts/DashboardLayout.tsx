@@ -5,10 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
   Building2,
-  FileText,
-  MessageSquare,
-  BarChart3,
-  Send,
   Shield,
   LogOut,
   Menu,
@@ -74,12 +70,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
     }
   };
 
+  const isRTL = i18n.language === 'ar';
+
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 z-50 w-72 glass-strong transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          isRTL ? 'right-0' : 'left-0'
+        } ${
+          isSidebarOpen 
+            ? 'translate-x-0' 
+            : isRTL 
+              ? 'translate-x-full' 
+              : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
@@ -116,7 +120,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
                 >
                   <Icon size={20} className="flex-shrink-0" />
                   <span className="font-medium text-sm">{item.label}</span>
-                  {isActive && <ChevronRight size={16} className="ml-auto opacity-70" />}
+                  {isActive && <ChevronRight size={16} className={`opacity-70 ${isRTL ? 'mr-auto rotate-180' : 'ml-auto'}`} />}
                 </button>
               );
             })}
@@ -145,7 +149,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-72 min-h-screen">
+      <div className={`flex-1 min-h-screen ${isRTL ? 'lg:mr-72' : 'lg:ml-72'}`}>
         {/* Header */}
         <header className="glass-strong sticky top-0 z-40 px-4 lg:px-8 py-4">
           <div className="flex items-center justify-between">
