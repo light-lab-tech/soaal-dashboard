@@ -18,6 +18,7 @@ const Questions: React.FC = () => {
   const [questions, setQuestions] = useState<PendingQuestion[]>([]);
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedQuestion, setSelectedQuestion] = useState<PendingQuestion | null>(null);
   const [answer, setAnswer] = useState('');
   const [isFaq, setIsFaq] = useState(false);
@@ -33,14 +34,19 @@ const Questions: React.FC = () => {
     if (!tenantId) return;
     try {
       setIsLoading(true);
+      setError(null);
+      // Only pass status filter if it's not 'all'
+      const params = statusFilter !== 'all' ? { status: statusFilter } : undefined;
       const [questionsResponse, tenantResponse] = await Promise.all([
-        api.getPendingQuestions(tenantId, { status: statusFilter }),
+        api.getPendingQuestions(tenantId, params),
         api.getTenant(tenantId),
       ]);
-      setQuestions(questionsResponse.data.questions);
-      setTenant(tenantResponse.data.tenant);
-    } catch (error) {
+      setQuestions(questionsResponse.data?.questions || []);
+      setTenant(tenantResponse.data?.tenant || null);
+    } catch (error: any) {
       console.error('Error loading questions:', error);
+      setError(error?.response?.data?.message || error?.message || 'Failed to load questions');
+      setQuestions([]);
     } finally {
       setIsLoading(false);
     }
@@ -78,46 +84,46 @@ const Questions: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'answered':
-        return <CheckCircle2 size={18} className="text-emerald-400" />;
+        return <CheckCircle2 size={14} className="text-emerald-400" />;
       case 'pending':
       default:
-        return <Clock size={18} className="text-amber-400" />;
+        return <Clock size={14} className="text-amber-400" />;
     }
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="glass-card flex items-center gap-4">
-          <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-glass-text">{t('common.loading')}</span>
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="glass-card flex items-center gap-3">
+          <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-xl font-semibold text-white mb-0.5">
             {t('questions.title')} - {tenant?.name}
           </h1>
-          <p className="text-glass-textSecondary">
+          <p className="text-sm text-glass-textSecondary">
             {questions.filter(q => q.status === 'pending').length} pending questions
           </p>
         </div>
 
         {/* Filter */}
-        <div className="glass px-4 py-2 rounded-full flex items-center gap-2">
+        <div className="glass px-3 py-1.5 rounded-full flex items-center gap-1.5">
           {(['all', 'pending', 'answered'] as const).map((filter) => (
             <button
               key={filter}
               onClick={() => setStatusFilter(filter)}
-              className={`px-4 py-1 rounded-full text-sm font-medium transition-all ${
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                 statusFilter === filter
-                  ? 'bg-primary-500 text-white'
+                  ? 'bg-amber-500 text-white'
                   : 'text-glass-text hover:text-white'
               }`}
             >
@@ -127,29 +133,52 @@ const Questions: React.FC = () => {
         </div>
       </div>
 
+      {/* Error State */}
+      {error && (
+        <div className="glass-card p-4 border-red-500/30 bg-red-500/10">
+          <div className="flex items-center gap-2 text-red-400">
+            <X size={16} />
+            <span className="text-sm font-medium">Error: {error}</span>
+          </div>
+          <button
+            onClick={loadData}
+            className="mt-3 glass-button-secondary px-3 py-1.5 rounded-lg text-xs"
+          >
+            Try Again
+          </button>
+        </div>
+      )}
+
       {/* Questions Grid */}
-      {questions.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {!error && questions.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {questions.map((question) => (
             <div
               key={question.id}
               onClick={() => question.status === 'pending' && setSelectedQuestion(question)}
-              className={`glass-card group hover:scale-105 transition-all duration-300 ${
+              className={`glass-card group hover:scale-[1.02] transition-all duration-200 p-4 ${
                 question.status === 'answered' ? 'opacity-60 cursor-default' : 'cursor-pointer'
               }`}
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600">
-                  <MessageSquare size={24} className="text-white" />
+              <div className="flex items-start justify-between mb-3">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600">
+                  <MessageSquare size={16} className="text-white" />
                 </div>
-                {getStatusIcon(question.status)}
+                <div className="flex items-center gap-1.5">
+                  {getStatusIcon(question.status)}
+                  <span className={`text-[10px] font-medium ${
+                    question.status === 'answered' ? 'text-emerald-400' : 'text-amber-400'
+                  }`}>
+                    {question.status}
+                  </span>
+                </div>
               </div>
 
-              <h3 className="text-lg font-semibold text-white mb-2 line-clamp-3">
+              <h3 className="text-sm font-medium text-white mb-2 line-clamp-3">
                 {question.question}
               </h3>
 
-              <div className="text-xs text-glass-textSecondary mb-4">
+              <div className="text-[10px] text-glass-textSecondary mb-3">
                 {new Date(question.created_at).toLocaleString()}
               </div>
 
@@ -159,105 +188,121 @@ const Questions: React.FC = () => {
                     e.stopPropagation();
                     setSelectedQuestion(question);
                   }}
-                  className="w-full glass-button px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2"
+                  className="w-full glass-button px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5"
                 >
-                  <Send size={16} />
+                  <Send size={14} />
                   {t('questions.answerQuestion')}
                 </button>
               )}
             </div>
           ))}
         </div>
-      ) : (
-        <div className="glass-card p-12 text-center">
-          <MessageSquare size={64} className="mx-auto mb-4 text-glass-textSecondary" />
-          <h3 className="text-xl font-semibold text-white mb-2">No questions</h3>
-          <p className="text-glass-textSecondary">
+      ) : !error && (
+        <div className="glass-card p-8 text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400/20 via-orange-500/20 to-amber-400/20 flex items-center justify-center">
+            <MessageSquare size={28} className="text-amber-400" />
+          </div>
+          <h3 className="text-base font-semibold text-white mb-1">
+            {statusFilter === 'pending' ? 'No pending questions' : 
+             statusFilter === 'answered' ? 'No answered questions' : 
+             'No questions yet'}
+          </h3>
+          <p className="text-sm text-glass-textSecondary mb-4">
             {statusFilter === 'pending'
-              ? 'No pending questions to answer'
-              : 'No questions found'}
+              ? 'All questions have been answered! Great job!'
+              : statusFilter === 'answered'
+              ? 'No questions have been answered yet'
+              : 'Questions from users will appear here when they ask something the bot cannot answer'}
           </p>
+          {statusFilter !== 'all' && (
+            <button
+              onClick={() => setStatusFilter('all')}
+              className="glass-button-secondary px-4 py-2 rounded-lg text-xs font-medium"
+            >
+              View All Questions
+            </button>
+          )}
         </div>
       )}
 
       {/* Answer Modal */}
       {selectedQuestion && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass-strong w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 rounded-2xl scrollbar-glass">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">{t('questions.answerQuestion')}</h2>
+          <div className="glass-strong w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 rounded-xl scrollbar-glass">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">{t('questions.answerQuestion')}</h2>
               <button
                 onClick={handleCloseModal}
-                className="p-2 rounded-lg glass-button-secondary"
+                className="p-1.5 rounded-lg glass-button-secondary"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitAnswer} className="space-y-6">
+            <form onSubmit={handleSubmitAnswer} className="space-y-4">
               {/* Question */}
-              <div className="glass-card p-4">
-                <label className="block text-sm font-medium text-glass-text mb-2">
+              <div className="glass-card p-3">
+                <label className="block text-xs font-medium text-glass-text mb-1.5">
                   {t('questions.question')}
                 </label>
-                <p className="text-white">{selectedQuestion.question}</p>
+                <p className="text-sm text-white">{selectedQuestion.question}</p>
               </div>
 
               {/* Answer */}
               <div>
-                <label className="block text-sm font-medium text-glass-text mb-2">
+                <label className="block text-xs font-medium text-glass-text mb-1.5">
                   {t('questions.answer')}
                 </label>
                 <textarea
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
-                  className="glass-input w-full px-4 py-3 rounded-xl min-h-[150px] resize-none"
+                  className="glass-input w-full px-3 py-2 rounded-lg min-h-[120px] resize-none text-sm"
                   placeholder="Enter your answer..."
                   required
                 />
               </div>
 
               {/* FAQ Toggle */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setIsFaq(!isFaq)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
                     isFaq
-                      ? 'bg-primary-500/20 text-primary-400 border border-primary-500/30'
+                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                       : 'glass-button-secondary'
                   }`}
                 >
-                  <Star size={18} className={isFaq ? 'fill-current' : ''} />
+                  <Star size={14} className={isFaq ? 'fill-current' : ''} />
                   {t('questions.markAsFaq')}
                 </button>
-                <p className="text-xs text-glass-textSecondary">
-                  Mark as FAQ to prioritize this answer for similar questions
+                <p className="text-[10px] text-glass-textSecondary">
+                  Prioritize for similar questions
                 </p>
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2 pt-3">
                 <button
                   type="button"
                   onClick={handleCloseModal}
-                  className="flex-1 glass-button-secondary px-6 py-3 rounded-xl"
+                  className="flex-1 glass-button-secondary px-4 py-2 rounded-lg text-sm"
                 >
                   {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || !answer.trim()}
-                  className="flex-1 glass-button px-6 py-3 rounded-xl flex items-center justify-center gap-2"
+                  className="flex-1 glass-button px-4 py-2 rounded-lg text-sm flex items-center justify-center gap-1.5"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                       {t('common.loading')}
                     </>
                   ) : (
                     <>
-                      <Send size={20} />
+                      <Send size={14} />
                       {t('questions.submitAnswer')}
                     </>
                   )}

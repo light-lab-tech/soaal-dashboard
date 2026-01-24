@@ -65,62 +65,62 @@ const Telegram: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="glass-card flex items-center gap-4">
-          <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-glass-text">{t('common.loading')}</span>
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="glass-card flex items-center gap-3">
+          <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">
+        <h1 className="text-xl font-semibold text-white mb-0.5">
           {t('telegram.title')} - {tenant?.name}
         </h1>
-        <p className="text-glass-textSecondary">
+        <p className="text-sm text-glass-textSecondary">
           Connect a Telegram bot to your tenant
         </p>
       </div>
 
       {/* Set Bot Token */}
-      <div className="glass-card p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600">
-            <Bot size={24} className="text-white" />
+      <div className="glass-card p-4">
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600">
+            <Bot size={18} className="text-white" />
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-white">
+          <div className="flex-1">
+            <h2 className="text-sm font-semibold text-white">
               {botInfo ? 'Bot Connected' : t('telegram.setToken')}
             </h2>
             {botInfo && (
-              <p className="text-sm text-glass-textSecondary">
+              <p className="text-xs text-glass-textSecondary">
                 @{botInfo.bot_username}
               </p>
             )}
           </div>
           {botInfo && (
-            <CheckCircle2 size={24} className="text-emerald-400 ml-auto" />
+            <CheckCircle2 size={18} className="text-emerald-400" />
           )}
         </div>
 
-        <form onSubmit={handleSetToken} className="space-y-4">
+        <form onSubmit={handleSetToken} className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-glass-text mb-2">
+            <label className="block text-xs font-medium text-glass-text mb-1.5">
               {t('telegram.botToken')}
             </label>
             <input
               type="text"
               value={botToken}
               onChange={(e) => setBotToken(e.target.value)}
-              className="glass-input w-full px-4 py-3 rounded-xl font-mono"
+              className="glass-input w-full px-3 py-2 rounded-lg font-mono text-sm"
               placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
               required
             />
-            <p className="text-xs text-glass-textSecondary mt-2">
+            <p className="text-[10px] text-glass-textSecondary mt-1.5">
               Get your bot token from @BotFather on Telegram
             </p>
           </div>
@@ -128,16 +128,16 @@ const Telegram: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="glass-button w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+            className="glass-button w-full py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5"
           >
             {isSubmitting ? (
               <>
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 {t('common.loading')}
               </>
             ) : (
               <>
-                <Send size={20} />
+                <Send size={14} />
                 {botInfo ? 'Update Token' : t('telegram.setToken')}
               </>
             )}
@@ -146,18 +146,18 @@ const Telegram: React.FC = () => {
       </div>
 
       {/* Instructions */}
-      <div className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <Send size={20} />
+      <div className="glass-card p-4">
+        <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-1.5">
+          <Send size={14} />
           {t('telegram.instructions')}
         </h3>
-        <ol className="space-y-4">
+        <ol className="space-y-2.5">
           {[1, 2, 3, 4].map((step) => (
-            <li key={step} className="flex gap-3">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-bold text-sm">
+            <li key={step} className="flex gap-2.5">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-[11px]">
                 {step}
               </div>
-              <p className="text-glass-text pt-1">{t(`telegram.step${step}` as any)}</p>
+              <p className="text-sm text-glass-text pt-0.5">{t(`telegram.step${step}` as any)}</p>
             </li>
           ))}
         </ol>
@@ -165,19 +165,19 @@ const Telegram: React.FC = () => {
 
       {/* Webhook Command */}
       {botInfo && (
-        <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Webhook Setup Command</h3>
-          <div className="glass-input p-4 rounded-xl font-mono text-sm break-all mb-4">
-            curl "https://api.telegram.org/bot{BOT_TOKEN}/setWebhook?url=https://your-domain.com/webhooks/telegram?token={BOT_TOKEN}"
+        <div className="glass-card p-4">
+          <h3 className="text-sm font-semibold text-white mb-3">Webhook Setup Command</h3>
+          <div className="glass-input p-3 rounded-lg font-mono text-xs break-all mb-3">
+            curl "https://api.telegram.org/bot{'{BOT_TOKEN}'}/setWebhook?url=https://your-domain.com/webhooks/telegram?token={'{BOT_TOKEN}'}"
           </div>
-          <p className="text-xs text-glass-textSecondary mb-4">
-            Replace <span className="text-primary-400">{'{BOT_TOKEN}'}</span> with your actual bot token
+          <p className="text-[10px] text-glass-textSecondary mb-3">
+            Replace <span className="text-blue-400">{'{BOT_TOKEN}'}</span> with your actual bot token
           </p>
           <button
             onClick={copyWebhookCommand}
-            className="glass-button-secondary w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+            className="glass-button-secondary w-full py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5"
           >
-            <Copy size={20} />
+            <Copy size={14} />
             Copy Command
           </button>
         </div>
@@ -185,26 +185,26 @@ const Telegram: React.FC = () => {
 
       {/* Bot Info */}
       {botInfo && (
-        <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Bot Information</h3>
-          <div className="space-y-4">
-            <div>
-              <span className="text-sm text-glass-textSecondary">{t('telegram.botUsername')}:</span>
-              <div className="flex items-center gap-2">
-                <span className="text-white font-semibold">@{botInfo.bot_username}</span>
+        <div className="glass-card p-4">
+          <h3 className="text-sm font-semibold text-white mb-3">Bot Information</h3>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-glass-textSecondary">{t('telegram.botUsername')}:</span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm text-white font-medium">@{botInfo.bot_username}</span>
                 <a
                   href={`https://t.me/${botInfo.bot_username}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary-400 hover:text-primary-300"
+                  className="text-blue-400 hover:text-blue-300"
                 >
-                  <ExternalLink size={16} />
+                  <ExternalLink size={14} />
                 </a>
               </div>
             </div>
-            <div>
-              <span className="text-sm text-glass-textSecondary">{t('telegram.botId')}:</span>
-              <span className="text-white font-semibold">{botInfo.bot_id}</span>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-glass-textSecondary">{t('telegram.botId')}:</span>
+              <span className="text-sm text-white font-medium">{botInfo.bot_id}</span>
             </div>
           </div>
         </div>

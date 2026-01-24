@@ -113,13 +113,13 @@ const Documents: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Check size={20} className="text-emerald-400" />;
+        return <Check size={14} className="text-emerald-400" />;
       case 'processing':
-        return <AlertCircle size={20} className="text-amber-400 animate-pulse" />;
+        return <AlertCircle size={14} className="text-amber-400 animate-pulse" />;
       case 'failed':
-        return <AlertCircle size={20} className="text-red-400" />;
+        return <AlertCircle size={14} className="text-red-400" />;
       default:
-        return <AlertCircle size={20} className="text-glass-textSecondary" />;
+        return <AlertCircle size={14} className="text-glass-textSecondary" />;
     }
   };
 
@@ -133,40 +133,40 @@ const Documents: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="glass-card flex items-center gap-4">
-          <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-glass-text">{t('common.loading')}</span>
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="glass-card flex items-center gap-3">
+          <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-xl font-semibold text-white mb-0.5">
             {t('documents.title')} - {tenant?.name}
           </h1>
-          <p className="text-glass-textSecondary">
+          <p className="text-sm text-glass-textSecondary">
             {documents.length} {documents.length === 1 ? 'document' : 'documents'}
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button
             onClick={() => setShowUrlModal(true)}
-            className="glass-button px-6 py-3 rounded-xl font-semibold flex items-center gap-2"
+            className="glass-button-secondary px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5"
           >
-            <LinkIcon size={20} />
+            <LinkIcon size={14} />
             {t('documents.ingestUrl')}
           </button>
           <button
             {...getRootProps()}
-            className="glass-button px-6 py-3 rounded-xl font-semibold flex items-center gap-2"
+            className="glass-button px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5"
           >
-            <Upload size={20} />
+            <Upload size={14} />
             {t('documents.uploadDocument')}
           </button>
           <input {...getInputProps()} />
@@ -176,53 +176,55 @@ const Documents: React.FC = () => {
       {/* Drop Zone */}
       <div
         {...getRootProps()}
-        className={`glass-card p-8 text-center cursor-pointer transition-all ${
-          isDragActive ? 'border-primary-400 bg-primary-500/10' : 'hover:border-primary-400/50'
+        className={`glass-card p-6 text-center cursor-pointer transition-all ${
+          isDragActive ? 'border-cyan-400 bg-cyan-500/10' : 'hover:border-cyan-400/50'
         }`}
       >
         <input {...getInputProps()} />
-        <Upload size={48} className="mx-auto mb-4 text-primary-400" />
-        <p className="text-lg font-semibold text-white mb-2">
+        <Upload size={32} className="mx-auto mb-3 text-cyan-400" />
+        <p className="text-sm font-medium text-white mb-1">
           {isDragActive ? 'Drop files here' : t('documents.dragDrop')}
         </p>
-        <p className="text-sm text-glass-textSecondary">{t('documents.supportedFormats')}</p>
+        <p className="text-xs text-glass-textSecondary">{t('documents.supportedFormats')}</p>
       </div>
 
       {/* Documents Grid */}
       {documents.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {documents.map((document) => (
-            <div key={document.id} className="glass-card group hover:scale-105 transition-transform duration-300">
-              <div className="flex items-start justify-between mb-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600">
-                  <FileText size={24} className="text-white" />
+            <div key={document.id} className="glass-card group hover:scale-[1.02] transition-transform duration-200 p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600">
+                  <FileText size={16} className="text-white" />
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   {getStatusIcon(document.status)}
+                  <span className={`text-[10px] font-medium ${
+                    document.status === 'completed' ? 'text-emerald-400' :
+                    document.status === 'processing' ? 'text-amber-400' : 'text-red-400'
+                  }`}>
+                    {document.status}
+                  </span>
                 </div>
               </div>
 
-              <h3 className="text-lg font-semibold text-white mb-1 truncate" title={document.name}>
+              <h3 className="text-sm font-medium text-white mb-1 truncate" title={document.name}>
                 {document.name}
               </h3>
-              <p className="text-sm text-glass-textSecondary mb-2 capitalize">
+              <p className="text-[11px] text-glass-textSecondary capitalize">
                 {document.file_type}
+                {document.file_size && ` • ${formatFileSize(document.file_size)}`}
               </p>
-              {document.file_size && (
-                <p className="text-sm text-glass-textSecondary mb-4">
-                  {formatFileSize(document.file_size)}
-                </p>
-              )}
 
-              <div className="text-xs text-glass-textSecondary mb-4">
-                Uploaded {new Date(document.created_at).toLocaleDateString()}
+              <div className="text-[10px] text-glass-textSecondary mt-2 mb-3">
+                {new Date(document.created_at).toLocaleDateString()}
               </div>
 
               <button
                 onClick={() => handleDeleteDocument(document.id)}
-                className="w-full glass-button-secondary px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 text-red-400 hover:text-red-300"
+                className="w-full glass-button-secondary px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10"
               >
-                <Trash2 size={16} />
+                <Trash2 size={14} />
                 {t('documents.deleteDocument')}
               </button>
             </div>
@@ -232,10 +234,10 @@ const Documents: React.FC = () => {
 
       {/* Empty State */}
       {documents.length === 0 && (
-        <div className="glass-card p-12 text-center">
-          <FileText size={64} className="mx-auto mb-4 text-glass-textSecondary" />
-          <h3 className="text-xl font-semibold text-white mb-2">No documents yet</h3>
-          <p className="text-glass-textSecondary mb-6">
+        <div className="glass-card p-8 text-center">
+          <FileText size={36} className="mx-auto mb-3 text-glass-textSecondary" />
+          <h3 className="text-base font-semibold text-white mb-1">No documents yet</h3>
+          <p className="text-sm text-glass-textSecondary">
             Upload or ingest documents to build your knowledge base
           </p>
         </div>
@@ -244,42 +246,42 @@ const Documents: React.FC = () => {
       {/* URL Ingest Modal */}
       {showUrlModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass-strong w-full max-w-md p-6 rounded-2xl">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white">{t('documents.ingestUrl')}</h2>
+          <div className="glass-strong w-full max-w-sm p-5 rounded-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">{t('documents.ingestUrl')}</h2>
               <button
                 onClick={() => setShowUrlModal(false)}
-                className="p-2 rounded-lg glass-button-secondary"
+                className="p-1.5 rounded-lg glass-button-secondary"
               >
-                <X size={20} />
+                <X size={16} />
               </button>
             </div>
-            <form onSubmit={handleIngestUrl} className="space-y-4">
+            <form onSubmit={handleIngestUrl} className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-glass-text mb-2">
+                <label className="block text-xs font-medium text-glass-text mb-1.5">
                   URL
                 </label>
                 <input
                   type="url"
                   value={urlInput}
                   onChange={(e) => setUrlInput(e.target.value)}
-                  className="glass-input w-full px-4 py-3 rounded-xl"
+                  className="glass-input w-full px-3 py-2 rounded-lg text-sm"
                   placeholder="https://example.com/about"
                   required
                 />
               </div>
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2 pt-3">
                 <button
                   type="button"
                   onClick={() => setShowUrlModal(false)}
-                  className="flex-1 glass-button-secondary px-6 py-3 rounded-xl"
+                  className="flex-1 glass-button-secondary px-4 py-2 rounded-lg text-sm"
                 >
                   {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={isUploading}
-                  className="flex-1 glass-button px-6 py-3 rounded-xl"
+                  className="flex-1 glass-button px-4 py-2 rounded-lg text-sm"
                 >
                   {isUploading ? t('common.loading') : t('common.create')}
                 </button>
