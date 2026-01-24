@@ -7,6 +7,7 @@ import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import Dashboard from './pages/Dashboard';
 import Tenants from './pages/Tenants';
+import TenantDetails from './pages/TenantDetails';
 import Documents from './pages/Documents';
 import Questions from './pages/Questions';
 import Analytics from './pages/Analytics';
@@ -44,6 +45,7 @@ function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/tenants" element={<Tenants />} />
+              <Route path="/tenants/:tenantId" element={<TenantDetails />} />
               <Route path="/tenants/:tenantId/documents" element={<Documents />} />
               <Route path="/tenants/:tenantId/questions" element={<Questions />} />
               <Route path="/tenants/:tenantId/analytics" element={<Analytics />} />

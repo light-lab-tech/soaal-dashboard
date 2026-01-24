@@ -254,7 +254,7 @@ const Dashboard: React.FC = () => {
             {tenants.slice(0, 3).map((tenant, index) => (
               <div
                 key={tenant.id}
-                onClick={() => navigate(`/tenants/${tenant.id}/documents`)}
+                onClick={() => navigate(`/tenants/${tenant.id}`)}
                 className="glass-card group hover:scale-[1.02] transition-all duration-300 cursor-pointer p-4"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -286,7 +286,7 @@ const Dashboard: React.FC = () => {
                 </div>
                 <div className="pt-3 mt-3 border-t border-white/10">
                   <button className="w-full glass-button-secondary py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 group">
-                    <span>Manage Tenant</span>
+                    <span>View Details</span>
                     <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all" />
                   </button>
                 </div>

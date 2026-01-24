@@ -10,10 +10,7 @@ import {
   Eye,
   EyeOff,
   Building2,
-  FileText,
-  MessageSquare,
-  BarChart3,
-  Send,
+  ArrowRight,
   X,
 } from 'lucide-react';
 
@@ -127,14 +124,18 @@ const Tenants: React.FC = () => {
       {/* Tenants Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {tenants.map((tenant) => (
-          <div key={tenant.id} className="glass-card group transition-all duration-200 p-4">
+          <div
+            key={tenant.id}
+            onClick={() => navigate(`/tenants/${tenant.id}`)}
+            className="glass-card group transition-all duration-200 p-4 cursor-pointer hover:scale-[1.02]"
+          >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2.5">
                 <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600">
                   <Building2 size={16} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-white">{tenant.name}</h3>
+                  <h3 className="text-sm font-semibold text-white group-hover:text-glow transition-all">{tenant.name}</h3>
                   <p className="text-[11px] text-glass-textSecondary capitalize">{tenant.plan} Plan</p>
                 </div>
               </div>
@@ -147,54 +148,26 @@ const Tenants: React.FC = () => {
               </span>
             </div>
 
-            {/* Quick Actions Grid */}
-            <div className="grid grid-cols-4 gap-2 mb-3">
-              <button
-                onClick={() => navigate(`/tenants/${tenant.id}/documents`)}
-                className="glass-button-secondary p-2 rounded-lg flex flex-col items-center gap-1 hover:bg-cyan-500/20 hover:border-cyan-400/30 transition-all group/btn"
-                title={t('nav.documents')}
-              >
-                <FileText size={16} className="text-cyan-400" />
-                <span className="text-[10px] text-glass-textSecondary group-hover/btn:text-white">{t('nav.documents')}</span>
-              </button>
-              <button
-                onClick={() => navigate(`/tenants/${tenant.id}/questions`)}
-                className="glass-button-secondary p-2 rounded-lg flex flex-col items-center gap-1 hover:bg-amber-500/20 hover:border-amber-400/30 transition-all group/btn"
-                title={t('nav.questions')}
-              >
-                <MessageSquare size={16} className="text-amber-400" />
-                <span className="text-[10px] text-glass-textSecondary group-hover/btn:text-white">{t('nav.questions')}</span>
-              </button>
-              <button
-                onClick={() => navigate(`/tenants/${tenant.id}/analytics`)}
-                className="glass-button-secondary p-2 rounded-lg flex flex-col items-center gap-1 hover:bg-purple-500/20 hover:border-purple-400/30 transition-all group/btn"
-                title={t('nav.analytics')}
-              >
-                <BarChart3 size={16} className="text-purple-400" />
-                <span className="text-[10px] text-glass-textSecondary group-hover/btn:text-white">{t('nav.analytics')}</span>
-              </button>
-              <button
-                onClick={() => navigate(`/tenants/${tenant.id}/telegram`)}
-                className="glass-button-secondary p-2 rounded-lg flex flex-col items-center gap-1 hover:bg-blue-500/20 hover:border-blue-400/30 transition-all group/btn"
-                title={t('nav.telegram')}
-              >
-                <Send size={16} className="text-blue-400" />
-                <span className="text-[10px] text-glass-textSecondary group-hover/btn:text-white">{t('nav.telegram')}</span>
-              </button>
-            </div>
+            <p className="text-xs text-glass-textSecondary mb-3">
+              Created {new Date(tenant.created_at).toLocaleDateString()}
+            </p>
 
             {/* Footer */}
             <div className="flex items-center justify-between pt-3 border-t border-white/10">
-              <span className="text-[10px] text-glass-textSecondary">
-                {new Date(tenant.created_at).toLocaleDateString()}
-              </span>
               <button
-                onClick={() => handleViewApiKeys(tenant)}
-                className="glass-button px-2.5 py-1 rounded-md text-[11px] font-medium flex items-center gap-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleViewApiKeys(tenant);
+                }}
+                className="glass-button-secondary px-2.5 py-1 rounded-md text-[11px] font-medium flex items-center gap-1"
               >
                 <Key size={12} />
                 API Keys
               </button>
+              <div className="flex items-center gap-1 text-xs text-glass-textSecondary group-hover:text-white transition-all">
+                <span>View Details</span>
+                <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all" />
+              </div>
             </div>
           </div>
         ))}
