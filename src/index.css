@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-slate-950 via-purple-950/50 to-slate-950 min-h-screen;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  [dir="rtl"] {
+    direction: rtl;
+  }
+  
+  [dir="ltr"] {
+    direction: ltr;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 shadow-2xl;
+  }
+  
+  .glass-strong {
+    @apply backdrop-blur-3xl bg-gradient-to-br from-white/15 to-white/10 border-white/20 shadow-2xl;
+  }
+  
+  .glass-card {
+    @apply glass rounded-3xl p-8 hover:border-white/20 transition-all duration-500;
+  }
+  
+  .glass-input {
+    @apply bg-white/5 border border-white/10 backdrop-blur-xl text-white placeholder-white/40 
+           focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-400/20 
+           outline-none transition-all duration-300;
+  }
+  
+  .glass-button {
+    @apply bg-gradient-to-r from-cyan-500 via-teal-500 to-cyan-600 
+           hover:from-cyan-400 hover:via-teal-400 hover:to-cyan-500
+           text-white font-semibold shadow-lg hover:shadow-cyan-500/40 
+           transition-all duration-300 transform hover:scale-105 active:scale-95;
+  }
+  
+  .glass-button-secondary {
+    @apply bg-white/10 hover:bg-white/20 border border-white/20 text-white 
+           hover:border-white/30 font-medium backdrop-blur-sm 
+           transition-all duration-300;
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 30px rgba(34, 211, 238, 0.5), 0 0 60px rgba(34, 211, 238, 0.3);
+  }
+  
+  .scrollbar-glass::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .scrollbar-glass::-webkit-scrollbar-track {
+    @apply bg-white/5 rounded-full;
+  }
+  
+  .scrollbar-glass::-webkit-scrollbar-thumb {
+    @apply bg-white/20 rounded-full hover:bg-white/30 transition-colors;
+  }
+}
+
+/* Animated Background */
+.background-container {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.background-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.4;
+  animation: float 20s ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%);
+  top: -200px;
+  left: -200px;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.25) 0%, transparent 70%);
+  bottom: -250px;
+  right: -250px;
+  animation-delay: -5s;
+}
+
+.orb-3 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: -10s;
+}
+
+.orb-4 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(20, 184, 166, 0.15) 0%, transparent 70%);
+  top: 30%;
+  right: -100px;
+  animation-delay: -15s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(30px, -30px) scale(1.1);
+    opacity: 0.6;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-gradient-shift {
+  animation: gradient-shift 15s ease infinite;
+  background-size: 200% 200%;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out;
+}
+
+/* RTL Flips */
+[dir="rtl"] .rotate-rtl {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .flex-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+[dir="rtl"] .text-left {
+  text-align: right;
+}
