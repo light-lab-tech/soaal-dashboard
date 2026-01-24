@@ -103,38 +103,38 @@ const Analytics: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="glass-card flex items-center gap-4">
-          <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-glass-text">{t('common.loading')}</span>
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="glass-card flex items-center gap-3">
+          <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+          <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-xl font-semibold text-white mb-0.5">
             {t('analytics.title')} - {tenant?.name}
           </h1>
-          <p className="text-glass-textSecondary">
+          <p className="text-sm text-glass-textSecondary">
             Monitor user satisfaction and feedback
           </p>
         </div>
 
         {/* Date Range Selector */}
-        <div className="glass px-4 py-2 rounded-full flex items-center gap-2">
-          <Calendar size={16} className="text-glass-textSecondary" />
+        <div className="glass px-3 py-1.5 rounded-full flex items-center gap-1.5">
+          <Calendar size={14} className="text-glass-textSecondary" />
           {(['today', '7days', '30days'] as const).map((range) => (
             <button
               key={range}
               onClick={() => setDateRange(range)}
-              className={`px-4 py-1 rounded-full text-sm font-medium transition-all ${
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                 dateRange === range
-                  ? 'bg-primary-500 text-white'
+                  ? 'bg-cyan-500 text-white'
                   : 'text-glass-text hover:text-white'
               }`}
             >
@@ -148,55 +148,55 @@ const Analytics: React.FC = () => {
 
       {/* Stats Overview */}
       {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="glass-card">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600">
-                <BarChart3 size={24} className="text-white" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="glass-card p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600">
+                <BarChart3 size={16} className="text-white" />
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-white mb-1">{stats.total_feedback}</h3>
-            <p className="text-sm text-glass-textSecondary">{t('analytics.totalFeedback')}</p>
+            <h3 className="text-2xl font-bold text-white mb-0.5">{stats.total_feedback}</h3>
+            <p className="text-xs text-glass-textSecondary">{t('analytics.totalFeedback')}</p>
           </div>
 
-          <div className="glass-card">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600">
-                <ThumbsUp size={24} className="text-white" />
+          <div className="glass-card p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600">
+                <ThumbsUp size={16} className="text-white" />
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-white mb-1">{stats.positive_count}</h3>
-            <p className="text-sm text-glass-textSecondary">{t('analytics.positive')}</p>
+            <h3 className="text-2xl font-bold text-white mb-0.5">{stats.positive_count}</h3>
+            <p className="text-xs text-glass-textSecondary">{t('analytics.positive')}</p>
           </div>
 
-          <div className="glass-card">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-red-500 to-red-600">
-                <ThumbsDown size={24} className="text-white" />
+          <div className="glass-card p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-red-500 to-red-600">
+                <ThumbsDown size={16} className="text-white" />
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-white mb-1">{stats.negative_count}</h3>
-            <p className="text-sm text-glass-textSecondary">{t('analytics.negative')}</p>
+            <h3 className="text-2xl font-bold text-white mb-0.5">{stats.negative_count}</h3>
+            <p className="text-xs text-glass-textSecondary">{t('analytics.negative')}</p>
           </div>
 
-          <div className="glass-card">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600">
-                <TrendingUp size={24} className="text-white" />
+          <div className="glass-card p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600">
+                <TrendingUp size={16} className="text-white" />
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-white mb-1">{stats.positive_percent}%</h3>
-            <p className="text-sm text-glass-textSecondary">{t('analytics.satisfaction')}</p>
+            <h3 className="text-2xl font-bold text-white mb-0.5">{stats.positive_percent}%</h3>
+            <p className="text-xs text-glass-textSecondary">{t('analytics.satisfaction')}</p>
           </div>
         </div>
       )}
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Pie Chart */}
-        <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-white mb-6">Feedback Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="glass-card p-4">
+          <h3 className="text-sm font-medium text-white mb-4">Feedback Distribution</h3>
+          <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
                 data={pieData}
@@ -219,9 +219,9 @@ const Analytics: React.FC = () => {
         </div>
 
         {/* Bar Chart */}
-        <div className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-white mb-6">Feedback Overview</h3>
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="glass-card p-4">
+          <h3 className="text-sm font-medium text-white mb-4">Feedback Overview</h3>
+          <ResponsiveContainer width="100%" height={220}>
             <BarChart data={barData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
               <XAxis dataKey="name" stroke="rgba(255,255,255,0.5)" />
@@ -244,48 +244,48 @@ const Analytics: React.FC = () => {
       <div>
         <button
           onClick={() => setShowDetailed(!showDetailed)}
-          className="glass-button px-6 py-3 rounded-xl font-semibold"
+          className="glass-button px-4 py-2 rounded-lg text-sm font-medium"
         >
           {showDetailed ? 'Hide' : 'Show'} {t('analytics.detailedFeedback')}
         </button>
       </div>
 
       {showDetailed && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {feedback.map((item) => (
-            <div key={item.id} className="glass-card p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
+            <div key={item.id} className="glass-card p-3">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex items-center gap-1.5">
                   {item.feedback_type === 'positive' ? (
-                    <ThumbsUp size={20} className="text-emerald-400" />
+                    <ThumbsUp size={14} className="text-emerald-400" />
                   ) : (
-                    <ThumbsDown size={20} className="text-red-400" />
+                    <ThumbsDown size={14} className="text-red-400" />
                   )}
-                  <span className="font-semibold text-white capitalize">{item.feedback_type}</span>
+                  <span className="text-sm font-medium text-white capitalize">{item.feedback_type}</span>
                 </div>
-                <span className="text-xs text-glass-textSecondary">
+                <span className="text-[10px] text-glass-textSecondary">
                   {new Date(item.created_at).toLocaleString()}
                 </span>
               </div>
 
               {item.user_question && (
-                <div className="mb-2">
-                  <span className="text-sm text-glass-textSecondary">{t('analytics.userQuestion')}:</span>
-                  <p className="text-white">{item.user_question}</p>
+                <div className="mb-1.5">
+                  <span className="text-xs text-glass-textSecondary">{t('analytics.userQuestion')}:</span>
+                  <p className="text-sm text-white">{item.user_question}</p>
                 </div>
               )}
 
               {item.message_content && (
-                <div className="mb-2">
-                  <span className="text-sm text-glass-textSecondary">{t('analytics.botResponse')}:</span>
-                  <p className="text-white">{item.message_content}</p>
+                <div className="mb-1.5">
+                  <span className="text-xs text-glass-textSecondary">{t('analytics.botResponse')}:</span>
+                  <p className="text-sm text-white">{item.message_content}</p>
                 </div>
               )}
 
               {item.comment && (
                 <div>
-                  <span className="text-sm text-glass-textSecondary">{t('analytics.comment')}:</span>
-                  <p className="text-white">{item.comment}</p>
+                  <span className="text-xs text-glass-textSecondary">{t('analytics.comment')}:</span>
+                  <p className="text-sm text-white">{item.comment}</p>
                 </div>
               )}
             </div>
