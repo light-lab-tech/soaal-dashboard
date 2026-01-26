@@ -82,7 +82,7 @@ const Telegram: React.FC = () => {
           {t('telegram.title')} - {tenant?.name}
         </h1>
         <p className="text-sm text-glass-textSecondary">
-          Connect a Telegram bot to your tenant
+          {t('telegram.connectBot')}
         </p>
       </div>
 
@@ -94,7 +94,7 @@ const Telegram: React.FC = () => {
           </div>
           <div className="flex-1">
             <h2 className="text-sm font-semibold text-white">
-              {botInfo ? 'Bot Connected' : t('telegram.setToken')}
+              {botInfo ? t('telegram.botConnected') : t('telegram.setToken')}
             </h2>
             {botInfo && (
               <p className="text-xs text-glass-textSecondary">
@@ -121,7 +121,7 @@ const Telegram: React.FC = () => {
               required
             />
             <p className="text-[10px] text-glass-textSecondary mt-1.5">
-              Get your bot token from @BotFather on Telegram
+              {t('telegram.getBotToken')}
             </p>
           </div>
 
@@ -138,7 +138,7 @@ const Telegram: React.FC = () => {
             ) : (
               <>
                 <Send size={14} />
-                {botInfo ? 'Update Token' : t('telegram.setToken')}
+                {botInfo ? t('telegram.updateToken') : t('telegram.setToken')}
               </>
             )}
           </button>
@@ -166,19 +166,19 @@ const Telegram: React.FC = () => {
       {/* Webhook Command */}
       {botInfo && (
         <div className="glass-card p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">Webhook Setup Command</h3>
+          <h3 className="text-sm font-semibold text-white mb-3">{t('telegram.webhookSetup')}</h3>
           <div className="glass-input p-3 rounded-lg font-mono text-xs break-all mb-3">
             curl "https://api.telegram.org/bot{'{BOT_TOKEN}'}/setWebhook?url=https://your-domain.com/webhooks/telegram?token={'{BOT_TOKEN}'}"
           </div>
           <p className="text-[10px] text-glass-textSecondary mb-3">
-            Replace <span className="text-blue-400">{'{BOT_TOKEN}'}</span> with your actual bot token
+            {t('telegram.replaceToken')}
           </p>
           <button
             onClick={copyWebhookCommand}
             className="glass-button-secondary w-full py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5"
           >
             <Copy size={14} />
-            Copy Command
+            {t('telegram.copyCommand')}
           </button>
         </div>
       )}
@@ -186,7 +186,7 @@ const Telegram: React.FC = () => {
       {/* Bot Info */}
       {botInfo && (
         <div className="glass-card p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">Bot Information</h3>
+          <h3 className="text-sm font-semibold text-white mb-3">{t('telegram.botInfo')}</h3>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs text-glass-textSecondary">{t('telegram.botUsername')}:</span>

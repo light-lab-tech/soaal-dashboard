@@ -111,7 +111,7 @@ const Questions: React.FC = () => {
             {t('questions.title')} - {tenant?.name}
           </h1>
           <p className="text-sm text-glass-textSecondary">
-            {questions.filter(q => q.status === 'pending').length} pending questions
+            {questions.filter(q => q.status === 'pending').length} {t('questions.pendingCount')}
           </p>
         </div>
 
@@ -138,13 +138,13 @@ const Questions: React.FC = () => {
         <div className="glass-card p-4 border-red-500/30 bg-red-500/10">
           <div className="flex items-center gap-2 text-red-400">
             <X size={16} />
-            <span className="text-sm font-medium">Error: {error}</span>
+            <span className="text-sm font-medium">{t('questions.error')}: {error}</span>
           </div>
           <button
             onClick={loadData}
             className="mt-3 glass-button-secondary px-3 py-1.5 rounded-lg text-xs"
           >
-            Try Again
+            {t('questions.tryAgain')}
           </button>
         </div>
       )}
@@ -203,23 +203,23 @@ const Questions: React.FC = () => {
             <MessageSquare size={28} className="text-amber-400" />
           </div>
           <h3 className="text-base font-semibold text-white mb-1">
-            {statusFilter === 'pending' ? 'No pending questions' : 
-             statusFilter === 'answered' ? 'No answered questions' : 
-             'No questions yet'}
+            {statusFilter === 'pending' ? t('questions.noPendingQuestions') : 
+             statusFilter === 'answered' ? t('questions.noAnsweredQuestions') : 
+             t('questions.noQuestionsYet')}
           </h3>
           <p className="text-sm text-glass-textSecondary mb-4">
             {statusFilter === 'pending'
-              ? 'All questions have been answered! Great job!'
+              ? t('questions.allAnswered')
               : statusFilter === 'answered'
-              ? 'No questions have been answered yet'
-              : 'Questions from users will appear here when they ask something the bot cannot answer'}
+              ? t('questions.noAnsweredYet')
+              : t('questions.questionsWillAppear')}
           </p>
           {statusFilter !== 'all' && (
             <button
               onClick={() => setStatusFilter('all')}
               className="glass-button-secondary px-4 py-2 rounded-lg text-xs font-medium"
             >
-              View All Questions
+              {t('questions.viewAllQuestions')}
             </button>
           )}
         </div>
@@ -257,7 +257,7 @@ const Questions: React.FC = () => {
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
                   className="glass-input w-full px-3 py-2 rounded-lg min-h-[120px] resize-none text-sm"
-                  placeholder="Enter your answer..."
+                  placeholder={t('questions.enterAnswer')}
                   required
                 />
               </div>
@@ -277,7 +277,7 @@ const Questions: React.FC = () => {
                   {t('questions.markAsFaq')}
                 </button>
                 <p className="text-[10px] text-glass-textSecondary">
-                  Prioritize for similar questions
+                  {t('questions.prioritizeForSimilar')}
                 </p>
               </div>
 

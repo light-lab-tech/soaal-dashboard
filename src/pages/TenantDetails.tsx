@@ -84,7 +84,7 @@ const TenantDetails: React.FC = () => {
       id: 'documents',
       icon: FileText,
       label: t('nav.documents'),
-      description: 'Manage knowledge base documents',
+      description: t('tenants.documentsDesc'),
       path: `/tenants/${tenantId}/documents`,
       color: 'from-cyan-500 to-teal-600',
       iconColor: 'text-cyan-400',
@@ -94,7 +94,7 @@ const TenantDetails: React.FC = () => {
       id: 'questions',
       icon: MessageSquare,
       label: t('nav.questions'),
-      description: 'Answer pending user questions',
+      description: t('tenants.questionsDesc'),
       path: `/tenants/${tenantId}/questions`,
       color: 'from-amber-500 to-orange-600',
       iconColor: 'text-amber-400',
@@ -104,7 +104,7 @@ const TenantDetails: React.FC = () => {
       id: 'analytics',
       icon: BarChart3,
       label: t('nav.analytics'),
-      description: 'View feedback and analytics',
+      description: t('tenants.analyticsDesc'),
       path: `/tenants/${tenantId}/analytics`,
       color: 'from-purple-500 to-pink-600',
       iconColor: 'text-purple-400',
@@ -114,7 +114,7 @@ const TenantDetails: React.FC = () => {
       id: 'telegram',
       icon: Send,
       label: t('nav.telegram'),
-      description: 'Configure Telegram bot',
+      description: t('tenants.telegramDesc'),
       path: `/tenants/${tenantId}/telegram`,
       color: 'from-blue-500 to-indigo-600',
       iconColor: 'text-blue-400',
@@ -137,16 +137,16 @@ const TenantDetails: React.FC = () => {
     return (
       <div className="glass-card p-8 text-center">
         <Building2 size={36} className="mx-auto mb-3 text-glass-textSecondary" />
-        <h3 className="text-base font-semibold text-white mb-1">Tenant not found</h3>
+        <h3 className="text-base font-semibold text-white mb-1">{t('tenants.tenantNotFound')}</h3>
         <p className="text-sm text-glass-textSecondary mb-4">
-          The tenant you're looking for doesn't exist or you don't have access to it.
+          {t('tenants.tenantNotFoundDesc')}
         </p>
         <button
           onClick={() => navigate('/tenants')}
           className="glass-button px-4 py-2 rounded-lg text-sm inline-flex items-center gap-1.5"
         >
           <ArrowLeft size={14} />
-          Back to Tenants
+          {t('tenants.backToTenants')}
         </button>
       </div>
     );
@@ -165,7 +165,7 @@ const TenantDetails: React.FC = () => {
           </button>
           <div>
             <h1 className="text-xl font-semibold text-white">{tenant.name}</h1>
-            <p className="text-sm text-glass-textSecondary">Tenant Management</p>
+            <p className="text-sm text-glass-textSecondary">{t('tenants.tenantManagement')}</p>
           </div>
         </div>
         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -182,21 +182,21 @@ const TenantDetails: React.FC = () => {
         <div className="glass-card p-4">
           <div className="flex items-center gap-2 mb-2">
             <CreditCard size={14} className="text-cyan-400" />
-            <span className="text-xs text-glass-textSecondary">Plan</span>
+            <span className="text-xs text-glass-textSecondary">{t('tenants.plan')}</span>
           </div>
           <p className="text-sm font-semibold text-white capitalize">{tenant.plan}</p>
         </div>
         <div className="glass-card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Activity size={14} className="text-emerald-400" />
-            <span className="text-xs text-glass-textSecondary">Status</span>
+            <span className="text-xs text-glass-textSecondary">{t('tenants.status')}</span>
           </div>
           <p className="text-sm font-semibold text-white capitalize">{tenant.status}</p>
         </div>
         <div className="glass-card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Calendar size={14} className="text-purple-400" />
-            <span className="text-xs text-glass-textSecondary">Created</span>
+            <span className="text-xs text-glass-textSecondary">{t('dashboard.created')}</span>
           </div>
           <p className="text-sm font-semibold text-white">
             {new Date(tenant.created_at).toLocaleDateString()}
@@ -205,15 +205,15 @@ const TenantDetails: React.FC = () => {
         <div className="glass-card p-4">
           <div className="flex items-center gap-2 mb-2">
             <Key size={14} className="text-amber-400" />
-            <span className="text-xs text-glass-textSecondary">API Keys</span>
+            <span className="text-xs text-glass-textSecondary">{t('tenants.apiKeys')}</span>
           </div>
-          <p className="text-sm font-semibold text-white">{apiKeys.length} keys</p>
+          <p className="text-sm font-semibold text-white">{apiKeys.length} {t('tenants.keys')}</p>
         </div>
       </div>
 
       {/* Actions Grid */}
       <div>
-        <h2 className="text-sm font-medium text-glass-textSecondary mb-3">Actions</h2>
+        <h2 className="text-sm font-medium text-glass-textSecondary mb-3">{t('tenants.actions')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {actions.map((action) => {
             const Icon = action.icon;
@@ -241,13 +241,13 @@ const TenantDetails: React.FC = () => {
       {/* API Keys Section */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-medium text-glass-textSecondary">API Keys</h2>
+          <h2 className="text-sm font-medium text-glass-textSecondary">{t('tenants.apiKeys')}</h2>
           <button
             onClick={() => setShowApiKeysModal(true)}
             className="glass-button px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5"
           >
             <Plus size={14} />
-            New Key
+            {t('tenants.newKey')}
           </button>
         </div>
 
@@ -297,7 +297,7 @@ const TenantDetails: React.FC = () => {
         ) : (
           <div className="glass-card p-6 text-center">
             <Key size={28} className="mx-auto mb-2 text-glass-textSecondary" />
-            <p className="text-sm text-glass-textSecondary">No API keys yet</p>
+            <p className="text-sm text-glass-textSecondary">{t('tenants.noApiKeysYet')}</p>
           </div>
         )}
       </div>
@@ -317,18 +317,18 @@ const TenantDetails: React.FC = () => {
             </div>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-glass-text mb-1.5">Type</label>
+                <label className="block text-xs font-medium text-glass-text mb-1.5">{t('tenants.type')}</label>
                 <select
                   value={newApiKey.type}
                   onChange={(e) => setNewApiKey({ ...newApiKey, type: e.target.value as any })}
                   className="glass-input w-full px-3 py-2 rounded-lg text-sm"
                 >
-                  <option value="public" className="bg-slate-900">Public</option>
-                  <option value="secret" className="bg-slate-900">Secret</option>
+                  <option value="public" className="bg-slate-900">{t('tenants.public')}</option>
+                  <option value="secret" className="bg-slate-900">{t('tenants.secret')}</option>
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-glass-text mb-1.5">Rate Limit</label>
+                <label className="block text-xs font-medium text-glass-text mb-1.5">{t('tenants.rateLimit')}</label>
                 <input
                   type="number"
                   value={newApiKey.rate_limit}

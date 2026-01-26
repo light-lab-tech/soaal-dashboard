@@ -121,7 +121,7 @@ const Analytics: React.FC = () => {
             {t('analytics.title')} - {tenant?.name}
           </h1>
           <p className="text-sm text-glass-textSecondary">
-            Monitor user satisfaction and feedback
+            {t('analytics.monitorSatisfaction')}
           </p>
         </div>
 
@@ -195,7 +195,7 @@ const Analytics: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Pie Chart */}
         <div className="glass-card p-4">
-          <h3 className="text-sm font-medium text-white mb-4">Feedback Distribution</h3>
+          <h3 className="text-sm font-medium text-white mb-4">{t('analytics.feedbackDistribution')}</h3>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
               <Pie
@@ -220,7 +220,7 @@ const Analytics: React.FC = () => {
 
         {/* Bar Chart */}
         <div className="glass-card p-4">
-          <h3 className="text-sm font-medium text-white mb-4">Feedback Overview</h3>
+          <h3 className="text-sm font-medium text-white mb-4">{t('analytics.feedbackOverview')}</h3>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={barData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
@@ -246,7 +246,7 @@ const Analytics: React.FC = () => {
           onClick={() => setShowDetailed(!showDetailed)}
           className="glass-button px-4 py-2 rounded-lg text-sm font-medium"
         >
-          {showDetailed ? 'Hide' : 'Show'} {t('analytics.detailedFeedback')}
+          {showDetailed ? t('analytics.hide') : t('analytics.show')} {t('analytics.detailedFeedback')}
         </button>
       </div>
 

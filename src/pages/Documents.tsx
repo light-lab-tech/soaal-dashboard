@@ -151,7 +151,7 @@ const Documents: React.FC = () => {
             {t('documents.title')} - {tenant?.name}
           </h1>
           <p className="text-sm text-glass-textSecondary">
-            {documents.length} {documents.length === 1 ? 'document' : 'documents'}
+            {documents.length} {documents.length === 1 ? t('documents.document') : t('documents.documents')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -183,7 +183,7 @@ const Documents: React.FC = () => {
         <input {...getInputProps()} />
         <Upload size={32} className="mx-auto mb-3 text-cyan-400" />
         <p className="text-sm font-medium text-white mb-1">
-          {isDragActive ? 'Drop files here' : t('documents.dragDrop')}
+          {isDragActive ? t('documents.dropFilesHere') : t('documents.dragDrop')}
         </p>
         <p className="text-xs text-glass-textSecondary">{t('documents.supportedFormats')}</p>
       </div>
@@ -236,9 +236,9 @@ const Documents: React.FC = () => {
       {documents.length === 0 && (
         <div className="glass-card p-8 text-center">
           <FileText size={36} className="mx-auto mb-3 text-glass-textSecondary" />
-          <h3 className="text-base font-semibold text-white mb-1">No documents yet</h3>
+          <h3 className="text-base font-semibold text-white mb-1">{t('documents.noDocumentsYet')}</h3>
           <p className="text-sm text-glass-textSecondary">
-            Upload or ingest documents to build your knowledge base
+            {t('documents.noDocumentsDesc')}
           </p>
         </div>
       )}
@@ -259,7 +259,7 @@ const Documents: React.FC = () => {
             <form onSubmit={handleIngestUrl} className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-glass-text mb-1.5">
-                  URL
+                  {t('documents.url')}
                 </label>
                 <input
                   type="url"

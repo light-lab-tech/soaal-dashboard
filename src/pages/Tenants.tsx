@@ -110,7 +110,7 @@ const Tenants: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold text-white mb-0.5">{t('tenants.title')}</h1>
-          <p className="text-sm text-glass-textSecondary">Manage your tenants and API keys</p>
+          <p className="text-sm text-glass-textSecondary">{t('tenants.description')}</p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
@@ -149,7 +149,7 @@ const Tenants: React.FC = () => {
             </div>
 
             <p className="text-xs text-glass-textSecondary mb-3">
-              Created {new Date(tenant.created_at).toLocaleDateString()}
+              {t('dashboard.created')} {new Date(tenant.created_at).toLocaleDateString()}
             </p>
 
             {/* Footer */}
@@ -165,7 +165,7 @@ const Tenants: React.FC = () => {
                 API Keys
               </button>
               <div className="flex items-center gap-1 text-xs text-glass-textSecondary group-hover:text-white transition-all">
-                <span>View Details</span>
+                <span>{t('tenants.viewDetails')}</span>
                 <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all" />
               </div>
             </div>
@@ -177,9 +177,9 @@ const Tenants: React.FC = () => {
       {tenants.length === 0 && (
         <div className="glass-card p-8 text-center">
           <Building2 size={40} className="mx-auto mb-3 text-glass-textSecondary" />
-          <h3 className="text-base font-semibold text-white mb-1">No tenants yet</h3>
+          <h3 className="text-base font-semibold text-white mb-1">{t('tenants.noTenantsYet')}</h3>
           <p className="text-sm text-glass-textSecondary mb-4">
-            Create your first tenant to get started
+            {t('tenants.createFirstTenant')}
           </p>
           <button
             onClick={() => setShowCreateModal(true)}

@@ -157,7 +157,7 @@ const Dashboard: React.FC = () => {
             </span>
           </h1>
           <p className="text-sm text-glass-textSecondary">
-            Here's an overview of your RAG service performance
+            {t('dashboard.overview')}
           </p>
         </div>
       </div>
@@ -275,18 +275,18 @@ const Dashboard: React.FC = () => {
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5">
                     <Users size={12} className="text-glass-textSecondary" />
-                    <span className="text-xs text-glass-textSecondary capitalize">{tenant.plan} Plan</span>
+                    <span className="text-xs text-glass-textSecondary capitalize">{tenant.plan} {t('tenants.plan')}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <FileText size={12} className="text-glass-textSecondary" />
                     <span className="text-xs text-glass-textSecondary">
-                      Created {new Date(tenant.created_at).toLocaleDateString()}
+                      {t('dashboard.created')} {new Date(tenant.created_at).toLocaleDateString()}
                     </span>
                   </div>
                 </div>
                 <div className="pt-3 mt-3 border-t border-white/10">
                   <button className="w-full glass-button-secondary py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 group">
-                    <span>View Details</span>
+                    <span>{t('dashboard.viewDetails')}</span>
                     <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all" />
                   </button>
                 </div>
@@ -302,9 +302,9 @@ const Dashboard: React.FC = () => {
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-400/20 via-teal-500/20 to-cyan-400/20 flex items-center justify-center">
             <Building2 size={28} className="text-cyan-400" />
           </div>
-          <h3 className="text-lg font-semibold text-white mb-1">No tenants yet</h3>
+          <h3 className="text-lg font-semibold text-white mb-1">{t('dashboard.noTenantsYet')}</h3>
           <p className="text-sm text-glass-textSecondary mb-4">
-            Get started by creating your first tenant
+            {t('dashboard.getStartedTenant')}
           </p>
           <button
             onClick={() => navigate('/tenants')}
