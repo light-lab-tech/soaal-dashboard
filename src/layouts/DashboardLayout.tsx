@@ -76,7 +76,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
     <div className="min-h-screen flex">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 z-50 w-56 glass-strong transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 z-50 w-64 bg-slate-800/95 backdrop-blur-xl border-r border-slate-700/50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isRTL ? 'right-0' : 'left-0'
         } ${
           isSidebarOpen 
@@ -88,20 +88,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="px-4 py-4 border-b border-white/10">
-            <Link to="/dashboard" className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 via-teal-500 to-cyan-600 flex items-center justify-center shadow-md">
-                <Home size={16} className="text-white" />
+          <div className="px-5 py-5 border-b border-slate-700/50">
+            <Link to="/dashboard" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-lg group-hover:shadow-cyan-500/30 transition-all">
+                <Home size={18} className="text-white" />
               </div>
               <div>
-                <h1 className="text-base font-bold text-white">SoaAL</h1>
-                <p className="text-[10px] text-glass-textSecondary">RAG Dashboard</p>
+                <h1 className="text-lg font-bold text-white">SoaAL</h1>
+                <p className="text-xs text-slate-400">RAG Dashboard</p>
               </div>
             </Link>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-glass">
+          <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto scrollbar-modern">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path || location.pathname.startsWith(item.path);
@@ -112,10 +112,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
                     navigate(item.path);
                     setIsSidebarOpen(false);
                   }}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all duration-200 group ${
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group ${
                     isActive
-                      ? 'bg-gradient-to-r from-cyan-500/20 to-teal-500/20 text-cyan-300 border border-cyan-400/30'
-                      : 'text-glass-text hover:bg-white/5 hover:text-white'
+                      ? 'bg-gradient-to-r from-cyan-600/20 to-teal-600/20 text-cyan-300 border border-cyan-500/30 shadow-lg shadow-cyan-500/10'
+                      : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
                   }`}
                 >
                   <Icon size={18} className="flex-shrink-0" />
@@ -127,19 +127,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
           </nav>
 
           {/* User Section */}
-          <div className="p-3 border-t border-white/10 space-y-1.5">
-            <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg bg-white/5">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
-                <User size={14} className="text-white" />
+          <div className="p-4 border-t border-slate-700/50 space-y-2">
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-700/30 border border-slate-700/50">
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-md">
+                <User size={16} className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-white truncate">{user?.name}</p>
-                <p className="text-[10px] text-glass-textSecondary truncate">{user?.email}</p>
+                <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
+                <p className="text-xs text-slate-400 truncate">{user?.email}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-pink-400 hover:bg-pink-500/10 hover:text-pink-300 transition-all duration-200 text-sm font-medium"
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 border border-transparent hover:border-red-500/20 transition-all duration-200 text-sm font-medium"
             >
               <LogOut size={16} />
               <span>{t('nav.logout')}</span>
@@ -149,33 +149,33 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
       </aside>
 
       {/* Main Content */}
-      <div className={`flex-1 min-h-screen ${isRTL ? 'lg:mr-56' : 'lg:ml-56'}`}>
+      <div className={`flex-1 min-h-screen ${isRTL ? 'lg:mr-64' : 'lg:ml-64'}`}>
         {/* Header */}
-        <header className="glass-strong sticky top-0 z-40 px-4 lg:px-6 py-3">
+        <header className="sticky top-0 z-40 bg-slate-800/80 backdrop-blur-xl border-b border-slate-700/50 px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="lg:hidden p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                className="lg:hidden p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-colors"
               >
                 {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
-              <h2 className="text-lg font-semibold text-white truncate">
+              <h2 className="text-xl font-bold text-white truncate">
                 {navItems.find((item) => location.pathname === item.path || location.pathname.startsWith(item.path))?.label || t('nav.dashboard')}
               </h2>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {/* Language Selector */}
-              <div className="glass px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                <Globe size={14} className="text-glass-textSecondary" />
+              <div className="bg-slate-700/50 border border-slate-600/50 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-700/70 transition-colors">
+                <Globe size={16} className="text-slate-400" />
                 <select
                   value={i18n.language}
                   onChange={(e) => handleLanguageChange(e.target.value)}
-                  className="bg-transparent text-white text-xs font-medium outline-none cursor-pointer"
+                  className="bg-transparent text-white text-sm font-medium outline-none cursor-pointer"
                 >
-                  <option value="en" className="bg-slate-900 text-white">English</option>
-                  <option value="ar" className="bg-slate-900 text-white">العربية</option>
+                  <option value="en" className="bg-slate-800 text-white">English</option>
+                  <option value="ar" className="bg-slate-800 text-white">العربية</option>
                 </select>
               </div>
             </div>
@@ -191,7 +191,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
       {/* Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
