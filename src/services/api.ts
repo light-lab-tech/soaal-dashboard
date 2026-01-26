@@ -46,13 +46,25 @@ class ApiClient {
 
     // Handle errors
     this.client.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        // Check if the response has success: false
+        if (response.data && typeof response.data === 'object' && 'success' in response.data && !response.data.success) {
+          const apiError: ApiError = response.data as ApiError;
+          return Promise.reject(new Error(apiError.error || 'An error occurred'));
+        }
+        return response;
+      },
       (error: AxiosError<ApiError>) => {
         if (error.response?.status === 401) {
           // Clear token and redirect to login
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           window.location.href = '/login';
+        }
+        // Extract error message from API response if available
+        if (error.response?.data && typeof error.response.data === 'object' && 'error' in error.response.data) {
+          const apiError = error.response.data as ApiError;
+          return Promise.reject(new Error(apiError.error));
         }
         return Promise.reject(error);
       }
@@ -103,6 +115,16 @@ class ApiClient {
 
   async createApiKey(tenantId: string, data: CreateApiKeyData): Promise<ApiResponse<{ api_key: ApiKey }>> {
     const response = await this.client.post<ApiResponse<{ api_key: ApiKey }>>(`/tenants/${tenantId}/api-keys`, data);
+    return response.data;
+  }
+
+  async listApiKeys(tenantId: string): Promise<ApiResponse<{ api_keys: ApiKey[]; total: number }>> {
+    const response = await this.client.get<ApiResponse<{ api_keys: ApiKey[]; total: number }>>(`/tenants/${tenantId}/api-keys`);
+    return response.data;
+  }
+
+  async getApiKey(tenantId: string, keyId: string): Promise<ApiResponse<{ api_key: ApiKey }>> {
+    const response = await this.client.get<ApiResponse<{ api_key: ApiKey }>>(`/tenants/${tenantId}/api-keys/${keyId}`);
     return response.data;
   }
 

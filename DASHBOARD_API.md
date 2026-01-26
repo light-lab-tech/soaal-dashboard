@@ -8,6 +8,12 @@ This documentation covers all APIs used by company owners (tenants) to manage th
 
 1. [Authentication](#authentication)
 2. [Tenant Management](#tenant-management)
+   - [Create Tenant](#create-tenant)
+   - [List My Tenants](#list-my-tenants)
+   - [Get Tenant Details](#get-tenant-details)
+   - [Create Additional API Key](#create-additional-api-key)
+   - [List API Keys](#list-api-keys)
+   - [Get API Key](#get-api-key)
 3. [Document Management](#document-management)
 4. [Pending Questions](#pending-questions)
 5. [Feedback Analytics](#feedback-analytics)
@@ -232,6 +238,7 @@ POST /tenants
     },
     "api_keys": {
       "public_key": {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
         "key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         "prefix": "pk_xxxxxxxx",
         "type": "public",
@@ -239,19 +246,21 @@ POST /tenants
         "use": "Client-side SDK (web/mobile). Safe to expose. Chat-only access."
       },
       "secret_key": {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
         "key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         "prefix": "sk_xxxxxxxx",
         "type": "secret",
         "rate_limit": -1,
         "use": "Server-side (document upload, admin). Never expose!"
       }
-    }
+    },
+    "message": "Tenant created successfully. Save your API keys now! Use GET /tenants/{tenant_id}/api-keys/{key_id} to retrieve them later."
   },
   "message": "Tenant created successfully"
 }
 ```
 
-> **Important:** Save both API keys securely. The full keys are only shown once!
+> **Important:** Save both API keys securely when they are shown. You can retrieve them later using `GET /tenants/{tenant_id}/api-keys/{key_id}` with the key ID.
 
 ---
 
@@ -326,6 +335,8 @@ GET /tenants/{tenant_id}
 }
 ```
 
+> **Note:** This endpoint returns API key metadata (IDs, prefixes, types) only. Use `GET /tenants/{tenant_id}/api-keys/{key_id}` to retrieve the actual keys.
+
 ---
 
 ### Create Additional API Key
@@ -355,14 +366,119 @@ POST /tenants/{tenant_id}/api-keys
   "success": true,
   "data": {
     "api_key": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
       "key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
       "prefix": "pk_xxxxxxxx",
       "type": "public",
       "rate_limit": 500
-    }
+    },
+    "message": "API key created successfully. Save this key now - it will not be shown again. Use GET /tenants/{tenant_id}/api-keys/{key_id} to retrieve it later."
   },
   "message": "API key created successfully"
 }
+```
+
+> **Note:** The key is only shown once in this response. Save it immediately or use `GET /tenants/{tenant_id}/api-keys/{key_id}` to retrieve it later.
+
+---
+
+### List API Keys
+
+Get all API keys for a tenant (metadata only - prefixes, types, rate limits).
+
+```
+GET /tenants/{tenant_id}/api-keys
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "api_keys": [
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "prefix": "pk_xxxxxxxx",
+        "type": "public",
+        "rate_limit": 1000,
+        "created_at": "2026-01-24T10:00:00Z",
+        "last_used_at": "2026-01-24T15:30:00Z"
+      },
+      {
+        "id": "550e8400-e29b-41d4-a716-446655440001",
+        "prefix": "sk_xxxxxxxx",
+        "type": "secret",
+        "rate_limit": -1,
+        "created_at": "2026-01-24T10:00:00Z"
+      }
+    ],
+    "total": 2
+  }
+}
+```
+
+> **Note:** This endpoint returns metadata only (prefixes, types, IDs). Use `GET /tenants/{tenant_id}/api-keys/{key_id}` to retrieve the actual key.
+
+---
+
+### Get API Key
+
+Retrieve the actual API key by its ID. The key is decrypted and returned.
+
+```
+GET /tenants/{tenant_id}/api-keys/{key_id}
+```
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| tenant_id | uuid | The tenant's ID |
+| key_id | uuid | The API key's ID (from list or create response) |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "api_key": {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "key": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "prefix": "pk_xxxxxxxx",
+      "type": "public",
+      "rate_limit": 1000,
+      "created_at": "2026-01-24T10:00:00Z"
+    }
+  }
+}
+```
+
+**Error Response (Key Not Found):**
+```json
+{
+  "success": false,
+  "error": "API key not found"
+}
+```
+
+**Error Response (Key Cannot Be Retrieved):**
+```json
+{
+  "success": false,
+  "error": "API key cannot be retrieved (created before encryption was enabled)"
+}
+```
+
+> **Note:** Keys created before encryption was enabled cannot be retrieved. Only keys created after the encryption feature was added can be retrieved using this endpoint.
+
+**Example:**
+```bash
+# 1. List all keys to get the key ID
+curl http://localhost:8080/api/v1/tenants/{tenant_id}/api-keys \
+  -H "Authorization: Bearer $JWT_TOKEN"
+
+# 2. Retrieve the actual key using the ID
+curl http://localhost:8080/api/v1/tenants/{tenant_id}/api-keys/{key_id} \
+  -H "Authorization: Bearer $JWT_TOKEN"
 ```
 
 ---
@@ -1149,22 +1265,33 @@ TOKEN=$(curl -s -X POST http://localhost:8080/api/v1/login \
   -d '{"email": "me@company.com", "password": "secret123"}' | jq -r '.data.token')
 
 # 3. Create Tenant
-curl -X POST http://localhost:8080/api/v1/tenants \
+TENANT_RESPONSE=$(curl -s -X POST http://localhost:8080/api/v1/tenants \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"name": "My Support Bot", "plan": "pro"}'
+  -d '{"name": "My Support Bot", "plan": "pro"}')
 
-# 4. Upload Document (replace TENANT_ID)
-curl -X POST http://localhost:8080/api/v1/tenants/TENANT_ID/documents \
+TENANT_ID=$(echo $TENANT_RESPONSE | jq -r '.data.tenant.id')
+PUBLIC_KEY_ID=$(echo $TENANT_RESPONSE | jq -r '.data.api_keys.public_key.id')
+SECRET_KEY_ID=$(echo $TENANT_RESPONSE | jq -r '.data.api_keys.secret_key.id')
+
+# 4. Retrieve API Keys (if you didn't save them)
+PUBLIC_KEY=$(curl -s http://localhost:8080/api/v1/tenants/$TENANT_ID/api-keys/$PUBLIC_KEY_ID \
+  -H "Authorization: Bearer $TOKEN" | jq -r '.data.api_key.key')
+
+SECRET_KEY=$(curl -s http://localhost:8080/api/v1/tenants/$TENANT_ID/api-keys/$SECRET_KEY_ID \
+  -H "Authorization: Bearer $TOKEN" | jq -r '.data.api_key.key')
+
+# 5. Upload Document
+curl -X POST http://localhost:8080/api/v1/tenants/$TENANT_ID/documents \
   -H "Authorization: Bearer $TOKEN" \
   -F "file=@knowledge-base.md"
 
-# 5. Check Pending Questions
-curl http://localhost:8080/api/v1/tenants/TENANT_ID/pending-questions \
+# 6. Check Pending Questions
+curl http://localhost:8080/api/v1/tenants/$TENANT_ID/pending-questions \
   -H "Authorization: Bearer $TOKEN"
 
-# 6. View Feedback Stats
-curl http://localhost:8080/api/v1/tenants/TENANT_ID/feedback/stats \
+# 7. View Feedback Stats
+curl http://localhost:8080/api/v1/tenants/$TENANT_ID/feedback/stats \
   -H "Authorization: Bearer $TOKEN"
 ```
 

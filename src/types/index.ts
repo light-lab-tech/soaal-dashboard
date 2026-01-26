@@ -50,6 +50,7 @@ export interface ApiKey {
   use?: string;
   id?: string;
   created_at?: string;
+  last_used_at?: string;
 }
 
 export interface CreateTenantData {

@@ -47,9 +47,12 @@ const TenantDetails: React.FC = () => {
     if (!tenantId) return;
     try {
       setIsLoading(true);
-      const response = await api.getTenant(tenantId);
-      setTenant(response.data.tenant);
-      setApiKeys(response.data.api_keys || []);
+      const [tenantResponse, apiKeysResponse] = await Promise.all([
+        api.getTenant(tenantId),
+        api.listApiKeys(tenantId),
+      ]);
+      setTenant(tenantResponse.data.tenant);
+      setApiKeys(apiKeysResponse.data.api_keys || []);
     } catch (error) {
       console.error('Error loading tenant:', error);
       navigate('/tenants');
@@ -62,8 +65,13 @@ const TenantDetails: React.FC = () => {
     if (!tenantId) return;
     try {
       const response = await api.createApiKey(tenantId, newApiKey);
-      if (response.data.api_key.key) {
+      if (response.data.api_key) {
+        // Add the new key to the list (it will have the actual key in the response)
         setApiKeys([...apiKeys, response.data.api_key]);
+        // If the key is provided, show it immediately
+        if (response.data.api_key.key && response.data.api_key.id) {
+          setVisibleKeys((prev) => ({ ...prev, [response.data.api_key.id!]: true }));
+        }
       }
       setNewApiKey({ type: 'secret', rate_limit: 100 });
     } catch (error) {
@@ -75,8 +83,36 @@ const TenantDetails: React.FC = () => {
     navigator.clipboard.writeText(key);
   };
 
-  const toggleKeyVisibility = (keyId: string) => {
-    setVisibleKeys((prev) => ({ ...prev, [keyId]: !prev[keyId] }));
+  const toggleKeyVisibility = async (keyId: string) => {
+    if (!keyId) return;
+    
+    // If already visible, just toggle
+    if (visibleKeys[keyId]) {
+      setVisibleKeys((prev) => ({ ...prev, [keyId]: !prev[keyId] }));
+      return;
+    }
+
+    // If not visible, try to fetch the actual key
+    if (!tenantId) return;
+    try {
+      const response = await api.getApiKey(tenantId, keyId);
+      if (response.data.api_key.key) {
+        // Update the API key in the list with the actual key
+        setApiKeys((prev) =>
+          prev.map((key) =>
+            (key.id || key.prefix) === keyId
+              ? { ...key, key: response.data.api_key.key }
+              : key
+          )
+        );
+        setVisibleKeys((prev) => ({ ...prev, [keyId]: true }));
+      }
+    } catch (error: any) {
+      console.error('Error retrieving API key:', error);
+      // Show error message to user
+      const errorMessage = error.response?.data?.error || 'Failed to retrieve API key';
+      alert(errorMessage);
+    }
   };
 
   const actions = [
