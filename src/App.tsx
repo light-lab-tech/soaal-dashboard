@@ -23,6 +23,10 @@ import Billing from './pages/Billing';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminTenants from './pages/admin/AdminTenants';
+import AdminTenantDetails from './pages/admin/AdminTenantDetails';
+import AdminTenantChats from './pages/admin/AdminTenantChats';
+import AdminTenantAnalytics from './pages/admin/AdminTenantAnalytics';
+import AdminChats from './pages/admin/AdminChats';
 import AdminPlans from './pages/admin/AdminPlans';
 
 function App() {
@@ -75,6 +79,10 @@ function App() {
                 <Route path="/admin/users" element={<AdminUsers />} />
                 <Route element={<AdminSuperAdminRoute />}>
                   <Route path="/admin/tenants" element={<AdminTenants />} />
+                  <Route path="/admin/tenants/:tenantId" element={<AdminTenantDetails />} />
+                  <Route path="/admin/tenants/:tenantId/chats" element={<AdminTenantChats />} />
+                  <Route path="/admin/tenants/:tenantId/analytics" element={<AdminTenantAnalytics />} />
+                  <Route path="/admin/chats" element={<AdminChats />} />
                   <Route path="/admin/plans" element={<AdminPlans />} />
                 </Route>
               </Route>

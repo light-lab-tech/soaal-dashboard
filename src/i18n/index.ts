@@ -152,6 +152,7 @@ const resources = {
       // Analytics
       analytics: {
         title: 'Feedback Analytics',
+        feedback: 'Feedback',
         totalFeedback: 'Total Feedback',
         positive: 'Positive',
         negative: 'Negative',
@@ -456,6 +457,7 @@ const resources = {
       // Analytics
       analytics: {
         title: 'تحليلات الملاحظات',
+        feedback: 'الملاحظات',
         totalFeedback: 'إجمالي الملاحظات',
         positive: 'إيجابي',
         negative: 'سلبي',

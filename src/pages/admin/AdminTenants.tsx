@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import type { Tenant } from '../../types';
-import { Trash2, Loader2 } from 'lucide-react';
+import { Trash2, Loader2, Eye } from 'lucide-react';
 
 const AdminTenants: React.FC = () => {
   const { t } = useTranslation();
@@ -109,7 +109,14 @@ const AdminTenants: React.FC = () => {
               <tbody>
                 {tenants.map((tenant) => (
                   <tr key={tenant.id} className="border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors">
-                    <td className="p-4"><span className="text-white font-medium">{tenant.name}</span></td>
+                    <td className="p-4">
+                      <button
+                        onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
+                        className="text-white font-medium hover:text-cyan-400 transition-colors"
+                      >
+                        {tenant.name}
+                      </button>
+                    </td>
                     <td className="p-4"><span className="text-slate-300 capitalize">{tenant.plan}</span></td>
                     <td className="p-4">
                       <select
@@ -124,9 +131,18 @@ const AdminTenants: React.FC = () => {
                     </td>
                     <td className="p-4"><span className="text-slate-400 text-sm">{tenant.created_at ? new Date(tenant.created_at).toLocaleDateString() : '—'}</span></td>
                     <td className="p-4 text-right">
-                      <button onClick={() => handleDeleteTenant(tenant.id)} className="p-2 rounded-lg btn-ghost text-red-400" title={t('admin.deleteTenant')}>
-                        <Trash2 size={18} />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
+                          className="p-2 rounded-lg btn-secondary text-cyan-400"
+                          title={t('common.view')}
+                        >
+                          <Eye size={18} />
+                        </button>
+                        <button onClick={() => handleDeleteTenant(tenant.id)} className="p-2 rounded-lg btn-ghost text-red-400" title={t('admin.deleteTenant')}>
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
