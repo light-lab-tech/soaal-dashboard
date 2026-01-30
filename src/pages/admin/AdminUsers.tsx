@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../services/api';
 import type { AdminUser, UpdateUserRoleData } from '../../types';
-import { Trash2, Lock, Loader2 } from 'lucide-react';
+import { Trash2, Lock, Loader2, ChevronRight } from 'lucide-react';
 
 const AdminUsers: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -95,10 +97,16 @@ const AdminUsers: React.FC = () => {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id} className="border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors">
-                  <td className="p-4"><span className="text-white font-medium">{user.name}</span></td>
-                  <td className="p-4"><span className="text-slate-300">{user.email}</span></td>
+                <tr
+                  key={user.id}
+                  onClick={() => navigate(`/admin/users/${user.id}`, { state: { user } })}
+                  className="border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors cursor-pointer group"
+                >
                   <td className="p-4">
+                    <span className="text-white font-medium group-hover:text-cyan-400 transition-colors">{user.name}</span>
+                  </td>
+                  <td className="p-4"><span className="text-slate-300">{user.email}</span></td>
+                  <td className="p-4" onClick={(e) => e.stopPropagation()}>
                     <select
                       value={user.role}
                       onChange={(e) => handleUpdateUserRole(user.id, e.target.value)}
@@ -112,7 +120,7 @@ const AdminUsers: React.FC = () => {
                     </select>
                   </td>
                   <td className="p-4"><span className="text-slate-400 text-sm">{new Date(user.created_at).toLocaleDateString()}</span></td>
-                  <td className="p-4 text-end">
+                  <td className="p-4 text-end" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-2">
                       {user.role !== 'disabled' && (
                         <button onClick={() => handleDisableUser(user.id)} className="p-2 rounded-lg btn-secondary text-amber-400" title={t('admin.disableUser')}>
@@ -122,6 +130,7 @@ const AdminUsers: React.FC = () => {
                       <button onClick={() => handleDeleteUser(user.id)} className="p-2 rounded-lg btn-ghost text-red-400" title={t('admin.deleteUser')}>
                         <Trash2 size={18} />
                       </button>
+                      <ChevronRight size={18} className="text-slate-500 group-hover:text-cyan-400 ml-1" aria-hidden />
                     </div>
                   </td>
                 </tr>

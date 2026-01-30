@@ -22,6 +22,7 @@ import AllChats from './pages/AllChats';
 import Billing from './pages/Billing';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminUserDetails from './pages/admin/AdminUserDetails';
 import AdminTenants from './pages/admin/AdminTenants';
 import AdminTenantDetails from './pages/admin/AdminTenantDetails';
 import AdminTenantChats from './pages/admin/AdminTenantChats';
@@ -77,6 +78,7 @@ function App() {
               <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<AdminAnalytics />} />
                 <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/users/:userId" element={<AdminUserDetails />} />
                 <Route element={<AdminSuperAdminRoute />}>
                   <Route path="/admin/tenants" element={<AdminTenants />} />
                   <Route path="/admin/tenants/:tenantId" element={<AdminTenantDetails />} />

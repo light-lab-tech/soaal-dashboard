@@ -276,6 +276,9 @@ const resources = {
         maxDocuments: 'Max Documents',
         featuresSummary: 'Features Summary',
         managePlans: 'Manage users and tenants across the platform',
+        subscription: 'Subscription',
+        userTenants: "User's Tenants",
+        noSubscription: 'No active subscription',
       },
       // Common
       common: {
@@ -581,6 +584,9 @@ const resources = {
         maxDocuments: 'الحد الأقصى للمستندات',
         featuresSummary: 'ملخص الميزات',
         managePlans: 'إدارة المستخدمين والمستأجرين عبر المنصة',
+        subscription: 'الاشتراك',
+        userTenants: 'مستأجرو المستخدم',
+        noSubscription: 'لا يوجد اشتراك نشط',
       },
       // Common
       common: {
