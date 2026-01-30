@@ -227,7 +227,7 @@ const Tenants: React.FC = () => {
               </button>
               <div className="flex items-center gap-1 text-xs text-glass-textSecondary group-hover:text-white transition-all">
                 <span>{t('tenants.viewDetails')}</span>
-                <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all" />
+                <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all rtl-flip" />
               </div>
             </div>
           </div>

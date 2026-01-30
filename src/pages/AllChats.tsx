@@ -137,7 +137,7 @@ const AllChats: React.FC = () => {
                   </span>
                   <ChevronRight
                     size={20}
-                    className={`text-slate-400 transition-transform ${expandedTenants[tenant.id] ? 'rotate-90' : ''}`}
+                    className={`text-slate-400 transition-transform rtl-flip ${expandedTenants[tenant.id] ? 'rotate-90' : ''}`}
                   />
                 </div>
               </button>
@@ -166,7 +166,7 @@ const AllChats: React.FC = () => {
                               </p>
                             </div>
                           </div>
-                          <ChevronRight size={16} className="text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
+                          <ChevronRight size={16} className="text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all rtl-flip" />
                         </button>
                       ))}
                       {totalChats > 5 && (

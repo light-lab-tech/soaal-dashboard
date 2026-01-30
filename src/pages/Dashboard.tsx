@@ -177,7 +177,7 @@ const Dashboard: React.FC = () => {
                   <div className={`p-2 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center ${action.shadow}`}>
                     <Icon size={18} className="text-white" />
                   </div>
-                  <ArrowRight size={16} className="text-glass-textSecondary group-hover:text-white group-hover:translate-x-1 transition-all" />
+                  <ArrowRight size={16} className="text-glass-textSecondary group-hover:text-white group-hover:translate-x-1 transition-all rtl-flip" />
                 </div>
                 <h3 className="text-sm font-medium text-white group-hover:text-glow transition-all">
                   {action.label}
@@ -206,7 +206,7 @@ const Dashboard: React.FC = () => {
               className="glass-button-secondary px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-1.5 group"
             >
               <span>{t('dashboard.viewAll')}</span>
-              <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all" />
+              <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all rtl-flip" />
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -246,7 +246,7 @@ const Dashboard: React.FC = () => {
                 <div className="pt-3 mt-3 border-t border-white/10">
                   <button className="w-full glass-button-secondary py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 group">
                     <span>{t('dashboard.viewDetails')}</span>
-                    <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all" />
+                    <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all rtl-flip" />
                   </button>
                 </div>
               </div>

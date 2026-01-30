@@ -192,7 +192,7 @@ const TenantDetails: React.FC = () => {
           onClick={() => navigate('/tenants')}
           className="glass-button px-4 py-2 rounded-lg text-sm inline-flex items-center gap-1.5"
         >
-          <ArrowLeft size={14} />
+          <ArrowLeft size={14} className="rtl-flip" />
           {t('tenants.backToTenants')}
         </button>
       </div>
@@ -208,7 +208,7 @@ const TenantDetails: React.FC = () => {
             onClick={() => navigate('/tenants')}
             className="p-2 rounded-lg glass-button-secondary"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={18} className="rtl-flip" />
           </button>
           <div>
             <h1 className="text-xl font-semibold text-white">{tenant.name}</h1>

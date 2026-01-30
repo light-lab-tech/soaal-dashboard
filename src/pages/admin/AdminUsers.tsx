@@ -130,7 +130,7 @@ const AdminUsers: React.FC = () => {
                       <button onClick={() => handleDeleteUser(user.id)} className="p-2 rounded-lg btn-ghost text-red-400" title={t('admin.deleteUser')}>
                         <Trash2 size={18} />
                       </button>
-                      <ChevronRight size={18} className="text-slate-500 group-hover:text-cyan-400 ml-1" aria-hidden />
+                      <ChevronRight size={18} className="text-slate-500 group-hover:text-cyan-400 ml-1 rtl-flip" aria-hidden />
                     </div>
                   </td>
                 </tr>

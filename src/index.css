@@ -416,8 +416,9 @@
   animation: pulse-glow 3s ease-in-out infinite;
 }
 
-/* RTL Flips */
-[dir="rtl"] .rotate-rtl {
+/* RTL Flips - directional icons (arrows, chevrons, external link) */
+[dir="rtl"] .rotate-rtl,
+[dir="rtl"] .rtl-flip {
   transform: scaleX(-1);
 }
 

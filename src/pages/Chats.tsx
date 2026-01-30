@@ -93,7 +93,7 @@ const Chats: React.FC = () => {
             onClick={handleBackToChats}
             className="p-2.5 rounded-xl bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-all duration-200 hover:scale-105"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} className="rtl-flip" />
           </button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-white">
@@ -174,7 +174,7 @@ const Chats: React.FC = () => {
             onClick={() => navigate(`/tenants/${tenantId}`)}
             className="p-2.5 rounded-xl bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-all duration-200 hover:scale-105"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} className="rtl-flip" />
           </button>
           <div>
             <h1 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -234,7 +234,7 @@ const Chats: React.FC = () => {
                 </div>
                 <ChevronRight
                   size={22}
-                  className="text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-2 transition-all duration-300"
+                  className="text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-2 transition-all duration-300 rtl-flip"
                 />
               </div>
             </div>

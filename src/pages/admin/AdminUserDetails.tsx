@@ -98,7 +98,7 @@ const AdminUserDetails: React.FC = () => {
           className="p-2 rounded-lg btn-secondary text-slate-300 hover:text-white transition-colors"
           aria-label={t('common.back')}
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={20} className="rtl-flip" />
         </button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
@@ -185,7 +185,7 @@ const AdminUserDetails: React.FC = () => {
                     className="p-1.5 rounded-lg btn-ghost text-cyan-400 hover:bg-cyan-500/10"
                     title={t('tenants.viewDetails')}
                   >
-                    <ExternalLink size={16} />
+                    <ExternalLink size={16} className="rtl-flip" />
                   </button>
                 </li>
               ))}

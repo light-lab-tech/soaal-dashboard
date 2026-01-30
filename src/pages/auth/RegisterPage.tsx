@@ -210,7 +210,7 @@ const RegisterPage: React.FC = () => {
                 <>
                   <UserPlus size={20} />
                   <span>{t('auth.register')}</span>
-                  <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
+                  <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300 rtl-flip" />
                 </>
               )}
             </button>
@@ -225,7 +225,7 @@ const RegisterPage: React.FC = () => {
                 className="glass-button-secondary inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold group"
               >
                 <span>{t('auth.login')}</span>
-                <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
+                <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300 rtl-flip" />
               </Link>
             </div>
           </form>

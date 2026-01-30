@@ -135,7 +135,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
                 >
                   <Icon size={18} className="flex-shrink-0" />
                   <span className="font-medium text-sm">{item.label}</span>
-                  {reallyActive && <ChevronRight size={14} className={`opacity-70 ${isRTL ? 'mr-auto rotate-180' : 'ml-auto'}`} />}
+                  {reallyActive && <ChevronRight size={14} className={`opacity-70 rtl-flip ${isRTL ? 'mr-auto' : 'ml-auto'}`} />}
                 </button>
               );
             })}

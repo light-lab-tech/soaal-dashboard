@@ -198,7 +198,7 @@ const Telegram: React.FC = () => {
                   rel="noopener noreferrer"
                   className="text-blue-400 hover:text-blue-300"
                 >
-                  <ExternalLink size={14} />
+                  <ExternalLink size={14} className="rtl-flip" />
                 </a>
               </div>
             </div>

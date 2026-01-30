@@ -234,7 +234,7 @@ const Billing: React.FC = () => {
                         <Loader2 size={16} className="animate-spin" />
                       ) : (
                         <>
-                          {t('billing.checkout')} (Stripe) <ExternalLink size={14} />
+                          {t('billing.checkout')} (Stripe) <ExternalLink size={14} className="rtl-flip" />
                         </>
                       )}
                     </button>

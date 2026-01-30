@@ -147,7 +147,7 @@ const LoginPage: React.FC = () => {
                 className="text-sm text-cyan-400 hover:text-cyan-300 font-medium transition-all duration-300 inline-flex items-center gap-1 group"
               >
                 {t('auth.forgotPassword')}
-                <ArrowRight size={16} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                <ArrowRight size={16} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 rtl-flip" />
               </Link>
             </div>
 
@@ -166,7 +166,7 @@ const LoginPage: React.FC = () => {
                 <>
                   <LogIn size={20} />
                   <span>{t('auth.login')}</span>
-                  <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
+                  <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300 rtl-flip" />
                 </>
               )}
             </button>
@@ -181,7 +181,7 @@ const LoginPage: React.FC = () => {
                 className="glass-button-secondary inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold group"
               >
                 <span>{t('auth.register')}</span>
-                <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300" />
+                <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300 rtl-flip" />
               </Link>
             </div>
           </form>

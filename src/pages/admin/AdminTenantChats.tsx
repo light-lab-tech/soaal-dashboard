@@ -103,7 +103,7 @@ const AdminTenantChats: React.FC = () => {
             onClick={handleBackToChats}
             className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-colors"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} className="rtl-flip" />
           </button>
           <div>
             <h1 className="text-xl font-bold text-white">
@@ -170,7 +170,7 @@ const AdminTenantChats: React.FC = () => {
             onClick={() => navigate(`/admin/tenants/${tenantId}`)}
             className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-colors"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} className="rtl-flip" />
           </button>
           <div>
             <h1 className="text-xl font-bold text-white">{t('chats.title')}</h1>
@@ -221,7 +221,7 @@ const AdminTenantChats: React.FC = () => {
                 </div>
                 <ChevronRight
                   size={20}
-                  className="text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all"
+                  className="text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all rtl-flip"
                 />
               </div>
             </div>

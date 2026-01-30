@@ -120,7 +120,7 @@ const AdminTenantDetails: React.FC = () => {
           onClick={() => navigate('/admin/tenants')}
           className="p-2.5 rounded-xl bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-all duration-200 hover:scale-105"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={20} className="rtl-flip" />
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-4">
@@ -249,7 +249,7 @@ const AdminTenantDetails: React.FC = () => {
                     </h3>
                     <p className="text-slate-400 text-sm mt-1">{action.description}</p>
                   </div>
-                  <ArrowLeft size={20} className="text-slate-500 group-hover:text-cyan-400 rotate-180 group-hover:translate-x-1 transition-all" />
+                  <ArrowLeft size={20} className="text-slate-500 group-hover:text-cyan-400 rotate-180 group-hover:translate-x-1 transition-all rtl-flip" />
                 </div>
               </button>
             );

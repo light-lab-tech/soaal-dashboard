@@ -93,7 +93,7 @@ const AdminTenantAnalytics: React.FC = () => {
           onClick={() => navigate(`/admin/tenants/${tenantId}`)}
           className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-colors"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={20} className="rtl-flip" />
         </button>
         <div>
           <h1 className="text-2xl font-bold text-white">{t('nav.analytics')}</h1>
