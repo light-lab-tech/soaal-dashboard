@@ -236,7 +236,7 @@ const AdminTenantDetails: React.FC = () => {
               <button
                 key={action.id}
                 onClick={() => navigate(action.path)}
-                className={`glass-card p-6 text-left group transition-all duration-300 ${action.hoverBg} hover:scale-[1.02] card-hover-lift`}
+                className={`glass-card p-6 text-start group transition-all duration-300 ${action.hoverBg} hover:scale-[1.02] card-hover-lift`}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-start gap-4">

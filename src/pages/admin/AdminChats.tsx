@@ -220,7 +220,7 @@ const AdminChats: React.FC = () => {
                   <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500/20 to-teal-500/20">
                     <Building2 size={20} className="text-cyan-400" />
                   </div>
-                  <div className="text-left">
+                  <div className="text-start">
                     <h3 className="text-white font-medium">{tenant.name}</h3>
                     <p className="text-slate-400 text-sm">
                       {totalChats} {t('nav.chats').toLowerCase()}
@@ -257,7 +257,7 @@ const AdminChats: React.FC = () => {
                         >
                           <div className="flex items-center gap-3">
                             <MessageSquare size={16} className="text-emerald-400" />
-                            <div className="text-left">
+                            <div className="text-start">
                               <p className="text-white text-sm">
                                 {chat.title || `${t('chats.chatTitle')} #${chat.id.slice(0, 8)}`}
                               </p>

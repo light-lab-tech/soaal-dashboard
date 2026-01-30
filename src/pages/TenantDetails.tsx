@@ -268,7 +268,7 @@ const TenantDetails: React.FC = () => {
               <button
                 key={action.id}
                 onClick={() => navigate(action.path)}
-                className={`glass-card p-4 text-left transition-all duration-200 ${action.hoverBg} group`}
+                className={`glass-card p-4 text-start transition-all duration-200 ${action.hoverBg} group`}
               >
                 <div className={`p-2.5 rounded-xl bg-gradient-to-br ${action.color} w-fit mb-3`}>
                   <Icon size={20} className="text-white" />

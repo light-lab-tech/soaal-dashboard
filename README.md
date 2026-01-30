@@ -12,7 +12,7 @@ A modern ReactJS dashboard for managing RAG (Retrieval-Augmented Generation) ser
 
 ### 🌍 Multi-Language Support
 - **English & Arabic**: Full bilingual support with easy language switching
-- **RTL Support**: Right-to-left layout for Arabic language
+- **RTL Support**: Right-to-start layout for Arabic language
 - **i18next**: Robust internationalization framework
 
 ### 📊 Dashboard Features

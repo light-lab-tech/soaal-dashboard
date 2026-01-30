@@ -171,7 +171,7 @@ const Dashboard: React.FC = () => {
                 key={action.label}
                 onClick={action.onClick}
                 disabled={action.needsTenants && tenants.length === 0}
-                className="glass-card group hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-left p-4"
+                className="glass-card group hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-start p-4"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className={`p-2 rounded-xl bg-gradient-to-br ${action.color} flex items-center justify-center ${action.shadow}`}>

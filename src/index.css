@@ -214,7 +214,7 @@
   }
 }
 
-@keyframes slide-in-right {
+@keyframes slide-in-end {
   from {
     opacity: 0;
     transform: translateX(20px);
@@ -276,8 +276,8 @@
   animation: slide-up 0.5s ease-out;
 }
 
-.animate-slide-in-right {
-  animation: slide-in-right 0.5s ease-out;
+.animate-slide-in-end {
+  animation: slide-in-end 0.5s ease-out;
 }
 
 .animate-fade-in {
@@ -422,13 +422,13 @@
 }
 
 [dir="rtl"] .flex-row {
-  flex-direction: row-reverse;
+  /* flex-direction: row-reverse; */
 }
 
-[dir="rtl"] .text-right {
+[dir="rtl"] .text-end {
   text-align: left;
 }
 
-[dir="rtl"] .text-left {
+[dir="rtl"] .text-start {
   text-align: right;
 }

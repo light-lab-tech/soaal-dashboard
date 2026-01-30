@@ -173,7 +173,7 @@ const AdminAnalytics: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <button
             onClick={() => navigate('/admin/users')}
-            className="glass-card group hover:scale-[1.02] transition-all duration-300 text-left p-4"
+            className="glass-card group hover:scale-[1.02] transition-all duration-300 text-start p-4"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-blue-500/30">
@@ -189,7 +189,7 @@ const AdminAnalytics: React.FC = () => {
             <>
               <button
                 onClick={() => navigate('/admin/tenants')}
-                className="glass-card group hover:scale-[1.02] transition-all duration-300 text-left p-4"
+                className="glass-card group hover:scale-[1.02] transition-all duration-300 text-start p-4"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-cyan-500/30">
@@ -203,7 +203,7 @@ const AdminAnalytics: React.FC = () => {
               </button>
               <button
                 onClick={() => navigate('/admin/plans')}
-                className="glass-card group hover:scale-[1.02] transition-all duration-300 text-left p-4"
+                className="glass-card group hover:scale-[1.02] transition-all duration-300 text-start p-4"
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-purple-500/30">

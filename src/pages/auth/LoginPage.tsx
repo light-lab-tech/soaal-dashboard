@@ -141,7 +141,7 @@ const LoginPage: React.FC = () => {
             </div>
 
             {/* Forgot Password Link */}
-            <div className="text-right">
+            <div className="text-end">
               <Link
                 to="/forgot-password"
                 className="text-sm text-cyan-400 hover:text-cyan-300 font-medium transition-all duration-300 inline-flex items-center gap-1 group"

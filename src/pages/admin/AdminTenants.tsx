@@ -99,11 +99,11 @@ const AdminTenants: React.FC = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-700/50">
-                  <th className="text-left p-4 text-sm font-medium text-slate-400">{t('tenants.tenantName')}</th>
-                  <th className="text-left p-4 text-sm font-medium text-slate-400">{t('tenants.plan')}</th>
-                  <th className="text-left p-4 text-sm font-medium text-slate-400">{t('tenants.status')}</th>
-                  <th className="text-left p-4 text-sm font-medium text-slate-400">{t('admin.createdAt')}</th>
-                  <th className="text-right p-4 text-sm font-medium text-slate-400">{t('common.actions')}</th>
+                  <th className="text-start p-4 text-sm font-medium text-slate-400">{t('tenants.tenantName')}</th>
+                  <th className="text-start p-4 text-sm font-medium text-slate-400">{t('tenants.plan')}</th>
+                  <th className="text-start p-4 text-sm font-medium text-slate-400">{t('tenants.status')}</th>
+                  <th className="text-start p-4 text-sm font-medium text-slate-400">{t('admin.createdAt')}</th>
+                  <th className="text-end p-4 text-sm font-medium text-slate-400">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -130,7 +130,7 @@ const AdminTenants: React.FC = () => {
                       </select>
                     </td>
                     <td className="p-4"><span className="text-slate-400 text-sm">{tenant.created_at ? new Date(tenant.created_at).toLocaleDateString() : '—'}</span></td>
-                    <td className="p-4 text-right">
+                    <td className="p-4 text-end">
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
