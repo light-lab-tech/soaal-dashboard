@@ -15,7 +15,6 @@ import {
   Users,
   BarChart3,
   RefreshCw,
-  Shield,
 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
@@ -40,25 +39,6 @@ const Dashboard: React.FC = () => {
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
-      // Super admin: platform stats from admin APIs
-      if (user?.role === 'super_admin') {
-        const [usersRes, tenantsRes, plansRes] = await Promise.all([
-          api.getAllUsers(),
-          api.getAllTenants().catch(() => ({ data: { tenants: [], total: 0 } })),
-          api.getAdminPlans().catch(() => ({ data: { plans: [] } })),
-        ]);
-        setTenants([]);
-        setStats({
-          totalTenants: tenantsRes.data.tenants?.length ?? 0,
-          totalDocuments: 0,
-          pendingQuestions: 0,
-          satisfactionRate: 0,
-          totalUsers: usersRes.data.users?.length ?? 0,
-          totalPlans: plansRes.data.plans?.length ?? 0,
-        });
-        return;
-      }
-
       const tenantsResponse = await api.getTenants();
       setTenants(tenantsResponse.data.tenants);
 
@@ -96,37 +76,20 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const isSuperAdmin = user?.role === 'super_admin';
-  const isAdmin = user?.role === 'admin';
-  const quickActions = isSuperAdmin
-    ? [
-        { icon: Users, label: t('admin.userManagement'), onClick: () => navigate('/admin/users'), color: 'from-blue-400 to-blue-600', shadow: 'shadow-blue-500/30', needsTenants: false },
-        { icon: Building2, label: t('admin.tenantManagement'), onClick: () => navigate('/admin/tenants'), color: 'from-cyan-400 to-teal-600', shadow: 'shadow-cyan-500/30', needsTenants: false },
-        { icon: BarChart3, label: t('admin.planManagement'), onClick: () => navigate('/admin/plans'), color: 'from-purple-400 to-purple-600', shadow: 'shadow-purple-500/30', needsTenants: false },
-      ]
-    : isAdmin
-      ? [
-          { icon: Shield, label: t('admin.overview'), onClick: () => navigate('/admin'), color: 'from-purple-400 to-purple-600', shadow: 'shadow-purple-500/30', needsTenants: false },
-          { icon: Users, label: t('admin.users'), onClick: () => navigate('/admin/users'), color: 'from-blue-400 to-blue-600', shadow: 'shadow-blue-500/30', needsTenants: false },
-        ]
-      : [
-          { icon: Building2, label: t('dashboard.createTenant'), onClick: () => navigate('/tenants'), color: 'from-cyan-400 via-teal-500 to-cyan-500', shadow: 'shadow-cyan-500/30', needsTenants: false },
-          { icon: FileText, label: t('dashboard.uploadDocument'), onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/documents`), color: 'from-purple-400 via-pink-500 to-purple-500', shadow: 'shadow-purple-500/30', needsTenants: true },
-          { icon: BarChart3, label: t('dashboard.viewAnalytics'), onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/analytics`), color: 'from-amber-400 via-orange-500 to-amber-500', shadow: 'shadow-amber-500/30', needsTenants: true },
-        ];
+  // Regular user quick actions only (admins don't see this page)
+  const quickActions = [
+    { icon: Building2, label: t('dashboard.createTenant'), onClick: () => navigate('/tenants'), color: 'from-cyan-400 via-teal-500 to-cyan-500', shadow: 'shadow-cyan-500/30', needsTenants: false },
+    { icon: FileText, label: t('dashboard.uploadDocument'), onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/documents`), color: 'from-purple-400 via-pink-500 to-purple-500', shadow: 'shadow-purple-500/30', needsTenants: true },
+    { icon: BarChart3, label: t('dashboard.viewAnalytics'), onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/analytics`), color: 'from-amber-400 via-orange-500 to-amber-500', shadow: 'shadow-amber-500/30', needsTenants: true },
+  ];
 
-  const statCards = isSuperAdmin
-    ? [
-        { icon: Users, label: t('admin.users'), value: stats.totalUsers, color: 'from-blue-400 to-blue-600', shadow: 'shadow-blue-500/30', trend: '' },
-        { icon: Building2, label: t('admin.allTenants'), value: stats.totalTenants, color: 'from-cyan-400 to-teal-600', shadow: 'shadow-cyan-500/30', trend: '' },
-        { icon: FileText, label: t('billing.plans'), value: stats.totalPlans, color: 'from-purple-400 to-purple-600', shadow: 'shadow-purple-500/30', trend: '' },
-      ]
-    : [
-        { icon: Building2, label: t('dashboard.totalTenants'), value: stats.totalTenants, color: 'from-cyan-400 via-teal-500 to-cyan-600', shadow: 'shadow-cyan-500/30', trend: '+12%' },
-        { icon: FileText, label: t('dashboard.totalDocuments'), value: stats.totalDocuments, color: 'from-purple-400 via-pink-500 to-purple-600', shadow: 'shadow-purple-500/30', trend: '+24%' },
-        { icon: MessageSquare, label: t('dashboard.pendingQuestions'), value: stats.pendingQuestions, color: 'from-amber-400 via-orange-500 to-amber-600', shadow: 'shadow-amber-500/30', trend: '+8%' },
-        { icon: TrendingUp, label: t('dashboard.satisfactionRate'), value: `${stats.satisfactionRate}%`, color: 'from-emerald-400 via-green-500 to-emerald-600', shadow: 'shadow-emerald-500/30', trend: '+5%' },
-      ];
+  // Regular user stat cards (admins use /admin page)
+  const statCards = [
+    { icon: Building2, label: t('dashboard.totalTenants'), value: stats.totalTenants, color: 'from-cyan-400 via-teal-500 to-cyan-600', shadow: 'shadow-cyan-500/30', trend: '+12%' },
+    { icon: FileText, label: t('dashboard.totalDocuments'), value: stats.totalDocuments, color: 'from-purple-400 via-pink-500 to-purple-600', shadow: 'shadow-purple-500/30', trend: '+24%' },
+    { icon: MessageSquare, label: t('dashboard.pendingQuestions'), value: stats.pendingQuestions, color: 'from-amber-400 via-orange-500 to-amber-600', shadow: 'shadow-amber-500/30', trend: '+8%' },
+    { icon: TrendingUp, label: t('dashboard.satisfactionRate'), value: `${stats.satisfactionRate}%`, color: 'from-emerald-400 via-green-500 to-emerald-600', shadow: 'shadow-emerald-500/30', trend: '+5%' },
+  ];
 
   if (isLoading) {
     return (
@@ -157,7 +120,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className={`grid grid-cols-2 gap-4 ${isSuperAdmin ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -225,8 +188,8 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Recent Tenants (only for non–super_admin) */}
-      {!isSuperAdmin && tenants.length > 0 && (
+      {/* Recent Tenants */}
+      {tenants.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold text-white flex items-center gap-2">
@@ -292,20 +255,8 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Super Admin: CTA to Admin */}
-      {isSuperAdmin && (
-        <div className="glass-card p-6 text-center border-purple-500/30 bg-purple-500/5">
-          <h3 className="text-lg font-semibold text-white mb-2">{t('admin.title')}</h3>
-          <p className="text-slate-400 text-sm mb-4">{t('admin.platformStats')}</p>
-          <button onClick={() => navigate('/admin')} className="btn-primary px-5 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2">
-            <Building2 size={16} />
-            {t('admin.overview')}
-          </button>
-        </div>
-      )}
-
-      {/* Empty State (only for non–super_admin) */}
-      {!isSuperAdmin && tenants.length === 0 && (
+      {/* Empty State */}
+      {tenants.length === 0 && (
         <div className="glass-card p-8 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-400/20 via-teal-500/20 to-cyan-400/20 flex items-center justify-center">
             <Building2 size={28} className="text-cyan-400" />

@@ -1,10 +1,12 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import AdminSuperAdminRoute from './components/AdminSuperAdminRoute';
+import UserRoute from './components/UserRoute';
 import NotFoundRedirect from './components/NotFoundRedirect';
+import RoleBasedRedirect from './components/RoleBasedRedirect';
 import BaseLayout from './layouts/BaseLayout';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
@@ -16,7 +18,7 @@ import Questions from './pages/Questions';
 import Analytics from './pages/Analytics';
 import Telegram from './pages/Telegram';
 import Billing from './pages/Billing';
-import AdminOverview from './pages/admin/AdminOverview';
+import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminUsers from './pages/admin/AdminUsers';
 import AdminTenants from './pages/admin/AdminTenants';
 import AdminPlans from './pages/admin/AdminPlans';
@@ -49,17 +51,23 @@ function App() {
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<BaseLayout changeLanguage={changeLanguage} />}>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/tenants" element={<Tenants />} />
-              <Route path="/billing" element={<Billing />} />
-              <Route path="/tenants/:tenantId" element={<TenantDetails />} />
-              <Route path="/tenants/:tenantId/documents" element={<Documents />} />
-              <Route path="/tenants/:tenantId/questions" element={<Questions />} />
-              <Route path="/tenants/:tenantId/analytics" element={<Analytics />} />
-              <Route path="/tenants/:tenantId/telegram" element={<Telegram />} />
+              <Route path="/" element={<RoleBasedRedirect />} />
+              
+              {/* User-only routes */}
+              <Route element={<UserRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/tenants" element={<Tenants />} />
+                <Route path="/billing" element={<Billing />} />
+                <Route path="/tenants/:tenantId" element={<TenantDetails />} />
+                <Route path="/tenants/:tenantId/documents" element={<Documents />} />
+                <Route path="/tenants/:tenantId/questions" element={<Questions />} />
+                <Route path="/tenants/:tenantId/analytics" element={<Analytics />} />
+                <Route path="/tenants/:tenantId/telegram" element={<Telegram />} />
+              </Route>
+              
+              {/* Admin-only routes */}
               <Route element={<AdminRoute />}>
-                <Route path="/admin" element={<AdminOverview />} />
+                <Route path="/admin" element={<AdminAnalytics />} />
                 <Route path="/admin/users" element={<AdminUsers />} />
                 <Route element={<AdminSuperAdminRoute />}>
                   <Route path="/admin/tenants" element={<AdminTenants />} />

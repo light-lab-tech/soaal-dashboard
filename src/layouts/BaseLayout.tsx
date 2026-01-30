@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   Building2,
   CreditCard,
-  Shield,
   LogOut,
   Menu,
   X,
@@ -23,24 +22,21 @@ interface BaseLayoutProps {
 
 /** Role-based nav: each tab is a separate page. No nested "admin" section. */
 function getNavItems(t: (key: string) => string, role: string | undefined) {
-  const items: { icon: typeof LayoutDashboard; label: string; path: string; id: string }[] = [
-    { icon: LayoutDashboard, label: t('nav.dashboard'), path: '/dashboard', id: 'dashboard' },
-  ];
+  const items: { icon: typeof LayoutDashboard; label: string; path: string; id: string }[] = [];
   
-  // Regular user tabs: Tenants and Billing
-  if (role !== 'super_admin' && role !== 'admin') {
-    items.push({ icon: Building2, label: t('nav.tenants'), path: '/tenants', id: 'tenants' });
-    items.push({ icon: CreditCard, label: t('nav.billing'), path: '/billing', id: 'billing' });
-  }
-
-  // Admin tabs: separate tabs per page (Overview, Users, Tenants, Plans)
+  // Admin tabs: Overview (Analytics), Users, Tenants, Plans
   if (role === 'super_admin' || role === 'admin') {
-    items.push({ icon: Shield, label: t('admin.overview'), path: '/admin', id: 'admin-overview' });
+    items.push({ icon: LayoutDashboard, label: t('admin.overview'), path: '/admin', id: 'admin-overview' });
     items.push({ icon: Users, label: t('admin.users'), path: '/admin/users', id: 'admin-users' });
     if (role === 'super_admin') {
       items.push({ icon: Building2, label: t('admin.allTenants'), path: '/admin/tenants', id: 'admin-tenants' });
       items.push({ icon: CreditCard, label: t('admin.planManagement'), path: '/admin/plans', id: 'admin-plans' });
     }
+  } else {
+    // Regular user tabs: Overview (Dashboard), Tenants, Billing
+    items.push({ icon: LayoutDashboard, label: t('dashboard.overview'), path: '/dashboard', id: 'dashboard' });
+    items.push({ icon: Building2, label: t('nav.tenants'), path: '/tenants', id: 'tenants' });
+    items.push({ icon: CreditCard, label: t('nav.billing'), path: '/billing', id: 'billing' });
   }
 
   return items;
