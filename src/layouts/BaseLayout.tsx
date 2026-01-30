@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Home,
   Users,
+  MessageSquare,
 } from 'lucide-react';
 
 interface BaseLayoutProps {
@@ -33,9 +34,10 @@ function getNavItems(t: (key: string) => string, role: string | undefined) {
       items.push({ icon: CreditCard, label: t('admin.planManagement'), path: '/admin/plans', id: 'admin-plans' });
     }
   } else {
-    // Regular user tabs: Overview (Dashboard), Tenants, Billing
+    // Regular user tabs: Overview (Dashboard), Tenants, Chats, Billing
     items.push({ icon: LayoutDashboard, label: t('dashboard.overview'), path: '/dashboard', id: 'dashboard' });
     items.push({ icon: Building2, label: t('nav.tenants'), path: '/tenants', id: 'tenants' });
+    items.push({ icon: MessageSquare, label: t('nav.chats'), path: '/chats', id: 'chats' });
     items.push({ icon: CreditCard, label: t('nav.billing'), path: '/billing', id: 'billing' });
   }
 

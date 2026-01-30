@@ -19,6 +19,7 @@ import {
   Calendar,
   CreditCard,
   Activity,
+  MessagesSquare,
 } from 'lucide-react';
 
 const TenantDetails: React.FC = () => {
@@ -155,6 +156,16 @@ const TenantDetails: React.FC = () => {
       color: 'from-blue-500 to-indigo-600',
       iconColor: 'text-blue-400',
       hoverBg: 'hover:bg-blue-500/10 hover:border-blue-400/30',
+    },
+    {
+      id: 'chats',
+      icon: MessagesSquare,
+      label: t('nav.chats'),
+      description: t('tenants.chatsDesc'),
+      path: `/tenants/${tenantId}/chats`,
+      color: 'from-emerald-500 to-green-600',
+      iconColor: 'text-emerald-400',
+      hoverBg: 'hover:bg-emerald-500/10 hover:border-emerald-400/30',
     },
   ];
 

@@ -17,6 +17,8 @@ import Documents from './pages/Documents';
 import Questions from './pages/Questions';
 import Analytics from './pages/Analytics';
 import Telegram from './pages/Telegram';
+import Chats from './pages/Chats';
+import AllChats from './pages/AllChats';
 import Billing from './pages/Billing';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminUsers from './pages/admin/AdminUsers';
@@ -57,12 +59,14 @@ function App() {
               <Route element={<UserRoute />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/tenants" element={<Tenants />} />
+                <Route path="/chats" element={<AllChats />} />
                 <Route path="/billing" element={<Billing />} />
                 <Route path="/tenants/:tenantId" element={<TenantDetails />} />
                 <Route path="/tenants/:tenantId/documents" element={<Documents />} />
                 <Route path="/tenants/:tenantId/questions" element={<Questions />} />
                 <Route path="/tenants/:tenantId/analytics" element={<Analytics />} />
                 <Route path="/tenants/:tenantId/telegram" element={<Telegram />} />
+                <Route path="/tenants/:tenantId/chats" element={<Chats />} />
               </Route>
               
               {/* Admin-only routes */}

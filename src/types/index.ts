@@ -117,6 +117,25 @@ export interface Pagination {
   total_pages: number;
 }
 
+// Chat Types
+export interface Chat {
+  id: string;
+  tenant_id: string;
+  title?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  tenant_id: string;
+  chat_id: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  token_usage?: Record<string, number>;
+  created_at: string;
+}
+
 // Telegram Types
 export interface TelegramBotData {
   bot_token: string;
@@ -126,6 +145,27 @@ export interface TelegramBotResponse {
   bot_username: string;
   bot_id: number;
   message: string;
+}
+
+// Tenant Analytics Types (Admin)
+export interface TenantAnalytics {
+  tenant_id: string;
+  documents_count: number;
+  chats_count: number;
+  messages_count: number;
+  usage_30d: {
+    tokens_in: number;
+    tokens_out: number;
+    searches: number;
+    requests: number;
+  };
+  feedback: {
+    total: number;
+    positive: number;
+    negative: number;
+    positive_percent: number;
+    negative_percent: number;
+  };
 }
 
 // Admin Types

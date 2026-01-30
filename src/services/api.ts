@@ -18,6 +18,8 @@ import type {
   AnswerData,
   FeedbackStats,
   Feedback,
+  Chat,
+  ChatMessage,
   TelegramBotData,
   TelegramBotResponse,
   AdminUser,
@@ -27,6 +29,7 @@ import type {
   Subscription,
   CheckoutData,
   CreatePlanData,
+  TenantAnalytics,
 } from '../types';
 
 class ApiClient {
@@ -130,6 +133,17 @@ class ApiClient {
 
   async getApiKey(tenantId: string, keyId: string): Promise<ApiResponse<{ api_key: ApiKey }>> {
     const response = await this.client.get<ApiResponse<{ api_key: ApiKey }>>(`/tenants/${tenantId}/api-keys/${keyId}`);
+    return response.data;
+  }
+
+  // Tenant Chats & Messages (for tenant owners)
+  async getTenantChats(tenantId: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<{ chats: Chat[]; total: number; page: number; limit: number }>> {
+    const response = await this.client.get<ApiResponse<{ chats: Chat[]; total: number; page: number; limit: number }>>(`/tenants/${tenantId}/chats`, { params });
+    return response.data;
+  }
+
+  async getTenantChatMessages(tenantId: string, chatId: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<{ messages: ChatMessage[]; total: number; page: number; limit: number }>> {
+    const response = await this.client.get<ApiResponse<{ messages: ChatMessage[]; total: number; page: number; limit: number }>>(`/tenants/${tenantId}/chats/${chatId}/messages`, { params });
     return response.data;
   }
 
@@ -255,6 +269,22 @@ class ApiClient {
     return response.data;
   }
 
+  // Admin: User Subscription & Tenants (admin or super_admin)
+  async getAdminUserSubscription(userId: string): Promise<ApiResponse<{ subscription: Subscription | null; plan: Plan | null; message?: string }>> {
+    const response = await this.client.get<ApiResponse<{ subscription: Subscription | null; plan: Plan | null; message?: string }>>(`/admin/users/${userId}/subscription`);
+    return response.data;
+  }
+
+  async getAdminUserSubscriptions(userId: string): Promise<ApiResponse<{ subscriptions: Subscription[]; total: number }>> {
+    const response = await this.client.get<ApiResponse<{ subscriptions: Subscription[]; total: number }>>(`/admin/users/${userId}/subscriptions`);
+    return response.data;
+  }
+
+  async getAdminUserTenants(userId: string): Promise<ApiResponse<{ tenants: Tenant[]; total: number }>> {
+    const response = await this.client.get<ApiResponse<{ tenants: Tenant[]; total: number }>>(`/admin/users/${userId}/tenants`);
+    return response.data;
+  }
+
   async getAllTenants(): Promise<ApiResponse<{ tenants: Tenant[]; total: number }>> {
     const response = await this.client.get<ApiResponse<{ tenants: Tenant[]; total: number }>>('/admin/tenants');
     return response.data;
@@ -267,6 +297,22 @@ class ApiClient {
 
   async deleteTenant(tenantId: string): Promise<ApiResponse<void>> {
     const response = await this.client.delete<ApiResponse<void>>(`/admin/tenants/${tenantId}`);
+    return response.data;
+  }
+
+  // Admin: Tenant Chats, Messages & Analytics (super_admin only)
+  async getAdminTenantChats(tenantId: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<{ chats: Chat[]; total: number; page: number; limit: number }>> {
+    const response = await this.client.get<ApiResponse<{ chats: Chat[]; total: number; page: number; limit: number }>>(`/admin/tenants/${tenantId}/chats`, { params });
+    return response.data;
+  }
+
+  async getAdminTenantChatMessages(tenantId: string, chatId: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<{ messages: ChatMessage[]; total: number; page: number; limit: number }>> {
+    const response = await this.client.get<ApiResponse<{ messages: ChatMessage[]; total: number; page: number; limit: number }>>(`/admin/tenants/${tenantId}/chats/${chatId}/messages`, { params });
+    return response.data;
+  }
+
+  async getAdminTenantAnalytics(tenantId: string): Promise<ApiResponse<TenantAnalytics>> {
+    const response = await this.client.get<ApiResponse<TenantAnalytics>>(`/admin/tenants/${tenantId}/analytics`);
     return response.data;
   }
 

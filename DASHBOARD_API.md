@@ -14,6 +14,8 @@ This documentation covers all APIs used by company owners (tenants) to manage th
    - [Create Additional API Key](#create-additional-api-key)
    - [List API Keys](#list-api-keys)
    - [Get API Key](#get-api-key)
+   - [List Tenant Chats](#list-tenant-chats)
+   - [List Tenant Chat Messages](#list-tenant-chat-messages)
 3. [Billing & Subscriptions](#billing--subscriptions)
    - [List Plans](#list-plans)
    - [Create Checkout Session](#create-checkout-session)
@@ -28,6 +30,8 @@ This documentation covers all APIs used by company owners (tenants) to manage th
 8. [Admin APIs](#admin-apis-super-admin-only)
    - [User Management](#admin-apis---user-management)
    - [Tenant Management](#admin-apis---tenant-management)
+   - [User Subscription & Tenants](#admin-apis---user-subscription--tenants)
+   - [Tenant Chats, Messages & Analytics](#admin-apis---tenant-chats-messages--analytics)
    - [Plan Management](#admin-apis---plan-management)
 
 ---
@@ -489,6 +493,82 @@ curl http://localhost:8080/api/v1/tenants/{tenant_id}/api-keys \
 # 2. Retrieve the actual key using the ID
 curl http://localhost:8080/api/v1/tenants/{tenant_id}/api-keys/{key_id} \
   -H "Authorization: Bearer $JWT_TOKEN"
+```
+
+---
+
+### List Tenant Chats
+
+List chats for a tenant you own (for dashboard management). Paginated.
+
+```
+GET /tenants/{tenant_id}/chats
+```
+
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | int | 1 | Page number |
+| limit | int | 20 | Items per page (max 100) |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "chats": [
+      {
+        "id": "uuid",
+        "tenant_id": "uuid",
+        "title": "Chat title or null",
+        "created_at": "2026-01-24T10:00:00Z",
+        "updated_at": "2026-01-24T10:00:00Z"
+      }
+    ],
+    "total": 42,
+    "page": 1,
+    "limit": 20
+  }
+}
+```
+
+---
+
+### List Tenant Chat Messages
+
+List messages for a specific chat (tenant you own). Paginated.
+
+```
+GET /tenants/{tenant_id}/chats/{chat_id}/messages
+```
+
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | int | 1 | Page number |
+| limit | int | 20 | Items per page (max 100) |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "messages": [
+      {
+        "id": "uuid",
+        "tenant_id": "uuid",
+        "chat_id": "uuid",
+        "role": "user",
+        "content": "Message text",
+        "token_usage": {},
+        "created_at": "2026-01-24T10:00:00Z"
+      }
+    ],
+    "total": 15,
+    "page": 1,
+    "limit": 20
+  }
+}
 ```
 
 ---
@@ -1266,6 +1346,138 @@ DELETE /admin/users/{user_id}/delete
 
 ---
 
+## Admin APIs - User Subscription & Tenants
+
+**Required Role:** `admin` or `super_admin`
+
+APIs to view a user's current subscription, subscription history, and tenants they own.
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+### Get User Subscription (Admin)
+
+Get the **current (active)** subscription for any user.
+
+```
+GET /admin/users/{user_id}/subscription
+```
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| user_id | uuid | The user's ID |
+
+**Response (has subscription):**
+```json
+{
+  "success": true,
+  "data": {
+    "subscription": {
+      "id": "uuid",
+      "user_id": "uuid",
+      "plan_id": "uuid",
+      "provider": "stripe",
+      "status": "active",
+      "current_period_start": "2026-01-24T00:00:00Z",
+      "current_period_end": "2026-02-24T00:00:00Z",
+      "cancel_at_period_end": false
+    },
+    "plan": { "id": "uuid", "name": "Pro", "slug": "pro", "currency": "USD" }
+  }
+}
+```
+
+**Response (no subscription):**
+```json
+{
+  "success": true,
+  "data": {
+    "subscription": null,
+    "plan": null,
+    "message": "No active subscription"
+  }
+}
+```
+
+---
+
+### List User Subscriptions (History)
+
+List **all** subscription records for a user (current and past; for support/audit).
+
+```
+GET /admin/users/{user_id}/subscriptions
+```
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| user_id | uuid | The user's ID |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "subscriptions": [
+      {
+        "id": "uuid",
+        "user_id": "uuid",
+        "plan_id": "uuid",
+        "provider": "stripe",
+        "status": "active",
+        "current_period_start": "2026-01-24T00:00:00Z",
+        "current_period_end": "2026-02-24T00:00:00Z",
+        "created_at": "2026-01-24T10:00:00Z",
+        "updated_at": "2026-01-24T10:00:00Z"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+---
+
+### List User Tenants
+
+List all tenants owned by a user.
+
+```
+GET /admin/users/{user_id}/tenants
+```
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| user_id | uuid | The user's ID |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "tenants": [
+      {
+        "id": "uuid",
+        "name": "Acme Support",
+        "plan": "pro",
+        "status": "active",
+        "created_at": "2026-01-24T10:00:00Z",
+        "updated_at": "2026-01-24T10:00:00Z"
+      }
+    ],
+    "total": 2
+  }
+}
+```
+
+---
+
 ## Admin APIs - Tenant Management
 
 **Required Role:** `super_admin` only
@@ -1400,6 +1612,106 @@ DELETE /admin/tenants/{tenant_id}
 ```
 
 > **Warning:** This action is irreversible. The tenant must have no documents before deletion. Consider suspending the tenant instead.
+
+---
+
+## Admin APIs - Tenant Chats, Messages & Analytics
+
+**Required Role:** `super_admin` only
+
+APIs to view chats, messages, and analytics for any tenant (support and operations).
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+### List Tenant Chats (Admin)
+
+List paginated chats for any tenant.
+
+```
+GET /admin/tenants/{tenant_id}/chats
+```
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| tenant_id | uuid | The tenant's ID |
+
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | int | 1 | Page number |
+| limit | int | 20 | Items per page (max 100) |
+
+**Response:** Same shape as [List Tenant Chats](#list-tenant-chats) (user): `chats`, `total`, `page`, `limit`.
+
+---
+
+### List Tenant Messages (Admin)
+
+List paginated messages for a chat in any tenant.
+
+```
+GET /admin/tenants/{tenant_id}/chats/{chat_id}/messages
+```
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| tenant_id | uuid | The tenant's ID |
+| chat_id | uuid | The chat's ID |
+
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | int | 1 | Page number |
+| limit | int | 20 | Items per page (max 100) |
+
+**Response:** Same shape as [List Tenant Chat Messages](#list-tenant-chat-messages) (user): `messages`, `total`, `page`, `limit`.
+
+---
+
+### Get Tenant Analytics
+
+Get aggregated analytics for a tenant: document/chat/message counts, feedback stats, and 30-day usage.
+
+```
+GET /admin/tenants/{tenant_id}/analytics
+```
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| tenant_id | uuid | The tenant's ID |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "tenant_id": "uuid",
+    "documents_count": 12,
+    "chats_count": 45,
+    "messages_count": 320,
+    "usage_30d": {
+      "tokens_in": 15000,
+      "tokens_out": 8000,
+      "searches": 120,
+      "requests": 95
+    },
+    "feedback": {
+      "total": 28,
+      "positive": 22,
+      "negative": 6,
+      "positive_percent": 78.57,
+      "negative_percent": 21.43
+    }
+  }
+}
+```
 
 ---
 
@@ -1594,12 +1906,18 @@ DELETE /admin/plans/{plan_id}
 | PUT | `/admin/users/{id}/role` | Update user role |
 | DELETE | `/admin/users/{id}` | Disable user |
 | DELETE | `/admin/users/{id}/delete` | Delete user |
+| GET | `/admin/users/{id}/subscription` | Get user's current subscription |
+| GET | `/admin/users/{id}/subscriptions` | List user's subscription history |
+| GET | `/admin/users/{id}/tenants` | List tenants owned by user |
 
 ### Tenant Management (super_admin only)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/admin/tenants` | List all tenants |
+| GET | `/admin/tenants/{id}/chats` | List tenant chats (paginated) |
+| GET | `/admin/tenants/{id}/chats/{chat_id}/messages` | List chat messages (paginated) |
+| GET | `/admin/tenants/{id}/analytics` | Get tenant analytics |
 | PUT | `/admin/tenants/{id}/status` | Update tenant status |
 | DELETE | `/admin/tenants/{id}` | Delete tenant |
 
