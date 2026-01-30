@@ -14,7 +14,6 @@ import {
   ChevronRight,
   Home,
   Users,
-  MessageSquare,
 } from 'lucide-react';
 
 interface BaseLayoutProps {
@@ -25,20 +24,18 @@ interface BaseLayoutProps {
 function getNavItems(t: (key: string) => string, role: string | undefined) {
   const items: { icon: typeof LayoutDashboard; label: string; path: string; id: string }[] = [];
   
-  // Admin tabs: Overview (Analytics), Users, Tenants, Chats, Plans
+  // Admin tabs: Overview (Analytics), Users, Tenants, Plans
   if (role === 'super_admin' || role === 'admin') {
     items.push({ icon: LayoutDashboard, label: t('admin.overview'), path: '/admin', id: 'admin-overview' });
     items.push({ icon: Users, label: t('admin.users'), path: '/admin/users', id: 'admin-users' });
     if (role === 'super_admin') {
       items.push({ icon: Building2, label: t('admin.allTenants'), path: '/admin/tenants', id: 'admin-tenants' });
-      items.push({ icon: MessageSquare, label: t('nav.chats'), path: '/admin/chats', id: 'admin-chats' });
       items.push({ icon: CreditCard, label: t('admin.planManagement'), path: '/admin/plans', id: 'admin-plans' });
     }
   } else {
-    // Regular user tabs: Overview (Dashboard), Tenants, Chats, Billing
+    // Regular user tabs: Overview (Dashboard), Tenants, Billing
     items.push({ icon: LayoutDashboard, label: t('dashboard.overview'), path: '/dashboard', id: 'dashboard' });
     items.push({ icon: Building2, label: t('nav.tenants'), path: '/tenants', id: 'tenants' });
-    items.push({ icon: MessageSquare, label: t('nav.chats'), path: '/chats', id: 'chats' });
     items.push({ icon: CreditCard, label: t('nav.billing'), path: '/billing', id: 'billing' });
   }
 
