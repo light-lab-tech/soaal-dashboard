@@ -150,10 +150,9 @@ const AdminAnalytics: React.FC = () => {
                   </h3>
                   <p className="text-sm text-slate-400">{stat.label}</p>
                 </div>
-                <ArrowRight
-                  size={20}
-                  className="text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all arrow-card-rtl rtl-flip"
-                />
+                <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
+                <ArrowRight size={20} className="text-slate-500 group-hover:text-cyan-400" />
+              </span>
               </div>
             </div>
           );
@@ -179,7 +178,9 @@ const AdminAnalytics: React.FC = () => {
               <div className="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-blue-500/30">
                 <Users size={18} className="text-white" />
               </div>
-              <ArrowRight size={16} className="text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all arrow-card-rtl rtl-flip" />
+              <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
+              <ArrowRight size={16} className="text-slate-400 group-hover:text-white" />
+            </span>
             </div>
             <h3 className="text-sm font-medium text-white group-hover:text-glow transition-all">
               {t('admin.userManagement')}
@@ -195,7 +196,9 @@ const AdminAnalytics: React.FC = () => {
                   <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-cyan-500/30">
                     <Building2 size={18} className="text-white" />
                   </div>
-                  <ArrowRight size={16} className="text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all arrow-card-rtl rtl-flip" />
+                  <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
+              <ArrowRight size={16} className="text-slate-400 group-hover:text-white" />
+            </span>
                 </div>
                 <h3 className="text-sm font-medium text-white group-hover:text-glow transition-all">
                   {t('admin.tenantManagement')}
@@ -209,7 +212,9 @@ const AdminAnalytics: React.FC = () => {
                   <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-purple-500/30">
                     <CreditCard size={18} className="text-white" />
                   </div>
-                  <ArrowRight size={16} className="text-slate-400 group-hover:text-white group-hover:translate-x-1 transition-all arrow-card-rtl rtl-flip" />
+                  <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
+              <ArrowRight size={16} className="text-slate-400 group-hover:text-white" />
+            </span>
                 </div>
                 <h3 className="text-sm font-medium text-white group-hover:text-glow transition-all">
                   {t('admin.planManagement')}

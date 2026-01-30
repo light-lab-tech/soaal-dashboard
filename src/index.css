@@ -422,20 +422,26 @@
   transform: scaleX(-1);
 }
 
-/* RTL card arrow hover - combines flip + translate so Tailwind doesn't override */
+/* RTL card arrow - wrapper approach so our transform isn't overridden by Tailwind */
+.arrow-card-rtl {
+  display: inline-flex;
+}
 [dir="rtl"] .arrow-card-rtl {
-  transform: scaleX(-1);
+  transform: scaleX(-1) !important;
 }
 [dir="rtl"] .group:hover .arrow-card-rtl {
-  transform: scaleX(-1) translateX(-0.25rem);
+  transform: scaleX(-1) translateX(-0.25rem) !important;
 }
 
-/* RTL slide-in arrow (opacity 0 → 1, translate offset → 0) */
+/* RTL slide-in arrow */
+.arrow-slide-rtl {
+  display: inline-flex;
+}
 [dir="rtl"] .arrow-slide-rtl {
-  transform: scaleX(-1) translateX(-0.25rem);
+  transform: scaleX(-1) translateX(-0.25rem) !important;
 }
 [dir="rtl"] .group:hover .arrow-slide-rtl {
-  transform: scaleX(-1) translateX(0);
+  transform: scaleX(-1) translateX(0) !important;
 }
 
 [dir="rtl"] .flex-row {

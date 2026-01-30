@@ -15,6 +15,7 @@ import {
   ThumbsDown,
   Loader2,
   Calendar,
+  ArrowRight,
 } from 'lucide-react';
 
 const AdminTenantDetails: React.FC = () => {
@@ -249,7 +250,9 @@ const AdminTenantDetails: React.FC = () => {
                     </h3>
                     <p className="text-slate-400 text-sm mt-1">{action.description}</p>
                   </div>
-                  <ArrowLeft size={20} className="text-slate-500 group-hover:text-cyan-400 rotate-180 group-hover:translate-x-1 transition-all rtl-flip" />
+                <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
+                  <ArrowRight size={20} className="text-slate-500 group-hover:text-cyan-400" />
+                </span>
                 </div>
               </button>
             );
