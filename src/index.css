@@ -422,6 +422,22 @@
   transform: scaleX(-1);
 }
 
+/* RTL card arrow hover - combines flip + translate so Tailwind doesn't override */
+[dir="rtl"] .arrow-card-rtl {
+  transform: scaleX(-1);
+}
+[dir="rtl"] .group:hover .arrow-card-rtl {
+  transform: scaleX(-1) translateX(-0.25rem);
+}
+
+/* RTL slide-in arrow (opacity 0 → 1, translate offset → 0) */
+[dir="rtl"] .arrow-slide-rtl {
+  transform: scaleX(-1) translateX(-0.25rem);
+}
+[dir="rtl"] .group:hover .arrow-slide-rtl {
+  transform: scaleX(-1) translateX(0);
+}
+
 [dir="rtl"] .flex-row {
   /* flex-direction: row-reverse; */
 }
