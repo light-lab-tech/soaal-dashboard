@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import type { Tenant, ApiKey, CreateTenantData, CreateApiKeyData } from '../types';
 import {
@@ -16,6 +17,7 @@ import {
 
 const Tenants: React.FC = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,9 +35,17 @@ const Tenants: React.FC = () => {
     rate_limit: 100,
   });
 
+  // Super admin manages tenants under Admin; redirect to Admin > Tenants
   useEffect(() => {
+    if (user?.role === 'super_admin') {
+      navigate('/admin/tenants', { replace: true });
+    }
+  }, [user?.role, navigate]);
+
+  useEffect(() => {
+    if (user?.role === 'super_admin') return;
     loadTenants();
-  }, []);
+  }, [user?.role]);
 
   const loadTenants = async () => {
     try {

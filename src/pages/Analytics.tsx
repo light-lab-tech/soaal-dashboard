@@ -234,7 +234,7 @@ const Analytics: React.FC = () => {
                 }}
               />
               <Legend />
-              <Bar dataKey="value" fill={(entry: any) => entry.color} radius={[8, 8, 0, 0]} />
+              <Bar dataKey="value" fill="#22d3ee" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

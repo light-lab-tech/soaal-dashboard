@@ -2,7 +2,10 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import DashboardLayout from './layouts/DashboardLayout';
+import AdminRoute from './components/AdminRoute';
+import AdminSuperAdminRoute from './components/AdminSuperAdminRoute';
+import NotFoundRedirect from './components/NotFoundRedirect';
+import BaseLayout from './layouts/BaseLayout';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import Dashboard from './pages/Dashboard';
@@ -12,7 +15,11 @@ import Documents from './pages/Documents';
 import Questions from './pages/Questions';
 import Analytics from './pages/Analytics';
 import Telegram from './pages/Telegram';
-import Admin from './pages/Admin';
+import Billing from './pages/Billing';
+import AdminOverview from './pages/admin/AdminOverview';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminTenants from './pages/admin/AdminTenants';
+import AdminPlans from './pages/admin/AdminPlans';
 
 function App() {
   const { i18n } = useTranslation();
@@ -41,21 +48,28 @@ function App() {
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
-            <Route element={<DashboardLayout changeLanguage={changeLanguage} />}>
+            <Route element={<BaseLayout changeLanguage={changeLanguage} />}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/tenants" element={<Tenants />} />
+              <Route path="/billing" element={<Billing />} />
               <Route path="/tenants/:tenantId" element={<TenantDetails />} />
               <Route path="/tenants/:tenantId/documents" element={<Documents />} />
               <Route path="/tenants/:tenantId/questions" element={<Questions />} />
               <Route path="/tenants/:tenantId/analytics" element={<Analytics />} />
               <Route path="/tenants/:tenantId/telegram" element={<Telegram />} />
-              <Route path="/admin" element={<Admin />} />
+              <Route element={<AdminRoute />}>
+                <Route path="/admin" element={<AdminOverview />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
+                <Route element={<AdminSuperAdminRoute />}>
+                  <Route path="/admin/tenants" element={<AdminTenants />} />
+                  <Route path="/admin/plans" element={<AdminPlans />} />
+                </Route>
+              </Route>
             </Route>
           </Route>
 
-          {/* Catch all */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={<NotFoundRedirect />} />
         </Routes>
       </div>
     </AuthProvider>

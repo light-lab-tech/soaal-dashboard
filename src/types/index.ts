@@ -141,6 +141,75 @@ export interface UpdateUserRoleData {
   role: 'user' | 'admin' | 'super_admin' | 'disabled';
 }
 
+// Billing & Plans Types
+export interface Plan {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  currency: string;
+  price_monthly_cents: number;
+  price_yearly_cents?: number;
+  is_active?: boolean;
+  sort_order?: number;
+  features_summary?: string;
+  max_projects?: number;
+  max_messages_per_month?: number;
+  max_documents?: number;
+  max_document_size_mb?: number;
+  enable_telegram_integration?: boolean;
+  enable_feedback?: boolean;
+  enable_custom_system_prompt?: boolean;
+  enable_rag_enhancements?: boolean;
+  gateway_one_price_id?: string;
+  gateway_one_yearly_price_id?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Subscription {
+  id: string;
+  user_id: string;
+  plan_id: string;
+  provider: 'stripe' | 'cryptocloud';
+  provider_subscription_id?: string;
+  provider_customer_id?: string;
+  status: 'active' | 'canceled' | 'past_due' | 'trialing';
+  current_period_start: string;
+  current_period_end: string;
+  cancel_at_period_end: boolean;
+  scheduled_plan_id?: string | null;
+  scheduled_provider?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CheckoutData {
+  plan_id: string;
+  provider: 'stripe' | 'cryptocloud';
+  period: 'monthly' | 'yearly';
+}
+
+export interface CreatePlanData {
+  name: string;
+  slug: string;
+  description?: string;
+  currency: string;
+  price_monthly_cents: number;
+  price_yearly_cents?: number;
+  is_active?: boolean;
+  sort_order?: number;
+  features_summary?: string;
+  max_projects?: number;
+  max_messages_per_month?: number;
+  max_documents?: number;
+  max_document_size_mb?: number;
+  enable_telegram_integration?: boolean;
+  enable_feedback?: boolean;
+  enable_custom_system_prompt?: boolean;
+  enable_rag_enhancements?: boolean;
+}
+
 // Generic API Response
 export interface ApiResponse<T> {
   success: boolean;

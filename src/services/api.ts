@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import type {
   ApiResponse,
@@ -22,6 +23,10 @@ import type {
   AdminUser,
   UpdateUserRoleData,
   Pagination,
+  Plan,
+  Subscription,
+  CheckoutData,
+  CreatePlanData,
 } from '../types';
 
 class ApiClient {
@@ -128,6 +133,37 @@ class ApiClient {
     return response.data;
   }
 
+  // Billing & Subscription Endpoints
+  async listPlans(): Promise<ApiResponse<{ plans: Plan[] }>> {
+    const response = await this.client.get<ApiResponse<{ plans: Plan[] }>>('/billing/plans');
+    return response.data;
+  }
+
+  async createCheckout(data: CheckoutData): Promise<ApiResponse<{ checkout_url: string; provider: string; plan_id: string; period: string }>> {
+    const response = await this.client.post<ApiResponse<{ checkout_url: string; provider: string; plan_id: string; period: string }>>('/billing/checkout', data);
+    return response.data;
+  }
+
+  async getSubscription(): Promise<ApiResponse<{ subscription: Subscription | null; plan?: Plan; message?: string }>> {
+    const response = await this.client.get<ApiResponse<{ subscription: Subscription | null; plan?: Plan; message?: string }>>('/billing/subscription');
+    return response.data;
+  }
+
+  async changePlan(planId: string): Promise<ApiResponse<void>> {
+    const response = await this.client.post<ApiResponse<void>>('/billing/subscription/change-plan', { plan_id: planId });
+    return response.data;
+  }
+
+  async changeGateway(provider: 'stripe' | 'cryptocloud'): Promise<ApiResponse<void>> {
+    const response = await this.client.post<ApiResponse<void>>('/billing/subscription/change-gateway', { provider });
+    return response.data;
+  }
+
+  async cancelSubscription(): Promise<ApiResponse<void>> {
+    const response = await this.client.post<ApiResponse<void>>('/billing/subscription/cancel');
+    return response.data;
+  }
+
   // Document Endpoints
   async getDocuments(tenantId: string): Promise<ApiResponse<{ documents: Document[] }>> {
     const response = await this.client.get<ApiResponse<{ documents: Document[] }>>(`/tenants/${tenantId}/documents`);
@@ -231,6 +267,32 @@ class ApiClient {
 
   async deleteTenant(tenantId: string): Promise<ApiResponse<void>> {
     const response = await this.client.delete<ApiResponse<void>>(`/admin/tenants/${tenantId}`);
+    return response.data;
+  }
+
+  // Admin Plan Management (super_admin only)
+  async getAdminPlans(): Promise<ApiResponse<{ plans: Plan[] }>> {
+    const response = await this.client.get<ApiResponse<{ plans: Plan[] }>>('/admin/plans');
+    return response.data;
+  }
+
+  async createPlan(data: CreatePlanData): Promise<ApiResponse<{ plan: Plan }>> {
+    const response = await this.client.post<ApiResponse<{ plan: Plan }>>('/admin/plans', data);
+    return response.data;
+  }
+
+  async getPlan(planId: string): Promise<ApiResponse<{ plan: Plan }>> {
+    const response = await this.client.get<ApiResponse<{ plan: Plan }>>(`/admin/plans/${planId}`);
+    return response.data;
+  }
+
+  async updatePlan(planId: string, data: Partial<CreatePlanData>): Promise<ApiResponse<void>> {
+    const response = await this.client.put<ApiResponse<void>>(`/admin/plans/${planId}`, data);
+    return response.data;
+  }
+
+  async deletePlan(planId: string): Promise<ApiResponse<void>> {
+    const response = await this.client.delete<ApiResponse<void>>(`/admin/plans/${planId}`);
     return response.data;
   }
 }

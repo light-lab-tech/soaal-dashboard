@@ -14,11 +14,21 @@ This documentation covers all APIs used by company owners (tenants) to manage th
    - [Create Additional API Key](#create-additional-api-key)
    - [List API Keys](#list-api-keys)
    - [Get API Key](#get-api-key)
-3. [Document Management](#document-management)
-4. [Pending Questions](#pending-questions)
-5. [Feedback Analytics](#feedback-analytics)
-6. [Telegram Bot Integration](#telegram-bot-integration)
-7. [Admin APIs](#admin-apis-super-admin-only)
+3. [Billing & Subscriptions](#billing--subscriptions)
+   - [List Plans](#list-plans)
+   - [Create Checkout Session](#create-checkout-session)
+   - [Get My Subscription](#get-my-subscription)
+   - [Change Plan](#change-plan)
+   - [Change Gateway](#change-gateway)
+   - [Cancel Subscription](#cancel-subscription)
+4. [Document Management](#document-management)
+5. [Pending Questions](#pending-questions)
+6. [Feedback Analytics](#feedback-analytics)
+7. [Telegram Bot Integration](#telegram-bot-integration)
+8. [Admin APIs](#admin-apis-super-admin-only)
+   - [User Management](#admin-apis---user-management)
+   - [Tenant Management](#admin-apis---tenant-management)
+   - [Plan Management](#admin-apis---plan-management)
 
 ---
 
@@ -483,6 +493,240 @@ curl http://localhost:8080/api/v1/tenants/{tenant_id}/api-keys/{key_id} \
 
 ---
 
+## Billing & Subscriptions
+
+All billing APIs require JWT authentication. Users can subscribe via **Stripe** or **CryptoCloud**, view their subscription, change plan or gateway (scheduled for next cycle), and cancel.
+
+**Headers (for all requests below):**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+### List Plans
+
+Get all active plans for the pricing page or dashboard.
+
+```
+GET /billing/plans
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "plans": [
+      {
+        "id": "b6215202-d167-45c1-a2dd-6d037fafee50",
+        "name": "Pro",
+        "slug": "pro",
+        "description": "For growing teams",
+        "currency": "USD",
+        "price_monthly_cents": 2900,
+        "price_yearly_cents": 29000,
+        "is_active": true,
+        "sort_order": 1,
+        "features_summary": "10 projects, 50k messages/mo",
+        "max_projects": 10,
+        "max_messages_per_month": 50000,
+        "max_documents": 500,
+        "enable_telegram_integration": true,
+        "enable_feedback": true,
+        "enable_custom_system_prompt": true,
+        "created_at": "2026-01-24T10:00:00Z",
+        "updated_at": "2026-01-24T10:00:00Z"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### Create Checkout Session
+
+Start checkout for a plan with the chosen payment provider. Returns a URL to redirect the user to complete payment (Stripe Checkout or CryptoCloud payment page).
+
+```
+POST /billing/checkout
+```
+
+**Request Body:**
+```json
+{
+  "plan_id": "b6215202-d167-45c1-a2dd-6d037fafee50",
+  "provider": "stripe",
+  "period": "monthly"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| plan_id | string (uuid) | Yes | Plan to subscribe to |
+| provider | string | Yes | `stripe` or `cryptocloud` |
+| period | string | Yes | `monthly` or `yearly` |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "checkout_url": "https://checkout.stripe.com/c/pay/cs_...",
+    "provider": "stripe",
+    "plan_id": "b6215202-d167-45c1-a2dd-6d037fafee50",
+    "period": "monthly"
+  }
+}
+```
+
+Redirect the user to `checkout_url` to complete payment. After success, the provider sends a webhook to your server and the subscription is activated.
+
+---
+
+### Get My Subscription
+
+Get the current subscription for the authenticated user.
+
+```
+GET /billing/subscription
+```
+
+**Response (has subscription):**
+```json
+{
+  "success": true,
+  "data": {
+    "subscription": {
+      "id": "uuid",
+      "user_id": "uuid",
+      "plan_id": "b6215202-d167-45c1-a2dd-6d037fafee50",
+      "provider": "stripe",
+      "provider_subscription_id": "sub_xxx",
+      "provider_customer_id": "cus_xxx",
+      "status": "active",
+      "current_period_start": "2026-01-24T00:00:00Z",
+      "current_period_end": "2026-02-24T00:00:00Z",
+      "cancel_at_period_end": false,
+      "scheduled_plan_id": null,
+      "scheduled_provider": null,
+      "created_at": "2026-01-24T10:00:00Z",
+      "updated_at": "2026-01-24T10:00:00Z"
+    },
+    "plan": {
+      "id": "b6215202-d167-45c1-a2dd-6d037fafee50",
+      "name": "Pro",
+      "slug": "pro",
+      "currency": "USD",
+      "price_monthly_cents": 2900,
+      "price_yearly_cents": 29000
+    }
+  }
+}
+```
+
+**Response (no subscription):**
+```json
+{
+  "success": true,
+  "data": {
+    "subscription": null,
+    "message": "No active subscription"
+  }
+}
+```
+
+---
+
+### Change Plan
+
+Schedule a plan change at the end of the current billing period.
+
+```
+POST /billing/subscription/change-plan
+```
+
+**Request Body:**
+```json
+{
+  "plan_id": "b6215202-d167-45c1-a2dd-6d037fafee50"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| plan_id | string (uuid) | Yes | Target plan ID |
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Plan change scheduled for next billing cycle"
+}
+```
+
+---
+
+### Change Gateway
+
+Schedule a switch to a different payment provider (Stripe or CryptoCloud) at the end of the current billing period.
+
+```
+POST /billing/subscription/change-gateway
+```
+
+**Request Body:**
+```json
+{
+  "provider": "cryptocloud"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| provider | string | Yes | `stripe` or `cryptocloud` |
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Payment gateway change scheduled for next billing cycle"
+}
+```
+
+---
+
+### Cancel Subscription
+
+Cancel the subscription at the end of the current billing period. Access continues until `current_period_end`.
+
+```
+POST /billing/subscription/cancel
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Subscription will be canceled at the end of the current billing period"
+}
+```
+
+---
+
+### Payment Webhooks (server-to-server)
+
+These endpoints are called by Stripe and CryptoCloud when payment events occur. They are **not** called by the dashboard; configure them in each provider's dashboard.
+
+| Method | Endpoint | Provider |
+|--------|----------|----------|
+| POST | `/webhooks/billing/stripe` | Stripe – send **Stripe-Signature** header; configure in Stripe Dashboard |
+| POST | `/webhooks/billing/cryptocloud` | CryptoCloud – send **X-Signature** or **Signature** header; configure in CryptoCloud |
+
+**Environment variables:** `STRIPE_WEBHOOK_SECRET`, `CRYPTOCLOUD_WEBHOOK_SECRET` (and `STRIPE_SECRET_KEY`, `CRYPTOCLOUD_API_KEY`, `CRYPTOCLOUD_SHOP_ID` for creating checkouts).
+
+---
+
 ## Document Management
 
 Manage knowledge base documents for your tenant.
@@ -851,6 +1095,7 @@ Administrative APIs for managing users and tenants. Access is controlled by user
 | List all tenants | ❌ | ❌ | ✅ |
 | Update tenant status | ❌ | ❌ | ✅ |
 | Delete any tenant | ❌ | ❌ | ✅ |
+| Manage plans (CRUD) | ❌ | ❌ | ✅ |
 | Initialize admin | ❌ | ✅ | ✅ |
 
 ---
@@ -1158,6 +1403,186 @@ DELETE /admin/tenants/{tenant_id}
 
 ---
 
+## Admin APIs - Plan Management
+
+**Required Role:** `super_admin` only
+
+These APIs allow super administrators to create and manage billing plans. Plans define pricing (monthly/yearly), limits (projects, messages, documents, etc.), and feature flags. When Stripe is configured (`STRIPE_SECRET_KEY`), creating a plan automatically creates a Stripe Product and recurring Prices (monthly and yearly) and stores the price IDs on the plan.
+
+**Headers:**
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+### List Plans (Admin)
+
+Same as user-facing `GET /billing/plans`; returns all active plans.
+
+```
+GET /admin/plans
+```
+
+**Response:** Same as [List Plans](#list-plans) (user billing).
+
+---
+
+### Create Plan
+
+Create a new billing plan. If Stripe is configured, a Stripe Product and Prices are created automatically and saved on the plan.
+
+```
+POST /admin/plans
+```
+
+**Request Body:**
+```json
+{
+  "name": "Pro",
+  "slug": "pro",
+  "description": "For growing teams",
+  "currency": "USD",
+  "price_monthly_cents": 2900,
+  "price_yearly_cents": 29000,
+  "is_active": true,
+  "sort_order": 1,
+  "features_summary": "10 projects, 50k messages/mo",
+  "max_projects": 10,
+  "max_messages_per_month": 50000,
+  "max_documents": 500,
+  "max_document_size_mb": 10,
+  "enable_telegram_integration": true,
+  "enable_feedback": true,
+  "enable_custom_system_prompt": true,
+  "enable_rag_enhancements": true
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| name | string | Yes | Plan display name |
+| slug | string | Yes | Unique slug (e.g. `pro`) |
+| currency | string | Yes | e.g. `USD` |
+| price_monthly_cents | int | Yes | Monthly price in cents |
+| price_yearly_cents | int | No | Yearly price in cents |
+| is_active | bool | No | Default `true` |
+| sort_order | int | No | Display order |
+| description, features_summary | string | No | For display |
+| max_projects, max_messages_per_month, max_documents, max_document_size_mb | int | No | Plan limits |
+| enable_* | bool | No | Feature flags |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "plan": {
+      "id": "b6215202-d167-45c1-a2dd-6d037fafee50",
+      "name": "Pro",
+      "slug": "pro",
+      "currency": "USD",
+      "price_monthly_cents": 2900,
+      "price_yearly_cents": 29000,
+      "gateway_one_price_id": "price_xxx",
+      "gateway_one_yearly_price_id": "price_yyy",
+      "is_active": true,
+      "created_at": "2026-01-24T10:00:00Z",
+      "updated_at": "2026-01-24T10:00:00Z"
+    }
+  },
+  "message": "Plan created successfully"
+}
+```
+
+> **Note:** Set `STRIPE_SECRET_KEY` so Stripe Product/Prices are created automatically. Otherwise add `gateway_one_price_id` and `gateway_one_yearly_price_id` later via Update Plan or Stripe Dashboard.
+
+---
+
+### Get Plan
+
+Get a single plan by ID.
+
+```
+GET /admin/plans/{plan_id}
+```
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| plan_id | uuid | The plan's ID |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "plan": {
+      "id": "b6215202-d167-45c1-a2dd-6d037fafee50",
+      "name": "Pro",
+      "slug": "pro",
+      "currency": "USD",
+      "price_monthly_cents": 2900,
+      "price_yearly_cents": 29000,
+      "gateway_one_price_id": "price_xxx",
+      "gateway_one_yearly_price_id": "price_yyy",
+      "is_active": true,
+      "created_at": "2026-01-24T10:00:00Z",
+      "updated_at": "2026-01-24T10:00:00Z"
+    }
+  }
+}
+```
+
+---
+
+### Update Plan
+
+Update an existing plan. Use to change pricing, limits, or Stripe/CryptoCloud price IDs.
+
+```
+PUT /admin/plans/{plan_id}
+```
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| plan_id | uuid | The plan's ID |
+
+**Request Body:** Same fields as [Create Plan](#create-plan) (partial update supported).
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Plan updated successfully"
+}
+```
+
+---
+
+### Delete Plan
+
+Deactivate a plan (soft delete). Existing subscribers keep access until their period ends; new signups cannot select this plan.
+
+```
+DELETE /admin/plans/{plan_id}
+```
+
+**Path Parameters:**
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| plan_id | uuid | The plan's ID |
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Plan deactivated successfully"
+}
+```
+
+---
+
 ## Admin Quick Reference
 
 ### User Management (admin, super_admin)
@@ -1177,6 +1602,16 @@ DELETE /admin/tenants/{tenant_id}
 | GET | `/admin/tenants` | List all tenants |
 | PUT | `/admin/tenants/{id}/status` | Update tenant status |
 | DELETE | `/admin/tenants/{id}` | Delete tenant |
+
+### Plan Management (super_admin only)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/admin/plans` | List all plans |
+| POST | `/admin/plans` | Create plan (Stripe Product/Prices auto-created if configured) |
+| GET | `/admin/plans/{id}` | Get plan by ID |
+| PUT | `/admin/plans/{id}` | Update plan |
+| DELETE | `/admin/plans/{id}` | Deactivate plan |
 
 ---
 
@@ -1235,6 +1670,42 @@ curl -X PUT http://localhost:8080/api/v1/admin/tenants/$TENANT_ID/status \
 # Disable their account
 curl -X DELETE http://localhost:8080/api/v1/admin/users/$USER_ID \
   -H "Authorization: Bearer $ADMIN_TOKEN"
+```
+
+### 5. Create a Billing Plan (Super Admin)
+
+```bash
+# Create a plan (Stripe Product/Prices auto-created if STRIPE_SECRET_KEY is set)
+curl -X POST http://localhost:8080/api/v1/admin/plans \
+  -H "Authorization: Bearer $SUPER_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Pro",
+    "slug": "pro",
+    "currency": "USD",
+    "price_monthly_cents": 2900,
+    "price_yearly_cents": 29000,
+    "is_active": true,
+    "sort_order": 1
+  }'
+```
+
+### 6. User Checkout Flow (Dashboard / Pricing Page)
+
+```bash
+# List plans (any authenticated user)
+curl http://localhost:8080/api/v1/billing/plans \
+  -H "Authorization: Bearer $TOKEN"
+
+# Start checkout (redirect user to checkout_url)
+curl -X POST http://localhost:8080/api/v1/billing/checkout \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"plan_id": "PLAN_UUID", "provider": "stripe", "period": "monthly"}'
+
+# Get current subscription
+curl http://localhost:8080/api/v1/billing/subscription \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 ---

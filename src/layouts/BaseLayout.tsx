@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
   Building2,
+  CreditCard,
   Shield,
   LogOut,
   Menu,
@@ -13,48 +14,54 @@ import {
   User,
   ChevronRight,
   Home,
+  Users,
 } from 'lucide-react';
 
-interface DashboardLayoutProps {
+interface BaseLayoutProps {
   changeLanguage: (lang: string) => void;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => {
+/** Role-based nav: each tab is a separate page. No nested "admin" section. */
+function getNavItems(t: (key: string) => string, role: string | undefined) {
+  const items: { icon: typeof LayoutDashboard; label: string; path: string; id: string }[] = [
+    { icon: LayoutDashboard, label: t('nav.dashboard'), path: '/dashboard', id: 'dashboard' },
+  ];
+  
+  // Regular user tabs: Tenants and Billing
+  if (role !== 'super_admin' && role !== 'admin') {
+    items.push({ icon: Building2, label: t('nav.tenants'), path: '/tenants', id: 'tenants' });
+    items.push({ icon: CreditCard, label: t('nav.billing'), path: '/billing', id: 'billing' });
+  }
+
+  // Admin tabs: separate tabs per page (Overview, Users, Tenants, Plans)
+  if (role === 'super_admin' || role === 'admin') {
+    items.push({ icon: Shield, label: t('admin.overview'), path: '/admin', id: 'admin-overview' });
+    items.push({ icon: Users, label: t('admin.users'), path: '/admin/users', id: 'admin-users' });
+    if (role === 'super_admin') {
+      items.push({ icon: Building2, label: t('admin.allTenants'), path: '/admin/tenants', id: 'admin-tenants' });
+      items.push({ icon: CreditCard, label: t('admin.planManagement'), path: '/admin/plans', id: 'admin-plans' });
+    }
+  }
+
+  return items;
+}
+
+const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  const navItems = getNavItems(t, user?.role);
+
   useEffect(() => {
-    // Set document direction based on language
     if (i18n.language === 'ar') {
       document.documentElement.setAttribute('dir', 'rtl');
     } else {
       document.documentElement.setAttribute('dir', 'ltr');
     }
   }, [i18n.language]);
-
-  const navItems = [
-    { 
-      icon: LayoutDashboard, 
-      label: t('nav.dashboard'), 
-      path: '/dashboard',
-      id: 'dashboard'
-    },
-    { 
-      icon: Building2, 
-      label: t('nav.tenants'), 
-      path: '/tenants',
-      id: 'tenants'
-    },
-    ...(user?.role === 'super_admin' ? [{ 
-      icon: Shield, 
-      label: t('nav.admin'), 
-      path: '/admin',
-      id: 'admin'
-    }] : []),
-  ];
 
   const handleLogout = async () => {
     await logout();
@@ -72,22 +79,32 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
 
   const isRTL = i18n.language === 'ar';
 
+  const getActiveLabel = () => {
+    const exact = navItems.find((item) => location.pathname === item.path);
+    if (exact) return exact.label;
+    const starts = navItems.find((item) => item.path !== '/admin' && location.pathname.startsWith(item.path + '/'));
+    if (starts) return starts.label;
+    if (location.pathname.startsWith('/admin')) {
+      const adminItem = navItems.find((item) => item.path !== '/admin' && location.pathname.startsWith(item.path));
+      return adminItem?.label ?? t('admin.title');
+    }
+    return t('nav.dashboard');
+  };
+
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 z-50 w-64 bg-slate-800/95 backdrop-blur-xl border-r border-slate-700/50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isRTL ? 'right-0' : 'left-0'
         } ${
-          isSidebarOpen 
-            ? 'translate-x-0' 
-            : isRTL 
-              ? 'translate-x-full' 
+          isSidebarOpen
+            ? 'translate-x-0'
+            : isRTL
+              ? 'translate-x-full'
               : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
           <div className="px-5 py-5 border-b border-slate-700/50">
             <Link to="/dashboard" className="flex items-center gap-3 group">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-lg group-hover:shadow-cyan-500/30 transition-all">
@@ -100,11 +117,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
             </Link>
           </div>
 
-          {/* Navigation */}
           <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto scrollbar-modern">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path || location.pathname.startsWith(item.path);
+              const isActive =
+                location.pathname === item.path ||
+                (item.path !== '/admin' && location.pathname.startsWith(item.path + '/'));
+              const reallyActive = item.path.startsWith('/admin') ? location.pathname === item.path : isActive;
               return (
                 <button
                   key={item.id}
@@ -113,20 +132,19 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
                     setIsSidebarOpen(false);
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group ${
-                    isActive
+                    reallyActive
                       ? 'bg-gradient-to-r from-cyan-600/20 to-teal-600/20 text-cyan-300 border border-cyan-500/30 shadow-lg shadow-cyan-500/10'
                       : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
                   }`}
                 >
                   <Icon size={18} className="flex-shrink-0" />
                   <span className="font-medium text-sm">{item.label}</span>
-                  {isActive && <ChevronRight size={14} className={`opacity-70 ${isRTL ? 'mr-auto rotate-180' : 'ml-auto'}`} />}
+                  {reallyActive && <ChevronRight size={14} className={`opacity-70 ${isRTL ? 'mr-auto rotate-180' : 'ml-auto'}`} />}
                 </button>
               );
             })}
           </nav>
 
-          {/* User Section */}
           <div className="p-4 border-t border-slate-700/50 space-y-2">
             <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-700/30 border border-slate-700/50">
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-md">
@@ -148,9 +166,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className={`flex-1 min-h-screen ${isRTL ? 'lg:mr-64' : 'lg:ml-64'}`}>
-        {/* Header */}
         <header className="sticky top-0 z-40 bg-slate-800/80 backdrop-blur-xl border-b border-slate-700/50 px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -160,13 +176,9 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
               >
                 {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
-              <h2 className="text-xl font-bold text-white truncate">
-                {navItems.find((item) => location.pathname === item.path || location.pathname.startsWith(item.path))?.label || t('nav.dashboard')}
-              </h2>
+              <h2 className="text-xl font-bold text-white truncate">{getActiveLabel()}</h2>
             </div>
-
             <div className="flex items-center gap-3">
-              {/* Language Selector */}
               <div className="bg-slate-700/50 border border-slate-600/50 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-700/70 transition-colors">
                 <Globe size={16} className="text-slate-400" />
                 <select
@@ -182,13 +194,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
           </div>
         </header>
 
-        {/* Content */}
         <main className="p-4 lg:p-6">
           <Outlet />
         </main>
       </div>
 
-      {/* Sidebar Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
@@ -199,4 +209,4 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ changeLanguage }) => 
   );
 };
 
-export default DashboardLayout;
+export default BaseLayout;

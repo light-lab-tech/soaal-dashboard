@@ -15,6 +15,7 @@ import {
   Users,
   BarChart3,
   RefreshCw,
+  Shield,
 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
@@ -27,6 +28,8 @@ const Dashboard: React.FC = () => {
     totalDocuments: 0,
     pendingQuestions: 0,
     satisfactionRate: 0,
+    totalUsers: 0,
+    totalPlans: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,10 +40,28 @@ const Dashboard: React.FC = () => {
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
+      // Super admin: platform stats from admin APIs
+      if (user?.role === 'super_admin') {
+        const [usersRes, tenantsRes, plansRes] = await Promise.all([
+          api.getAllUsers(),
+          api.getAllTenants().catch(() => ({ data: { tenants: [], total: 0 } })),
+          api.getAdminPlans().catch(() => ({ data: { plans: [] } })),
+        ]);
+        setTenants([]);
+        setStats({
+          totalTenants: tenantsRes.data.tenants?.length ?? 0,
+          totalDocuments: 0,
+          pendingQuestions: 0,
+          satisfactionRate: 0,
+          totalUsers: usersRes.data.users?.length ?? 0,
+          totalPlans: plansRes.data.plans?.length ?? 0,
+        });
+        return;
+      }
+
       const tenantsResponse = await api.getTenants();
       setTenants(tenantsResponse.data.tenants);
 
-      // Calculate stats from tenants
       let totalDocs = 0;
       let pendingQs = 0;
       let totalFeedback = 0;
@@ -50,10 +71,8 @@ const Dashboard: React.FC = () => {
         try {
           const docsResponse = await api.getDocuments(tenant.id);
           totalDocs += docsResponse.data.documents.length;
-
           const questionsResponse = await api.getPendingQuestions(tenant.id);
           pendingQs += questionsResponse.data.questions.filter(q => q.status === 'pending').length;
-
           const feedbackResponse = await api.getFeedbackStats(tenant.id);
           totalFeedback += feedbackResponse.data.total_feedback;
           positiveFeedback += feedbackResponse.data.positive_count;
@@ -67,6 +86,8 @@ const Dashboard: React.FC = () => {
         totalDocuments: totalDocs,
         pendingQuestions: pendingQs,
         satisfactionRate: totalFeedback > 0 ? Math.round((positiveFeedback / totalFeedback) * 100) : 0,
+        totalUsers: 0,
+        totalPlans: 0,
       });
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -75,64 +96,37 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const quickActions = [
-    {
-      icon: Building2,
-      label: t('dashboard.createTenant'),
-      onClick: () => navigate('/tenants'),
-      color: 'from-cyan-400 via-teal-500 to-cyan-500',
-      shadow: 'shadow-cyan-500/30',
-    },
-    {
-      icon: FileText,
-      label: t('dashboard.uploadDocument'),
-      onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/documents`),
-      color: 'from-purple-400 via-pink-500 to-purple-500',
-      shadow: 'shadow-purple-500/30',
-    },
-    {
-      icon: BarChart3,
-      label: t('dashboard.viewAnalytics'),
-      onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/analytics`),
-      color: 'from-amber-400 via-orange-500 to-amber-500',
-      shadow: 'shadow-amber-500/30',
-    },
-  ];
+  const isSuperAdmin = user?.role === 'super_admin';
+  const isAdmin = user?.role === 'admin';
+  const quickActions = isSuperAdmin
+    ? [
+        { icon: Users, label: t('admin.userManagement'), onClick: () => navigate('/admin/users'), color: 'from-blue-400 to-blue-600', shadow: 'shadow-blue-500/30', needsTenants: false },
+        { icon: Building2, label: t('admin.tenantManagement'), onClick: () => navigate('/admin/tenants'), color: 'from-cyan-400 to-teal-600', shadow: 'shadow-cyan-500/30', needsTenants: false },
+        { icon: BarChart3, label: t('admin.planManagement'), onClick: () => navigate('/admin/plans'), color: 'from-purple-400 to-purple-600', shadow: 'shadow-purple-500/30', needsTenants: false },
+      ]
+    : isAdmin
+      ? [
+          { icon: Shield, label: t('admin.overview'), onClick: () => navigate('/admin'), color: 'from-purple-400 to-purple-600', shadow: 'shadow-purple-500/30', needsTenants: false },
+          { icon: Users, label: t('admin.users'), onClick: () => navigate('/admin/users'), color: 'from-blue-400 to-blue-600', shadow: 'shadow-blue-500/30', needsTenants: false },
+        ]
+      : [
+          { icon: Building2, label: t('dashboard.createTenant'), onClick: () => navigate('/tenants'), color: 'from-cyan-400 via-teal-500 to-cyan-500', shadow: 'shadow-cyan-500/30', needsTenants: false },
+          { icon: FileText, label: t('dashboard.uploadDocument'), onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/documents`), color: 'from-purple-400 via-pink-500 to-purple-500', shadow: 'shadow-purple-500/30', needsTenants: true },
+          { icon: BarChart3, label: t('dashboard.viewAnalytics'), onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/analytics`), color: 'from-amber-400 via-orange-500 to-amber-500', shadow: 'shadow-amber-500/30', needsTenants: true },
+        ];
 
-  const statCards = [
-    {
-      icon: Building2,
-      label: t('dashboard.totalTenants'),
-      value: stats.totalTenants,
-      color: 'from-cyan-400 via-teal-500 to-cyan-600',
-      shadow: 'shadow-cyan-500/30',
-      trend: '+12%',
-    },
-    {
-      icon: FileText,
-      label: t('dashboard.totalDocuments'),
-      value: stats.totalDocuments,
-      color: 'from-purple-400 via-pink-500 to-purple-600',
-      shadow: 'shadow-purple-500/30',
-      trend: '+24%',
-    },
-    {
-      icon: MessageSquare,
-      label: t('dashboard.pendingQuestions'),
-      value: stats.pendingQuestions,
-      color: 'from-amber-400 via-orange-500 to-amber-600',
-      shadow: 'shadow-amber-500/30',
-      trend: '+8%',
-    },
-    {
-      icon: TrendingUp,
-      label: t('dashboard.satisfactionRate'),
-      value: `${stats.satisfactionRate}%`,
-      color: 'from-emerald-400 via-green-500 to-emerald-600',
-      shadow: 'shadow-emerald-500/30',
-      trend: '+5%',
-    },
-  ];
+  const statCards = isSuperAdmin
+    ? [
+        { icon: Users, label: t('admin.users'), value: stats.totalUsers, color: 'from-blue-400 to-blue-600', shadow: 'shadow-blue-500/30', trend: '' },
+        { icon: Building2, label: t('admin.allTenants'), value: stats.totalTenants, color: 'from-cyan-400 to-teal-600', shadow: 'shadow-cyan-500/30', trend: '' },
+        { icon: FileText, label: t('billing.plans'), value: stats.totalPlans, color: 'from-purple-400 to-purple-600', shadow: 'shadow-purple-500/30', trend: '' },
+      ]
+    : [
+        { icon: Building2, label: t('dashboard.totalTenants'), value: stats.totalTenants, color: 'from-cyan-400 via-teal-500 to-cyan-600', shadow: 'shadow-cyan-500/30', trend: '+12%' },
+        { icon: FileText, label: t('dashboard.totalDocuments'), value: stats.totalDocuments, color: 'from-purple-400 via-pink-500 to-purple-600', shadow: 'shadow-purple-500/30', trend: '+24%' },
+        { icon: MessageSquare, label: t('dashboard.pendingQuestions'), value: stats.pendingQuestions, color: 'from-amber-400 via-orange-500 to-amber-600', shadow: 'shadow-amber-500/30', trend: '+8%' },
+        { icon: TrendingUp, label: t('dashboard.satisfactionRate'), value: `${stats.satisfactionRate}%`, color: 'from-emerald-400 via-green-500 to-emerald-600', shadow: 'shadow-emerald-500/30', trend: '+5%' },
+      ];
 
   if (isLoading) {
     return (
@@ -163,8 +157,8 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {statCards.map((stat, index) => {
+      <div className={`grid grid-cols-2 gap-4 ${isSuperAdmin ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
+        {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
             <div
@@ -175,9 +169,11 @@ const Dashboard: React.FC = () => {
                 <div className={`p-2.5 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center ${stat.shadow}`}>
                   <Icon size={18} className="text-white" />
                 </div>
-                <span className="text-[10px] text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                  {stat.trend}
-                </span>
+                {stat.trend && (
+                  <span className="text-[10px] text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                    {stat.trend}
+                  </span>
+                )}
               </div>
               <h3 className="text-2xl font-bold text-white mb-0.5 group-hover:text-glow transition-all">
                 {stat.value}
@@ -211,7 +207,7 @@ const Dashboard: React.FC = () => {
               <button
                 key={action.label}
                 onClick={action.onClick}
-                disabled={action.onClick.toString().includes('navigate') && tenants.length === 0}
+                disabled={action.needsTenants && tenants.length === 0}
                 className="glass-card group hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-left p-4"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -229,8 +225,8 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Recent Tenants */}
-      {tenants.length > 0 && (
+      {/* Recent Tenants (only for non–super_admin) */}
+      {!isSuperAdmin && tenants.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold text-white flex items-center gap-2">
@@ -251,7 +247,7 @@ const Dashboard: React.FC = () => {
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {tenants.slice(0, 3).map((tenant, index) => (
+            {tenants.slice(0, 3).map((tenant) => (
               <div
                 key={tenant.id}
                 onClick={() => navigate(`/tenants/${tenant.id}`)}
@@ -296,8 +292,20 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Empty State */}
-      {tenants.length === 0 && (
+      {/* Super Admin: CTA to Admin */}
+      {isSuperAdmin && (
+        <div className="glass-card p-6 text-center border-purple-500/30 bg-purple-500/5">
+          <h3 className="text-lg font-semibold text-white mb-2">{t('admin.title')}</h3>
+          <p className="text-slate-400 text-sm mb-4">{t('admin.platformStats')}</p>
+          <button onClick={() => navigate('/admin')} className="btn-primary px-5 py-2.5 rounded-xl text-sm font-medium inline-flex items-center gap-2">
+            <Building2 size={16} />
+            {t('admin.overview')}
+          </button>
+        </div>
+      )}
+
+      {/* Empty State (only for non–super_admin) */}
+      {!isSuperAdmin && tenants.length === 0 && (
         <div className="glass-card p-8 text-center">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-400/20 via-teal-500/20 to-cyan-400/20 flex items-center justify-center">
             <Building2 size={28} className="text-cyan-400" />

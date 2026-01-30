@@ -24,7 +24,6 @@ const Documents: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [showUrlModal, setShowUrlModal] = useState(false);
   const [urlInput, setUrlInput] = useState('');
-  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!tenantId) {
