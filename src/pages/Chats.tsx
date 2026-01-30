@@ -86,20 +86,21 @@ const Chats: React.FC = () => {
   // Show messages view
   if (selectedChat) {
     return (
-      <div className="space-y-5">
+      <div className="space-y-5 animate-fade-in">
         {/* Header */}
         <div className="flex items-center gap-4">
           <button
             onClick={handleBackToChats}
-            className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-colors"
+            className="p-2.5 rounded-xl bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-all duration-200 hover:scale-105"
           >
             <ArrowLeft size={20} />
           </button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-xl font-bold text-white">
               {selectedChat.title || `${t('chats.chatTitle')} #${selectedChat.id.slice(0, 8)}`}
             </h1>
-            <p className="text-slate-400 text-sm">
+            <p className="text-slate-400 text-sm flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               {new Date(selectedChat.created_at).toLocaleString()}
             </p>
           </div>
@@ -108,40 +109,53 @@ const Chats: React.FC = () => {
         {/* Messages */}
         {isLoadingMessages ? (
           <div className="flex items-center justify-center min-h-[200px]">
-            <Loader2 size={24} className="animate-spin text-cyan-400" />
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 size={32} className="animate-spin text-cyan-400" />
+              <span className="text-slate-400 text-sm">{t('common.loading')}</span>
+            </div>
           </div>
         ) : messages.length === 0 ? (
-          <div className="glass-card p-8 text-center">
-            <MessageSquare size={48} className="mx-auto text-slate-500 mb-3" />
-            <p className="text-slate-400">{t('chats.noMessages')}</p>
+          <div className="glass-card p-12 text-center">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-slate-700/50 flex items-center justify-center empty-state-icon">
+              <MessageSquare size={36} className="text-slate-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-white mb-2">{t('chats.noMessages')}</h3>
+            <p className="text-slate-400 text-sm">Messages will appear here when the conversation starts</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {messages.map((message) => (
+          <div className="space-y-4">
+            {messages.map((message, index) => (
               <div
                 key={message.id}
-                className={`glass-card p-4 ${
+                className={`glass-card p-5 animate-slide-up ${
                   message.role === 'user'
-                    ? 'border-l-4 border-cyan-500/50'
+                    ? 'border-l-4 border-cyan-500/70 bg-cyan-500/5'
                     : message.role === 'assistant'
-                    ? 'border-l-4 border-purple-500/50'
+                    ? 'border-l-4 border-purple-500/70 bg-purple-500/5'
                     : 'border-l-4 border-slate-500/50'
                 }`}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  {message.role === 'user' ? (
-                    <User size={16} className="text-cyan-400" />
-                  ) : (
-                    <Bot size={16} className="text-purple-400" />
-                  )}
-                  <span className="text-sm font-medium text-slate-300 capitalize">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`p-2 rounded-lg ${
+                    message.role === 'user' ? 'bg-cyan-500/20' : 'bg-purple-500/20'
+                  }`}>
+                    {message.role === 'user' ? (
+                      <User size={16} className="text-cyan-400" />
+                    ) : (
+                      <Bot size={16} className="text-purple-400" />
+                    )}
+                  </div>
+                  <span className={`text-sm font-semibold ${
+                    message.role === 'user' ? 'text-cyan-400' : 'text-purple-400'
+                  }`}>
                     {message.role === 'user' ? t('chats.user') : t('chats.assistant')}
                   </span>
                   <span className="text-xs text-slate-500 ml-auto">
                     {new Date(message.created_at).toLocaleTimeString()}
                   </span>
                 </div>
-                <p className="text-white whitespace-pre-wrap">{message.content}</p>
+                <p className="text-white whitespace-pre-wrap leading-relaxed">{message.content}</p>
               </div>
             ))}
           </div>
@@ -152,26 +166,33 @@ const Chats: React.FC = () => {
 
   // Show chats list
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(`/tenants/${tenantId}`)}
-            className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-colors"
+            className="p-2.5 rounded-xl bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-all duration-200 hover:scale-105"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-white">{t('chats.title')}</h1>
-            <p className="text-slate-400 text-sm">
-              {tenant?.name} • {t('chats.totalChats')}: {totalChats}
+            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+              <span className="p-2 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20">
+                <MessageSquare size={20} className="text-emerald-400" />
+              </span>
+              {t('chats.title')}
+            </h1>
+            <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
+              {tenant?.name}
+              <span className="w-1 h-1 rounded-full bg-slate-500"></span>
+              <span className="text-emerald-400 font-medium">{totalChats}</span> {t('chats.totalChats').toLowerCase()}
             </p>
           </div>
         </div>
         <button
           onClick={loadData}
-          className="glass-button-secondary px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
+          className="glass-button-secondary px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 hover:scale-105 transition-transform"
         >
           <RefreshCw size={16} />
           {t('common.update')}
@@ -180,38 +201,40 @@ const Chats: React.FC = () => {
 
       {/* Chats List */}
       {chats.length === 0 ? (
-        <div className="glass-card p-12 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-700/50 flex items-center justify-center">
-            <MessageSquare size={32} className="text-slate-400" />
+        <div className="glass-card p-16 text-center">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-slate-700/50 flex items-center justify-center empty-state-icon">
+            <MessageSquare size={40} className="text-slate-400" />
           </div>
-          <h3 className="text-lg font-semibold text-white mb-2">{t('chats.noChats')}</h3>
-          <p className="text-slate-400 text-sm">{t('chats.noChatsDesc')}</p>
+          <h3 className="text-xl font-semibold text-white mb-2">{t('chats.noChats')}</h3>
+          <p className="text-slate-400 text-sm max-w-md mx-auto">{t('chats.noChatsDesc')}</p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {chats.map((chat) => (
+        <div className="space-y-3">
+          {chats.map((chat, index) => (
             <div
               key={chat.id}
               onClick={() => loadMessages(chat)}
-              className="glass-card p-4 cursor-pointer hover:scale-[1.01] transition-all group"
+              className="glass-card p-5 cursor-pointer hover:scale-[1.01] transition-all group card-hover-lift animate-slide-up"
+              style={{ animationDelay: `${index * 50}ms` }}
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500/20 to-teal-500/20">
-                    <MessageSquare size={20} className="text-cyan-400" />
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20 group-hover:from-emerald-500/30 group-hover:to-green-500/30 transition-colors">
+                    <MessageSquare size={22} className="text-emerald-400" />
                   </div>
                   <div>
-                    <h3 className="text-white font-medium">
+                    <h3 className="text-white font-semibold group-hover:text-emerald-300 transition-colors">
                       {chat.title || `${t('chats.chatTitle')} #${chat.id.slice(0, 8)}`}
                     </h3>
-                    <p className="text-slate-400 text-sm">
+                    <p className="text-slate-400 text-sm flex items-center gap-2 mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                       {new Date(chat.created_at).toLocaleString()}
                     </p>
                   </div>
                 </div>
                 <ChevronRight
-                  size={20}
-                  className="text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all"
+                  size={22}
+                  className="text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-2 transition-all duration-300"
                 />
               </div>
             </div>
