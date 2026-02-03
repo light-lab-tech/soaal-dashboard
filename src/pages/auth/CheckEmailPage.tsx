@@ -60,7 +60,7 @@ const CheckEmailPage: React.FC = () => {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 md:p-8">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="background-container">
         <div className="background-orb orb-1"></div>
         <div className="background-orb orb-2"></div>
@@ -68,49 +68,49 @@ const CheckEmailPage: React.FC = () => {
         <div className="background-orb orb-4"></div>
       </div>
 
-      <div className="relative z-10 w-full max-w-lg animate-slide-up">
+      <div className="relative z-10 w-full max-w-md animate-slide-up">
         <div className="glass-card overflow-hidden">
           <div className="h-1 bg-gradient-to-r from-cyan-400 via-teal-500 to-cyan-600 animate-gradient-shift"></div>
 
-          <div className="text-center pt-8 pb-6">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-cyan-400 via-teal-500 to-cyan-600 mb-6 shadow-2xl shadow-cyan-500/30">
-              <Mail size={36} className="text-white" />
+          <div className="text-center pt-5 pb-4 px-4">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-cyan-400 via-teal-500 to-cyan-600 mb-3 shadow-lg shadow-cyan-500/30">
+              <Mail size={24} className="text-white" />
             </div>
-            <h1 className="text-4xl font-bold mb-2">
-              <span className="text-glow bg-gradient-to-r from-cyan-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold mb-0.5">
+              <span className="bg-gradient-to-r from-cyan-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent">
                 SoaAL
               </span>
             </h1>
-            <p className="text-base text-glass-textSecondary font-medium">{t('auth.checkEmailTitle')}</p>
+            <p className="text-sm text-glass-textSecondary">{t('auth.checkEmailTitle')}</p>
           </div>
 
-          <div className="px-8 pb-8 space-y-6">
-            <p className="text-glass-text text-center">{t('auth.checkEmailMessage')}</p>
+          <div className="px-4 pb-4 sm:px-5 sm:pb-5 space-y-4">
+            <p className="text-glass-text text-center text-sm">{t('auth.checkEmailMessage')}</p>
 
             {success && (
-              <div className="glass p-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm">
+              <div className="glass p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm">
                 {t('auth.resendVerificationSent')}
               </div>
             )}
             {error && (
-              <div className="glass p-4 rounded-2xl border border-red-500/30 bg-red-500/10 text-red-400 text-sm">
+              <div className="glass p-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-sm">
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleResend} className="space-y-4">
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-glass-text px-1">{t('auth.email')}</label>
+            <form onSubmit={handleResend} className="space-y-3">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-medium text-glass-text px-1">{t('auth.email')}</label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-cyan-400 transition-colors z-10">
-                    <Mail size={20} />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-cyan-400 transition-colors">
+                    <Mail size={16} />
                   </div>
                   <input
                     type="email"
                     value={email}
                     onChange={hasEmailFromState ? undefined : (e) => setEmail(e.target.value)}
                     readOnly={hasEmailFromState}
-                    className={`glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-base ${
+                    className={`glass-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm ${
                       hasEmailFromState ? 'opacity-75 cursor-not-allowed' : ''
                     }`}
                     placeholder="user@company.com"
@@ -123,43 +123,43 @@ const CheckEmailPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading || success || !email.trim()}
-                className="glass-button w-full py-4 rounded-2xl text-base font-semibold flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="glass-button w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isLoading ? (
                   <>
-                    <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-[3px] border-white/30 border-t-white rounded-full animate-spin" />
                     <span>{t('common.loading')}</span>
                   </>
                 ) : (
                   <>
-                    <Send size={20} />
+                    <Send size={16} />
                     <span>{t('auth.resendVerificationLink')}</span>
                   </>
                 )}
               </button>
             </form>
 
-            <div className="text-center pt-4 border-t border-white/10">
+            <div className="text-center pt-3 border-t border-white/10">
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-medium"
+                className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-medium text-sm"
               >
-                <ArrowLeft size={18} className="rtl-flip" />
+                <ArrowLeft size={14} className="rtl-flip" />
                 {t('auth.login')}
               </Link>
             </div>
           </div>
 
-          <div className="absolute top-4 right-4">
-            <div className="glass-button-secondary px-4 py-2 rounded-2xl flex items-center gap-2">
-              <Globe size={16} className="text-glass-textSecondary" />
+          <div className="absolute top-3 right-3">
+            <div className="glass-button-secondary px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
+              <Globe size={12} className="text-glass-textSecondary" />
               <select
                 value={i18n.language}
                 onChange={(e) => changeLanguage(e.target.value)}
-                className="bg-transparent text-white font-medium outline-none cursor-pointer"
+                className="bg-transparent text-white text-xs font-medium outline-none cursor-pointer"
               >
-                <option value="en" className="bg-slate-900 text-white">English</option>
-                <option value="ar" className="bg-slate-900 text-white">العربية</option>
+                <option value="en" className="bg-slate-800 text-white">English</option>
+                <option value="ar" className="bg-slate-800 text-white">العربية</option>
               </select>
             </div>
           </div>
