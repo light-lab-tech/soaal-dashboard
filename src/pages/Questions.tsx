@@ -161,7 +161,7 @@ const Questions: React.FC = () => {
               }`}
             >
               <div className="flex items-start justify-between mb-3">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8] to-[#7C3AED]">
                   <MessageSquare size={16} className="text-white" />
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -199,8 +199,8 @@ const Questions: React.FC = () => {
         </div>
       ) : !error && (
         <div className="glass-card p-8 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-amber-400/20 via-orange-500/20 to-amber-400/20 flex items-center justify-center">
-            <MessageSquare size={28} className="text-amber-400" />
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#8B00E8]/20 via-[#A855F7]/20 to-[#7C3AED]/20 flex items-center justify-center">
+            <MessageSquare size={28} className="text-[#8B00E8]" />
           </div>
           <h3 className="text-base font-semibold text-white mb-1">
             {statusFilter === 'pending' ? t('questions.noPendingQuestions') : 

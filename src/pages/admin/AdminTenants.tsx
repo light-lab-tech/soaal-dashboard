@@ -67,7 +67,7 @@ const AdminTenants: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3 p-6">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-white">{t('common.loading')}</span>
         </div>
       </div>
@@ -112,7 +112,7 @@ const AdminTenants: React.FC = () => {
                     <td className="p-4">
                       <button
                         onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
-                        className="text-white font-medium hover:text-cyan-400 transition-colors"
+                        className="text-white font-medium hover:text-[#8B00E8] transition-colors"
                       >
                         {tenant.name}
                       </button>
@@ -134,7 +134,7 @@ const AdminTenants: React.FC = () => {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
-                          className="p-2 rounded-lg btn-secondary text-cyan-400"
+                          className="p-2 rounded-lg btn-secondary text-[#8B00E8]"
                           title={t('common.view')}
                         >
                           <Eye size={18} />

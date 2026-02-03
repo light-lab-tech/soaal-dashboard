@@ -134,7 +134,7 @@ const Documents: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-6 h-6 border-2 border-[#8B00E8] border-t-transparent rounded-full animate-spin"></div>
           <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
@@ -176,11 +176,11 @@ const Documents: React.FC = () => {
       <div
         {...getRootProps()}
         className={`glass-card p-6 text-center cursor-pointer transition-all ${
-          isDragActive ? 'border-cyan-400 bg-cyan-500/10' : 'hover:border-cyan-400/50'
+          isDragActive ? 'border-[#8B00E8] bg-[#A855F7]/10' : 'hover:border-[#8B00E8]/50'
         }`}
       >
         <input {...getInputProps()} />
-        <Upload size={32} className="mx-auto mb-3 text-cyan-400" />
+        <Upload size={32} className="mx-auto mb-3 text-[#8B00E8]" />
         <p className="text-sm font-medium text-white mb-1">
           {isDragActive ? t('documents.dropFilesHere') : t('documents.dragDrop')}
         </p>
@@ -193,7 +193,7 @@ const Documents: React.FC = () => {
           {documents.map((document) => (
             <div key={document.id} className="glass-card group hover:scale-[1.02] transition-transform duration-200 p-4">
               <div className="flex items-start justify-between mb-3">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8] to-[#7C3AED]">
                   <FileText size={16} className="text-white" />
                 </div>
                 <div className="flex items-center gap-1.5">

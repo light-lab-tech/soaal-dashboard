@@ -57,7 +57,7 @@ const AdminAnalytics: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3 p-6">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-white">{t('common.loading')}</span>
         </div>
       </div>
@@ -81,8 +81,8 @@ const AdminAnalytics: React.FC = () => {
             label: t('admin.allTenants'),
             value: stats.tenants,
             path: '/admin/tenants',
-            color: 'from-cyan-500 to-teal-600',
-            shadow: 'shadow-cyan-500/30',
+            color: 'from-[#8B00E8] to-[#7C3AED]',
+            shadow: 'shadow-[#8B00E8]/30',
             trend: '+8%',
           },
           {
@@ -102,11 +102,11 @@ const AdminAnalytics: React.FC = () => {
     <div className="space-y-5">
       {/* Header */}
       <div className="glass-card relative overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 opacity-0 transition-opacity group-hover:opacity-100"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#8B00E8]/10 via-[#A855F7]/10 to-[#7C3AED]/10 opacity-0 transition-opacity group-hover:opacity-100"></div>
         <div className="relative flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-1">
-              <span className="bg-gradient-to-r from-cyan-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
                 {t('admin.title')}
               </span>
             </h1>
@@ -151,7 +151,7 @@ const AdminAnalytics: React.FC = () => {
                   <p className="text-sm text-slate-400">{stat.label}</p>
                 </div>
                 <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
-                <ArrowRight size={20} className="text-slate-500 group-hover:text-cyan-400" />
+                <ArrowRight size={20} className="text-slate-500 group-hover:text-[#8B00E8]" />
               </span>
               </div>
             </div>
@@ -162,9 +162,9 @@ const AdminAnalytics: React.FC = () => {
       {/* Quick Actions */}
       <div className="glass-card">
         <div className="flex items-center gap-2 mb-4">
-          <Activity className="text-pink-400" size={20} />
+          <Activity className="text-[#8B00E8]" size={20} />
           <h2 className="text-lg font-semibold text-white">
-            <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-pink-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#8B00E8] bg-clip-text text-transparent">
               {t('admin.quickLinks')}
             </span>
           </h2>
@@ -193,7 +193,7 @@ const AdminAnalytics: React.FC = () => {
                 className="glass-card group hover:scale-[1.02] transition-all duration-300 text-start p-4"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-cyan-500/30">
+                  <div className="p-2 rounded-xl bg-gradient-to-br from-[#8B00E8] to-[#7C3AED] flex items-center justify-center shadow-[#8B00E8]/30">
                     <Building2 size={18} className="text-white" />
                   </div>
                   <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">

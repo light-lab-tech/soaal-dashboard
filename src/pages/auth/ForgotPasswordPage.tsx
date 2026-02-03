@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../services/api';
-import { Mail, ArrowLeft, Sparkles, Globe } from 'lucide-react';
+import { Mail, ArrowLeft, Globe } from 'lucide-react';
+import { Logo } from '../../components/Logo';
 
 const ForgotPasswordPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -53,14 +54,14 @@ const ForgotPasswordPage: React.FC = () => {
 
       <div className="relative z-10 w-full max-w-md animate-slide-up">
         <div className="glass-card overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 animate-gradient-shift"></div>
+          <div className="h-1 bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] animate-gradient-shift"></div>
 
           <div className="text-center pt-5 pb-4 px-4">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 mb-3 shadow-lg shadow-amber-500/30">
-              <Sparkles size={24} className="text-white" />
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-brand-gradient mb-3 shadow-lg shadow-[#8B00E8]/40">
+              <Logo size={28} variant="icon-only" />
             </div>
             <h1 className="text-xl font-bold mb-0.5">
-              <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
                 SoaAL
               </span>
             </h1>
@@ -84,7 +85,7 @@ const ForgotPasswordPage: React.FC = () => {
                 <div className="space-y-1.5">
                   <label className="block text-xs font-medium text-glass-text px-1">{t('auth.email')}</label>
                   <div className="relative group">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-amber-400 transition-colors">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-[#A855F7] transition-colors">
                       <Mail size={16} />
                     </div>
                     <input
@@ -103,7 +104,7 @@ const ForgotPasswordPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 text-white hover:opacity-90 transition-opacity"
+                  className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 bg-brand-gradient text-white hover:opacity-90 transition-opacity shadow-lg shadow-[#8B00E8]/30"
                 >
                   {isLoading ? (
                     <>
@@ -120,7 +121,7 @@ const ForgotPasswordPage: React.FC = () => {
             <div className="text-center pt-3 border-t border-white/10">
               <Link
                 to="/login"
-                className="inline-flex items-center gap-1.5 text-amber-400 hover:text-amber-300 font-medium text-sm"
+                className="inline-flex items-center gap-1.5 text-[#A855F7] hover:text-[#8B00E8] font-medium text-sm"
               >
                 <ArrowLeft size={14} className="rtl-flip" />
                 {t('auth.login')}

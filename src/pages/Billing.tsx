@@ -111,7 +111,7 @@ const Billing: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
@@ -139,11 +139,11 @@ const Billing: React.FC = () => {
 
       {/* Current Subscription */}
       {subscription && currentPlan && (
-        <div className="glass-card p-4 border-cyan-500/30 bg-cyan-500/5">
+        <div className="glass-card p-4 border-[#8B00E8]/30 bg-[#A855F7]/5">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="flex-1">
               <h2 className="text-base font-semibold text-white mb-1">{t('billing.currentPlan')}</h2>
-              <p className="text-cyan-400 font-medium">{currentPlan.name}</p>
+              <p className="text-[#8B00E8] font-medium">{currentPlan.name}</p>
               <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 text-xs text-glass-textSecondary">
                 <span className="flex items-center gap-1">
                   <Calendar size={12} />
@@ -204,12 +204,12 @@ const Billing: React.FC = () => {
             return (
               <div
                 key={plan.id}
-                className={`glass-card p-4 ${isCurrent ? 'ring-2 ring-cyan-400/50' : ''}`}
+                className={`glass-card p-4 ${isCurrent ? 'ring-2 ring-[#8B00E8]/50' : ''}`}
               >
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-white">{plan.name}</h3>
                   {isCurrent && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-500/20 text-cyan-400">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#A855F7]/20 text-[#8B00E8]">
                       {t('billing.currentPlan')}
                     </span>
                   )}

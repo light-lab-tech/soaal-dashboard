@@ -111,7 +111,7 @@ const AdminPlans: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3 p-6">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-white">{t('common.loading')}</span>
         </div>
       </div>
@@ -156,7 +156,7 @@ const AdminPlans: React.FC = () => {
                   </td>
                   <td className="p-4 text-end">
                     <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => openEditPlan(plan)} className="p-2 rounded-lg btn-secondary text-cyan-400" title={t('admin.editPlan')}>
+                      <button onClick={() => openEditPlan(plan)} className="p-2 rounded-lg btn-secondary text-[#8B00E8]" title={t('admin.editPlan')}>
                         <Pencil size={18} />
                       </button>
                       <button onClick={() => handleDeletePlan(plan.id)} className="p-2 rounded-lg btn-ghost text-red-400" title={t('admin.deletePlan')}>

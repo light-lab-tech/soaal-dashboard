@@ -76,7 +76,7 @@ const Chats: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
@@ -110,7 +110,7 @@ const Chats: React.FC = () => {
         {isLoadingMessages ? (
           <div className="flex items-center justify-center min-h-[200px]">
             <div className="flex flex-col items-center gap-3">
-              <Loader2 size={28} className="animate-spin text-cyan-400" />
+              <Loader2 size={28} className="animate-spin text-[#8B00E8]" />
               <span className="text-glass-textSecondary text-sm">{t('common.loading')}</span>
             </div>
           </div>
@@ -122,29 +122,29 @@ const Chats: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <div
                 key={message.id}
                 className={`glass-card p-4 ${
                   message.role === 'user'
-                    ? 'border-l-4 border-cyan-500/70 bg-cyan-500/5'
+                    ? 'border-l-4 border-[#8B00E8]/70 bg-[#A855F7]/5'
                     : message.role === 'assistant'
-                    ? 'border-l-4 border-purple-500/70 bg-purple-500/5'
+                    ? 'border-l-4 border-[#7C3AED]/70 bg-[#7C3AED]/5'
                     : 'border-l-4 border-glass-textSecondary/30'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div className={`p-1.5 rounded-lg shrink-0 ${
-                    message.role === 'user' ? 'bg-cyan-500/20' : 'bg-purple-500/20'
+                    message.role === 'user' ? 'bg-[#A855F7]/20' : 'bg-[#7C3AED]/20'
                   }`}>
                     {message.role === 'user' ? (
-                      <User size={14} className="text-cyan-400" />
+                      <User size={14} className="text-[#8B00E8]" />
                     ) : (
-                      <Bot size={14} className="text-purple-400" />
+                      <Bot size={14} className="text-[#7C3AED]" />
                     )}
                   </div>
                   <span className={`text-xs font-semibold ${
-                    message.role === 'user' ? 'text-cyan-400' : 'text-purple-400'
+                    message.role === 'user' ? 'text-[#8B00E8]' : 'text-[#7C3AED]'
                   }`}>
                     {message.role === 'user' ? t('chats.user') : t('chats.assistant')}
                   </span>
@@ -205,7 +205,7 @@ const Chats: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-3">
-          {chats.map((chat, index) => (
+          {chats.map((chat) => (
             <div
               key={chat.id}
               onClick={() => loadMessages(chat)}

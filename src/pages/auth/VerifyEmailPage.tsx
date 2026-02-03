@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { MailCheck, Sparkles, Globe, Send } from 'lucide-react';
+import { MailCheck, Globe, Send } from 'lucide-react';
 import { api } from '../../services/api';
+import { Logo } from '../../components/Logo';
 
 const VerifyEmailPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -110,14 +111,14 @@ const VerifyEmailPage: React.FC = () => {
 
       <div className="relative z-10 w-full max-w-md animate-slide-up">
         <div className="glass-card overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-cyan-400 via-teal-500 to-cyan-600 animate-gradient-shift"></div>
+          <div className="h-1 bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] animate-gradient-shift"></div>
 
           <div className="text-center pt-5 pb-4 px-4">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-cyan-400 via-teal-500 to-cyan-600 mb-3 shadow-lg shadow-cyan-500/30">
-              <Sparkles size={24} className="text-white" />
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-brand-gradient mb-3 shadow-lg shadow-[#8B00E8]/40">
+              <Logo size={28} variant="icon-only" />
             </div>
             <h1 className="text-xl font-bold mb-0.5">
-              <span className="bg-gradient-to-r from-cyan-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
                 SoaAL
               </span>
             </h1>
@@ -127,14 +128,14 @@ const VerifyEmailPage: React.FC = () => {
           <div className="px-4 pb-4 sm:px-5 sm:pb-5 space-y-4">
             {(status === 'idle' || !hasCheckedToken) && (
               <div className="flex flex-col items-center gap-3 py-4">
-                <div className="w-10 h-10 border-[3px] border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin" />
+                <div className="w-10 h-10 border-[3px] border-[#8B00E8]/30 border-t-[#8B00E8] rounded-full animate-spin" />
                 <p className="text-glass-textSecondary text-sm">{t('common.loading')}</p>
               </div>
             )}
 
             {status === 'loading' && (
               <div className="flex flex-col items-center gap-3 py-4">
-                <div className="w-10 h-10 border-[3px] border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin" />
+                <div className="w-10 h-10 border-[3px] border-[#8B00E8]/30 border-t-[#8B00E8] rounded-full animate-spin" />
                 <p className="text-glass-textSecondary text-sm">{t('common.loading')}</p>
               </div>
             )}
@@ -160,7 +161,7 @@ const VerifyEmailPage: React.FC = () => {
                   <div className="space-y-1">
                     <label className="block text-xs font-medium text-glass-text px-1">{t('auth.email')}</label>
                     <div className="relative group">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-cyan-400 transition-colors">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-[#A855F7] transition-colors">
                         <MailCheck size={16} />
                       </div>
                       <input
@@ -195,7 +196,7 @@ const VerifyEmailPage: React.FC = () => {
                 <div className="text-center pt-2">
                   <Link
                     to="/login"
-                    className="text-cyan-400 hover:text-cyan-300 font-medium text-sm"
+                    className="text-[#A855F7] hover:text-[#8B00E8] font-medium text-sm"
                   >
                     {t('auth.login')}
                   </Link>

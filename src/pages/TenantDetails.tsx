@@ -124,9 +124,8 @@ const TenantDetails: React.FC = () => {
       label: t('nav.documents'),
       description: t('tenants.documentsDesc'),
       path: `/tenants/${tenantId}/documents`,
-      color: 'from-cyan-500 to-teal-600',
-      iconColor: 'text-cyan-400',
-      hoverBg: 'hover:bg-cyan-500/10 hover:border-cyan-400/30',
+      color: 'from-[#8B00E8] via-[#A855F7] to-[#7C3AED]',
+      shadow: 'shadow-[#8B00E8]/30',
     },
     {
       id: 'questions',
@@ -134,9 +133,8 @@ const TenantDetails: React.FC = () => {
       label: t('nav.questions'),
       description: t('tenants.questionsDesc'),
       path: `/tenants/${tenantId}/questions`,
-      color: 'from-amber-500 to-orange-600',
-      iconColor: 'text-amber-400',
-      hoverBg: 'hover:bg-amber-500/10 hover:border-amber-400/30',
+      color: 'from-cyan-400 via-teal-500 to-cyan-600',
+      shadow: 'shadow-cyan-500/30',
     },
     {
       id: 'analytics',
@@ -144,9 +142,8 @@ const TenantDetails: React.FC = () => {
       label: t('nav.analytics'),
       description: t('tenants.analyticsDesc'),
       path: `/tenants/${tenantId}/analytics`,
-      color: 'from-purple-500 to-pink-600',
-      iconColor: 'text-purple-400',
-      hoverBg: 'hover:bg-purple-500/10 hover:border-purple-400/30',
+      color: 'from-emerald-400 via-green-500 to-emerald-600',
+      shadow: 'shadow-emerald-500/30',
     },
     {
       id: 'telegram',
@@ -154,9 +151,8 @@ const TenantDetails: React.FC = () => {
       label: t('nav.telegram'),
       description: t('tenants.telegramDesc'),
       path: `/tenants/${tenantId}/telegram`,
-      color: 'from-blue-500 to-indigo-600',
-      iconColor: 'text-blue-400',
-      hoverBg: 'hover:bg-blue-500/10 hover:border-blue-400/30',
+      color: 'from-blue-400 via-indigo-500 to-blue-600',
+      shadow: 'shadow-blue-500/30',
     },
     {
       id: 'chats',
@@ -164,9 +160,8 @@ const TenantDetails: React.FC = () => {
       label: t('nav.chats'),
       description: t('tenants.chatsDesc'),
       path: `/tenants/${tenantId}/chats`,
-      color: 'from-emerald-500 to-green-600',
-      iconColor: 'text-emerald-400',
-      hoverBg: 'hover:bg-emerald-500/10 hover:border-emerald-400/30',
+      color: 'from-pink-400 via-rose-500 to-pink-600',
+      shadow: 'shadow-pink-500/30',
     },
     {
       id: 'settings',
@@ -174,9 +169,8 @@ const TenantDetails: React.FC = () => {
       label: t('nav.settings'),
       description: t('tenants.settingsDesc'),
       path: `/tenants/${tenantId}/settings`,
-      color: 'from-slate-500 to-gray-600',
-      iconColor: 'text-slate-400',
-      hoverBg: 'hover:bg-slate-500/10 hover:border-slate-400/30',
+      color: 'from-slate-400 via-gray-500 to-slate-600',
+      shadow: 'shadow-slate-500/30',
     },
   ];
 
@@ -184,7 +178,7 @@ const TenantDetails: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-6 h-6 border-2 border-[#8B00E8] border-t-transparent rounded-full animate-spin"></div>
           <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
@@ -213,58 +207,76 @@ const TenantDetails: React.FC = () => {
   return (
     <div className="space-y-5">
       {/* Back Button & Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/tenants')}
-            className="p-2 rounded-lg glass-button-secondary"
-          >
-            <ArrowLeft size={18} className="rtl-flip" />
-          </button>
-          <div>
-            <h1 className="text-xl font-semibold text-white">{tenant.name}</h1>
-            <p className="text-sm text-glass-textSecondary">{t('tenants.tenantManagement')}</p>
+      <div className="glass-card relative overflow-hidden group">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#8B00E8]/10 via-[#A855F7]/10 to-[#7C3AED]/10 opacity-0 transition-opacity group-hover:opacity-100"></div>
+        <div className="relative flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/tenants')}
+              className="p-2 rounded-lg glass-button-secondary"
+            >
+              <ArrowLeft size={18} className="rtl-flip" />
+            </button>
+            <div>
+              <h1 className="text-xl font-semibold text-white flex items-center gap-2">
+                <span className="p-1.5 rounded-lg bg-gradient-to-br from-[#8B00E8]/20 to-[#7C3AED]/20">
+                  <Building2 size={16} className="text-[#8B00E8]" />
+                </span>
+                <span className="bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
+                  {tenant.name}
+                </span>
+              </h1>
+              <p className="text-sm text-glass-textSecondary">{t('tenants.tenantManagement')}</p>
+            </div>
           </div>
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+            tenant.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' :
+            tenant.status === 'suspended' ? 'bg-amber-500/20 text-amber-400' :
+            'bg-red-500/20 text-red-400'
+          }`}>
+            {tenant.status}
+          </span>
         </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-          tenant.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' :
-          tenant.status === 'suspended' ? 'bg-amber-500/20 text-amber-400' :
-          'bg-red-500/20 text-red-400'
-        }`}>
-          {tenant.status}
-        </span>
       </div>
 
       {/* Tenant Info Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="glass-card p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <CreditCard size={14} className="text-cyan-400" />
-            <span className="text-xs text-glass-textSecondary">{t('tenants.plan')}</span>
+          <div className="flex items-start justify-between mb-3">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8] to-[#7C3AED]">
+              <CreditCard size={14} className="text-white" />
+            </div>
           </div>
+          <p className="text-xs text-glass-textSecondary mb-1">{t('tenants.plan')}</p>
           <p className="text-sm font-semibold text-white capitalize">{tenant.plan}</p>
         </div>
         <div className="glass-card p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Activity size={14} className="text-emerald-400" />
-            <span className="text-xs text-glass-textSecondary">{t('tenants.status')}</span>
+          <div className="flex items-start justify-between mb-3">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600">
+              <Activity size={14} className="text-white" />
+            </div>
           </div>
+          <p className="text-xs text-glass-textSecondary mb-1">{t('tenants.status')}</p>
           <p className="text-sm font-semibold text-white capitalize">{tenant.status}</p>
         </div>
         <div className="glass-card p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Calendar size={14} className="text-purple-400" />
-            <span className="text-xs text-glass-textSecondary">{t('dashboard.created')}</span>
+          <div className="flex items-start justify-between mb-3">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600">
+              <Calendar size={14} className="text-white" />
+            </div>
           </div>
+          <p className="text-xs text-glass-textSecondary mb-1">{t('dashboard.created')}</p>
           <p className="text-sm font-semibold text-white">
             {new Date(tenant.created_at).toLocaleDateString()}
           </p>
         </div>
         <div className="glass-card p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Key size={14} className="text-amber-400" />
-            <span className="text-xs text-glass-textSecondary">{t('tenants.apiKeys')}</span>
+          <div className="flex items-start justify-between mb-3">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600">
+              <Key size={14} className="text-white" />
+            </div>
           </div>
+          <p className="text-xs text-glass-textSecondary mb-1">{t('tenants.apiKeys')}</p>
           <p className="text-sm font-semibold text-white">{apiKeys.length} {t('tenants.keys')}</p>
         </div>
       </div>
@@ -279,9 +291,9 @@ const TenantDetails: React.FC = () => {
               <button
                 key={action.id}
                 onClick={() => navigate(action.path)}
-                className={`glass-card p-4 text-start transition-all duration-200 ${action.hoverBg} group`}
+                className="glass-card p-4 text-start transition-all duration-200 group hover:scale-[1.02]"
               >
-                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${action.color} w-fit mb-3`}>
+                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${action.color} w-fit mb-3 ${action.shadow}`}>
                   <Icon size={20} className="text-white" />
                 </div>
                 <h3 className="text-sm font-semibold text-white mb-1 group-hover:text-glow transition-all">
@@ -315,11 +327,11 @@ const TenantDetails: React.FC = () => {
               <div key={apiKey.id || apiKey.prefix} className="glass-card p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Key size={14} className="text-cyan-400" />
+                    <Key size={14} className="text-[#8B00E8]" />
                     <span className="text-sm font-medium text-white">{apiKey.prefix}</span>
                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                      apiKey.type === 'public' ? 'bg-cyan-500/20 text-cyan-400' :
-                      'bg-purple-500/20 text-purple-400'
+                      apiKey.type === 'public' ? 'bg-[#A855F7]/20 text-[#8B00E8]' :
+                      'bg-[#7C3AED]/20 text-[#7C3AED]'
                     }`}>
                       {apiKey.type}
                     </span>

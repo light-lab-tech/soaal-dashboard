@@ -91,7 +91,7 @@ const AdminTenantDetails: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
@@ -125,8 +125,8 @@ const AdminTenantDetails: React.FC = () => {
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-4">
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-teal-500/20 border border-cyan-500/30 shadow-lg shadow-cyan-500/10">
-              <Building2 size={28} className="text-cyan-400" />
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-[#8B00E8]/20 to-[#A855F7]/20 border border-[#8B00E8]/30 shadow-lg shadow-[#8B00E8]/10">
+              <Building2 size={28} className="text-[#8B00E8]" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white">{tenant.name}</h1>
@@ -151,10 +151,10 @@ const AdminTenantDetails: React.FC = () => {
       {/* Analytics Summary */}
       {analytics && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="glass-card p-5 group hover:scale-[1.02] transition-all duration-300 hover:border-cyan-500/30">
+          <div className="glass-card p-5 group hover:scale-[1.02] transition-all duration-300 hover:border-[#8B00E8]/30">
             <div className="flex items-center gap-2 text-slate-400 text-sm mb-3">
-              <div className="p-2 rounded-lg bg-cyan-500/10">
-                <FileText size={16} className="text-cyan-400" />
+              <div className="p-2 rounded-lg bg-[#8B00E8]/10">
+                <FileText size={16} className="text-[#8B00E8]" />
               </div>
               {t('nav.documents')}
             </div>
@@ -213,8 +213,8 @@ const AdminTenantDetails: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-4 p-4 rounded-xl bg-slate-700/30 border border-slate-600/30 hover:border-slate-500/50 transition-colors">
-            <div className="p-3 rounded-xl bg-cyan-500/10">
-              <Activity size={20} className="text-cyan-400" />
+            <div className="p-3 rounded-xl bg-[#8B00E8]/10">
+              <Activity size={20} className="text-[#8B00E8]" />
             </div>
             <div>
               <p className="text-xs text-slate-400 mb-0.5">{t('billing.status')}</p>
@@ -245,13 +245,13 @@ const AdminTenantDetails: React.FC = () => {
                     <Icon size={24} className="text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-white text-lg font-semibold group-hover:text-cyan-300 transition-colors">
+                    <h3 className="text-white text-lg font-semibold group-hover:text-[#A855F7] transition-colors">
                       {action.label}
                     </h3>
                     <p className="text-slate-400 text-sm mt-1">{action.description}</p>
                   </div>
                 <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
-                  <ArrowRight size={20} className="text-slate-500 group-hover:text-cyan-400" />
+                  <ArrowRight size={20} className="text-slate-500 group-hover:text-[#8B00E8]" />
                 </span>
                 </div>
               </button>

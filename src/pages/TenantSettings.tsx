@@ -80,14 +80,14 @@ const TenantSettings: React.FC = () => {
       value: '',
       label: t('tenants.defaultStyle'),
       icon: Brain,
-      color: 'from-violet-500 to-purple-600',
+      color: 'from-[#8B00E8] to-[#7C3AED]',
       desc: t('tenants.defaultStyleDesc')
     },
     {
       value: 'short',
       label: t('tenants.short'),
       icon: MessageSquare,
-      color: 'from-cyan-500 to-teal-600',
+      color: 'from-[#8B00E8] to-[#7C3AED]',
       desc: t('tenants.shortDesc')
     },
     {
@@ -101,7 +101,7 @@ const TenantSettings: React.FC = () => {
       value: 'friendly',
       label: t('tenants.friendly'),
       icon: Sparkles,
-      color: 'from-pink-500 to-rose-600',
+      color: 'from-[#8B00E8] to-[#7C3AED]',
       desc: t('tenants.friendlyDesc')
     },
     {
@@ -117,7 +117,7 @@ const TenantSettings: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px">
         <div className="glass-card flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-6 h-6 border-2 border-[#8B00E8] border-t-transparent rounded-full animate-spin"></div>
           <span className="text-gray-300 text-sm">{t('common.loading')}</span>
         </div>
       </div>
@@ -159,7 +159,7 @@ const TenantSettings: React.FC = () => {
       {/* Chat Settings Card */}
       <div className="glass-card p-4">
         <h2 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
-          <SettingsIcon size={18} className="text-cyan-400" />
+          <SettingsIcon size={18} className="text-[#8B00E8]" />
           {t('tenants.chatSettings')}
         </h2>
 
@@ -181,7 +181,7 @@ const TenantSettings: React.FC = () => {
                       setHasChanges(true);
                     }}
                     className={`glass-card p-3 text-left transition-all duration-200 group ${
-                      isSelected ? 'ring-2 ring-cyan-400/50' : ''
+                      isSelected ? 'ring-2 ring-[#8B00E8]/50' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">

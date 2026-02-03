@@ -192,7 +192,7 @@ const Tenants: React.FC = () => {
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8] to-[#7C3AED]">
                   <Building2 size={16} className="text-white" />
                 </div>
                 <div>
@@ -360,11 +360,11 @@ const Tenants: React.FC = () => {
                 <div key={apiKey.id || apiKey.prefix} className="glass-card p-3">
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-1.5">
-                      <Key size={14} className="text-cyan-400" />
+                      <Key size={14} className="text-[#8B00E8]" />
                       <span className="text-sm font-medium text-white">{apiKey.prefix}</span>
                       <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
-                        apiKey.type === 'public' ? 'bg-cyan-500/20 text-cyan-400' :
-                        'bg-purple-500/20 text-purple-400'
+                        apiKey.type === 'public' ? 'bg-[#A855F7]/20 text-[#8B00E8]' :
+                        'bg-[#7C3AED]/20 text-[#7C3AED]'
                       }`}>
                         {apiKey.type}
                       </span>

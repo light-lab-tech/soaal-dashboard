@@ -72,7 +72,7 @@ const AllChats: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
@@ -115,8 +115,8 @@ const AllChats: React.FC = () => {
                 className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500/20 to-teal-500/20 shrink-0">
-                    <Building2 size={16} className="text-cyan-400" />
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8]/20 to-[#A855F7]/20 shrink-0">
+                    <Building2 size={16} className="text-[#8B00E8]" />
                   </div>
                   <div className="text-start min-w-0">
                     <h3 className="text-sm font-medium text-white truncate">{tenant.name}</h3>
@@ -164,13 +164,13 @@ const AllChats: React.FC = () => {
                               </p>
                             </div>
                           </div>
-                          <ChevronRight size={14} className="text-glass-textSecondary group-hover:text-cyan-400 group-hover:translate-x-0.5 transition-all rtl-flip shrink-0" />
+                          <ChevronRight size={14} className="text-glass-textSecondary group-hover:text-[#8B00E8] group-hover:translate-x-0.5 transition-all rtl-flip shrink-0" />
                         </button>
                       ))}
                       {totalChats > 5 && (
                         <button
                           onClick={() => navigate(`/tenants/${tenant.id}/chats`)}
-                          className="w-full p-2 text-center text-cyan-400 hover:text-cyan-300 text-xs font-medium"
+                          className="w-full p-2 text-center text-[#8B00E8] hover:text-[#A855F7] text-xs font-medium"
                         >
                           {t('chats.viewMessages')} (+{totalChats - 5} {t('common.more')})
                         </button>

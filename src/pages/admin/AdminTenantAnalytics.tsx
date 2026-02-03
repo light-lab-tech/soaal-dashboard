@@ -63,7 +63,7 @@ const AdminTenantAnalytics: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
@@ -105,8 +105,8 @@ const AdminTenantAnalytics: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="glass-card p-5">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 rounded-lg bg-cyan-500/20">
-              <FileText size={20} className="text-cyan-400" />
+            <div className="p-2 rounded-lg bg-[#8B00E8]/20">
+              <FileText size={20} className="text-[#8B00E8]" />
             </div>
             <span className="text-slate-400 text-sm">{t('nav.documents')}</span>
           </div>

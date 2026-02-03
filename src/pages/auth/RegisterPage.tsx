@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { UserPlus, Mail, Lock, User, ArrowRight, Sparkles, Globe } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, ArrowRight, Globe } from 'lucide-react';
+import { Logo } from '../../components/Logo';
 
 const RegisterPage: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -90,17 +91,17 @@ const RegisterPage: React.FC = () => {
       <div className="relative z-10 w-full max-w-md animate-slide-up">
         <div className="glass-card overflow-hidden">
           {/* Top Accent Line */}
-          <div className="h-1 bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 animate-gradient-shift"></div>
+          <div className="h-1 bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] animate-gradient-shift"></div>
 
           {/* Header */}
           <div className="text-center pt-5 pb-4 px-4">
             {/* Logo */}
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-purple-400 via-pink-500 to-purple-600 mb-3 shadow-lg shadow-pink-500/30">
-              <Sparkles size={24} className="text-white" />
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-brand-gradient mb-3 shadow-lg shadow-[#8B00E8]/40">
+              <Logo size={28} variant="icon-only" />
             </div>
 
             <h1 className="text-xl font-bold mb-0.5">
-              <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
                 SoaAL
               </span>
             </h1>
@@ -138,7 +139,7 @@ const RegisterPage: React.FC = () => {
                     {t('auth.name')}
                   </label>
                   <div className="relative group">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-[#A855F7] transition-colors">
                       <User size={16} />
                     </div>
                     <input
@@ -160,7 +161,7 @@ const RegisterPage: React.FC = () => {
                     {t('auth.email')}
                   </label>
                   <div className="relative group">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-[#A855F7] transition-colors">
                       <Mail size={16} />
                     </div>
                     <input
@@ -182,7 +183,7 @@ const RegisterPage: React.FC = () => {
                     {t('auth.password')}
                   </label>
                   <div className="relative group">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-[#A855F7] transition-colors">
                       <Lock size={16} />
                     </div>
                     <input
@@ -205,7 +206,7 @@ const RegisterPage: React.FC = () => {
                     {t('auth.confirmPassword')}
                   </label>
                   <div className="relative group">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-[#A855F7] transition-colors">
                       <Lock size={16} />
                     </div>
                     <input
@@ -229,7 +230,7 @@ const RegisterPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 text-white hover:opacity-90 transition-opacity"
+                className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 bg-brand-gradient text-white hover:opacity-90 transition-opacity shadow-lg shadow-[#8B00E8]/30"
               >
                 {isLoading ? (
                   <>

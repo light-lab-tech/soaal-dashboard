@@ -70,7 +70,7 @@ const AdminUsers: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3 p-6">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-white">{t('common.loading')}</span>
         </div>
       </div>
@@ -103,7 +103,7 @@ const AdminUsers: React.FC = () => {
                   className="border-b border-slate-700/30 hover:bg-slate-700/20 transition-colors cursor-pointer group"
                 >
                   <td className="p-4">
-                    <span className="text-white font-medium group-hover:text-cyan-400 transition-colors">{user.name}</span>
+                    <span className="text-white font-medium group-hover:text-[#8B00E8] transition-colors">{user.name}</span>
                   </td>
                   <td className="p-4"><span className="text-slate-300">{user.email}</span></td>
                   <td className="p-4" onClick={(e) => e.stopPropagation()}>
@@ -130,7 +130,7 @@ const AdminUsers: React.FC = () => {
                       <button onClick={() => handleDeleteUser(user.id)} className="p-2 rounded-lg btn-ghost text-red-400" title={t('admin.deleteUser')}>
                         <Trash2 size={18} />
                       </button>
-                      <ChevronRight size={18} className="text-slate-500 group-hover:text-cyan-400 ml-1 rtl-flip" aria-hidden />
+                      <ChevronRight size={18} className="text-slate-500 group-hover:text-[#8B00E8] ml-1 rtl-flip" aria-hidden />
                     </div>
                   </td>
                 </tr>

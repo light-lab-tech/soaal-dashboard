@@ -74,7 +74,7 @@ const AdminUserDetails: React.FC = () => {
       case 'active': return 'text-emerald-400';
       case 'canceled': return 'text-red-400';
       case 'past_due': return 'text-amber-400';
-      case 'trialing': return 'text-cyan-400';
+      case 'trialing': return 'text-[#8B00E8]';
       default: return 'text-slate-400';
     }
   };
@@ -83,7 +83,7 @@ const AdminUserDetails: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3 p-6">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-white">{t('common.loading')}</span>
         </div>
       </div>
@@ -102,7 +102,7 @@ const AdminUserDetails: React.FC = () => {
         </button>
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <User size={28} className="text-cyan-400" />
+            <User size={28} className="text-[#8B00E8]" />
             {user ? `${user.name} (${user.email})` : userId}
           </h1>
           <p className="text-slate-400 text-sm mt-1">
@@ -120,8 +120,8 @@ const AdminUserDetails: React.FC = () => {
         {/* Subscription */}
         <div className="glass-card p-6 card-hover-lift">
           <div className="flex items-center gap-3 mb-4">
-            <div className="icon-container p-2 rounded-lg bg-cyan-500/10">
-              <CreditCard size={22} className="text-cyan-400" />
+            <div className="icon-container p-2 rounded-lg bg-[#8B00E8]/10">
+              <CreditCard size={22} className="text-[#8B00E8]" />
             </div>
             <h2 className="text-lg font-semibold text-white">{t('admin.subscription')}</h2>
           </div>
@@ -182,7 +182,7 @@ const AdminUserDetails: React.FC = () => {
                   </span>
                   <button
                     onClick={() => navigate(`/admin/tenants/${tenant.id}`)}
-                    className="p-1.5 rounded-lg btn-ghost text-cyan-400 hover:bg-cyan-500/10"
+                    className="p-1.5 rounded-lg btn-ghost text-[#8B00E8] hover:bg-[#A855F7]/10"
                     title={t('tenants.viewDetails')}
                   >
                     <ExternalLink size={16} className="rtl-flip" />

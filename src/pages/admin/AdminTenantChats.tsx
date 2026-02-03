@@ -86,7 +86,7 @@ const AdminTenantChats: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3">
-          <Loader2 size={24} className="animate-spin text-cyan-400" />
+          <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
@@ -118,7 +118,7 @@ const AdminTenantChats: React.FC = () => {
         {/* Messages */}
         {isLoadingMessages ? (
           <div className="flex items-center justify-center min-h-[200px]">
-            <Loader2 size={24} className="animate-spin text-cyan-400" />
+            <Loader2 size={24} className="animate-spin text-[#8B00E8]" />
           </div>
         ) : messages.length === 0 ? (
           <div className="glass-card p-8 text-center">
@@ -132,17 +132,17 @@ const AdminTenantChats: React.FC = () => {
                 key={message.id}
                 className={`glass-card p-4 ${
                   message.role === 'user'
-                    ? 'border-l-4 border-cyan-500/50'
+                    ? 'border-l-4 border-[#8B00E8]/50'
                     : message.role === 'assistant'
-                    ? 'border-l-4 border-purple-500/50'
+                    ? 'border-l-4 border-[#7C3AED]/50'
                     : 'border-l-4 border-slate-500/50'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   {message.role === 'user' ? (
-                    <User size={16} className="text-cyan-400" />
+                    <User size={16} className="text-[#8B00E8]" />
                   ) : (
-                    <Bot size={16} className="text-purple-400" />
+                    <Bot size={16} className="text-[#7C3AED]" />
                   )}
                   <span className="text-sm font-medium text-slate-300 capitalize">
                     {message.role === 'user' ? t('chats.user') : t('chats.assistant')}
@@ -207,8 +207,8 @@ const AdminTenantChats: React.FC = () => {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500/20 to-teal-500/20">
-                    <MessageSquare size={20} className="text-cyan-400" />
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8]/20 to-[#A855F7]/20">
+                    <MessageSquare size={20} className="text-[#8B00E8]" />
                   </div>
                   <div>
                     <h3 className="text-white font-medium">
@@ -221,7 +221,7 @@ const AdminTenantChats: React.FC = () => {
                 </div>
                 <ChevronRight
                   size={20}
-                  className="text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all rtl-flip"
+                  className="text-slate-500 group-hover:text-[#8B00E8] group-hover:translate-x-1 transition-all rtl-flip"
                 />
               </div>
             </div>

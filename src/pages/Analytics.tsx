@@ -105,7 +105,7 @@ const Analytics: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-6 h-6 border-2 border-[#8B00E8] border-t-transparent rounded-full animate-spin"></div>
           <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
@@ -134,7 +134,7 @@ const Analytics: React.FC = () => {
               onClick={() => setDateRange(range)}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                 dateRange === range
-                  ? 'bg-cyan-500 text-white'
+                  ? 'bg-[#8B00E8] text-white'
                   : 'text-glass-text hover:text-white'
               }`}
             >
@@ -151,7 +151,7 @@ const Analytics: React.FC = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="glass-card p-4">
             <div className="flex items-start justify-between mb-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-600">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8] to-[#7C3AED]">
                 <BarChart3 size={16} className="text-white" />
               </div>
             </div>
@@ -181,7 +181,7 @@ const Analytics: React.FC = () => {
 
           <div className="glass-card p-4">
             <div className="flex items-start justify-between mb-3">
-              <div className="p-2 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8] to-[#7C3AED]">
                 <TrendingUp size={16} className="text-white" />
               </div>
             </div>

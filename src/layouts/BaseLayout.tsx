@@ -12,9 +12,9 @@ import {
   Globe,
   User,
   ChevronRight,
-  Home,
   Users,
 } from 'lucide-react';
+import { Logo } from '../components/Logo';
 
 interface BaseLayoutProps {
   changeLanguage: (lang: string) => void;
@@ -23,7 +23,7 @@ interface BaseLayoutProps {
 /** Role-based nav: each tab is a separate page. No nested "admin" section. */
 function getNavItems(t: (key: string) => string, role: string | undefined) {
   const items: { icon: typeof LayoutDashboard; label: string; path: string; id: string }[] = [];
-  
+
   // Admin tabs: Overview (Analytics), Users, Tenants, Plans
   if (role === 'super_admin' || role === 'admin') {
     items.push({ icon: LayoutDashboard, label: t('admin.overview'), path: '/admin', id: 'admin-overview' });
@@ -90,7 +90,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
   return (
     <div className="min-h-screen flex">
       <aside
-        className={`fixed inset-y-0 z-50 w-64 bg-slate-800/95 backdrop-blur-xl border-r border-slate-700/50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 z-50 w-64 bg-gradient-to-b from-slate-800/98 to-slate-900/98 backdrop-blur-xl border-r border-slate-700/50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isRTL ? 'right-0' : 'left-0'
         } ${
           isSidebarOpen
@@ -101,13 +101,13 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="px-5 py-5 border-b border-slate-700/50">
+          <div className="px-5 py-5 border-b border-slate-700/50 bg-gradient-to-r from-[#8B00E8]/10 to-transparent">
             <Link to="/dashboard" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-lg group-hover:shadow-cyan-500/30 transition-all">
-                <Home size={18} className="text-white" />
+              <div className="w-10 h-10 rounded-xl bg-brand-gradient flex items-center justify-center shadow-lg shadow-[#8B00E8]/40 group-hover:scale-105 transition-all">
+                <Logo size={20} variant="icon-only" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-white">SoaAL</h1>
+                <h1 className="text-lg font-bold bg-gradient-to-r from-[#A855F7] to-[#8B00E8] bg-clip-text text-transparent">SoaAL</h1>
                 <p className="text-xs text-slate-400">RAG Dashboard</p>
               </div>
             </Link>
@@ -120,6 +120,26 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
                 location.pathname === item.path ||
                 (item.path !== '/admin' && location.pathname.startsWith(item.path + '/'));
               const reallyActive = item.path.startsWith('/admin') ? location.pathname === item.path : isActive;
+
+              // Get color for each nav item
+              const getNavColor = () => {
+                if (item.path.includes('dashboard') || item.path.includes('admin')) return 'text-cyan-400';
+                if (item.path.includes('tenant')) return 'text-emerald-400';
+                if (item.path.includes('billing') || item.path.includes('plan')) return 'text-amber-400';
+                if (item.path.includes('user')) return 'text-pink-400';
+                return 'text-violet-400';
+              };
+
+              const getActiveGradient = () => {
+                if (item.path.includes('dashboard') || item.path.includes('admin')) return 'from-cyan-600/20 to-teal-600/20 text-cyan-300 border-cyan-500/30 shadow-cyan-500/10';
+                if (item.path.includes('tenant')) return 'from-emerald-600/20 to-green-600/20 text-emerald-300 border-emerald-500/30 shadow-emerald-500/10';
+                if (item.path.includes('billing') || item.path.includes('plan')) return 'from-amber-600/20 to-orange-600/20 text-amber-300 border-amber-500/30 shadow-amber-500/10';
+                if (item.path.includes('user')) return 'from-pink-600/20 to-rose-600/20 text-pink-300 border-pink-500/30 shadow-pink-500/10';
+                return 'from-violet-600/20 to-purple-600/20 text-violet-300 border-violet-500/30 shadow-violet-500/10';
+              };
+
+              const navColor = getNavColor();
+
               return (
                 <button
                   key={item.id}
@@ -129,11 +149,11 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
                   }}
                   className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group ${
                     reallyActive
-                      ? 'bg-gradient-to-r from-cyan-600/20 to-teal-600/20 text-cyan-300 border border-cyan-500/30 shadow-lg shadow-cyan-500/10'
+                      ? `bg-gradient-to-r ${getActiveGradient()}`
                       : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
                   }`}
                 >
-                  <Icon size={18} className="flex-shrink-0" />
+                  <Icon size={18} className={`flex-shrink-0 ${reallyActive ? '' : navColor}`} />
                   <span className="font-medium text-sm">{item.label}</span>
                   {reallyActive && <ChevronRight size={14} className={`opacity-70 rtl-flip ${isRTL ? 'mr-auto' : 'ml-auto'}`} />}
                 </button>
@@ -142,8 +162,8 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
           </nav>
 
           <div className="p-4 border-t border-slate-700/50 space-y-2">
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-700/30 border border-slate-700/50">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-md">
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gradient-to-r from-[#8B00E8]/20 to-transparent border border-[#8B00E8]/30">
+              <div className="w-9 h-9 rounded-lg bg-brand-gradient flex items-center justify-center shadow-md shadow-[#8B00E8]/30">
                 <User size={16} className="text-white" />
               </div>
               <div className="flex-1 min-w-0">
@@ -163,7 +183,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
       </aside>
 
       <div className={`flex-1 min-h-screen ${isRTL ? 'lg:mr-64' : 'lg:ml-64'}`}>
-        <header className="sticky top-0 z-40 bg-slate-800/80 backdrop-blur-xl border-b border-slate-700/50 px-4 lg:px-6 py-4">
+        <header className="sticky top-0 z-40 bg-gradient-to-r from-slate-800/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border-b border-slate-700/50 px-4 lg:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -172,7 +192,10 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
               >
                 {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
-              <h2 className="text-xl font-bold text-white truncate">{getActiveLabel()}</h2>
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:block w-1 h-6 rounded-full bg-gradient-to-b from-[#8B00E8] to-[#A855F7]"></div>
+                <h2 className="text-xl font-bold text-white truncate">{getActiveLabel()}</h2>
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="bg-slate-700/50 border border-slate-600/50 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-700/70 transition-colors">

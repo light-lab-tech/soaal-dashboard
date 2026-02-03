@@ -78,17 +78,17 @@ const Dashboard: React.FC = () => {
 
   // Regular user quick actions only (admins don't see this page)
   const quickActions = [
-    { icon: Building2, label: t('dashboard.createTenant'), onClick: () => navigate('/tenants'), color: 'from-cyan-400 via-teal-500 to-cyan-500', shadow: 'shadow-cyan-500/30', needsTenants: false },
-    { icon: FileText, label: t('dashboard.uploadDocument'), onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/documents`), color: 'from-purple-400 via-pink-500 to-purple-500', shadow: 'shadow-purple-500/30', needsTenants: true },
-    { icon: BarChart3, label: t('dashboard.viewAnalytics'), onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/analytics`), color: 'from-amber-400 via-orange-500 to-amber-500', shadow: 'shadow-amber-500/30', needsTenants: true },
+    { icon: Building2, label: t('dashboard.createTenant'), onClick: () => navigate('/tenants'), color: 'from-[#8B00E8] via-[#A855F7] to-[#7C3AED]', shadow: 'shadow-[#8B00E8]/40', needsTenants: false, textColor: 'text-white' },
+    { icon: FileText, label: t('dashboard.uploadDocument'), onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/documents`), color: 'from-cyan-400 via-teal-500 to-cyan-600', shadow: 'shadow-cyan-500/30', needsTenants: true, textColor: 'text-cyan-400' },
+    { icon: BarChart3, label: t('dashboard.viewAnalytics'), onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/analytics`), color: 'from-emerald-400 via-green-500 to-emerald-600', shadow: 'shadow-emerald-500/30', needsTenants: true, textColor: 'text-emerald-400' },
   ];
 
   // Regular user stat cards (admins use /admin page)
   const statCards = [
-    { icon: Building2, label: t('dashboard.totalTenants'), value: stats.totalTenants, color: 'from-cyan-400 via-teal-500 to-cyan-600', shadow: 'shadow-cyan-500/30', trend: '+12%' },
-    { icon: FileText, label: t('dashboard.totalDocuments'), value: stats.totalDocuments, color: 'from-purple-400 via-pink-500 to-purple-600', shadow: 'shadow-purple-500/30', trend: '+24%' },
-    { icon: MessageSquare, label: t('dashboard.pendingQuestions'), value: stats.pendingQuestions, color: 'from-amber-400 via-orange-500 to-amber-600', shadow: 'shadow-amber-500/30', trend: '+8%' },
-    { icon: TrendingUp, label: t('dashboard.satisfactionRate'), value: `${stats.satisfactionRate}%`, color: 'from-emerald-400 via-green-500 to-emerald-600', shadow: 'shadow-emerald-500/30', trend: '+5%' },
+    { icon: Building2, label: t('dashboard.totalTenants'), value: stats.totalTenants, color: 'from-[#8B00E8] via-[#A855F7] to-[#7C3AED]', shadow: 'shadow-[#8B00E8]/40', trend: '+12%', trendColor: 'text-[#8B00E8]', bgTrend: 'bg-[#8B00E8]/10' },
+    { icon: FileText, label: t('dashboard.totalDocuments'), value: stats.totalDocuments, color: 'from-cyan-400 via-teal-500 to-cyan-600', shadow: 'shadow-cyan-500/30', trend: '+24%', trendColor: 'text-cyan-400', bgTrend: 'bg-cyan-500/10' },
+    { icon: MessageSquare, label: t('dashboard.pendingQuestions'), value: stats.pendingQuestions, color: 'from-amber-400 via-orange-500 to-amber-600', shadow: 'shadow-amber-500/30', trend: '+8%', trendColor: 'text-amber-400', bgTrend: 'bg-amber-500/10' },
+    { icon: TrendingUp, label: t('dashboard.satisfactionRate'), value: `${stats.satisfactionRate}%`, color: 'from-pink-400 via-rose-500 to-pink-600', shadow: 'shadow-pink-500/30', trend: '+5%', trendColor: 'text-pink-400', bgTrend: 'bg-pink-500/10' },
   ];
 
   if (isLoading) {
@@ -106,10 +106,10 @@ const Dashboard: React.FC = () => {
     <div className="space-y-5">
       {/* Welcome Section */}
       <div className="glass-card relative overflow-hidden group">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-purple-500/10 to-pink-500/10 opacity-0 transition-opacity group-hover:opacity-100"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#8B00E8]/10 via-[#A855F7]/10 to-[#7C3AED]/10 opacity-0 transition-opacity group-hover:opacity-100"></div>
         <div className="relative">
           <h1 className="text-xl font-bold mb-1">
-            <span className="bg-gradient-to-r from-cyan-400 via-teal-500 to-cyan-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
               {t('dashboard.welcome')}, {user?.name}!
             </span>
           </h1>
@@ -133,7 +133,7 @@ const Dashboard: React.FC = () => {
                   <Icon size={18} className="text-white" />
                 </div>
                 {stat.trend && (
-                  <span className="text-[10px] text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                  <span className={`text-[10px] ${stat.trendColor} font-medium ${stat.bgTrend} px-2 py-0.5 rounded-full`}>
                     {stat.trend}
                   </span>
                 )}
@@ -151,8 +151,8 @@ const Dashboard: React.FC = () => {
       <div className="glass-card">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold text-white flex items-center gap-2">
-            <Activity className="text-pink-400" size={18} />
-            <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-pink-400 bg-clip-text text-transparent">
+            <Activity className="text-[#8B00E8]" size={18} />
+            <span className="bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
               {t('dashboard.quickActions')}
             </span>
           </h2>
@@ -181,7 +181,7 @@ const Dashboard: React.FC = () => {
                   <ArrowRight size={16} className="text-glass-textSecondary group-hover:text-white" />
                 </span>
                 </div>
-                <h3 className="text-sm font-medium text-white group-hover:text-glow transition-all">
+                <h3 className={`text-sm font-medium group-hover:text-glow transition-all ${action.textColor || 'text-white'}`}>
                   {action.label}
                 </h3>
               </button>
@@ -195,8 +195,8 @@ const Dashboard: React.FC = () => {
         <div>
           <div className="flex items-center justify-between mb-3 gap-3">
             <h2 className="text-base font-semibold text-white flex items-center gap-2">
-              <Building2 className="text-cyan-400" size={18} />
-              <span className="bg-gradient-to-r from-cyan-400 via-teal-500 to-cyan-400 bg-clip-text text-transparent">
+              <Building2 className="text-[#8B00E8]" size={18} />
+              <span className="bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
                 {t('nav.tenants')}
               </span>
               <span className="text-glass-textSecondary text-sm font-normal">
@@ -219,7 +219,7 @@ const Dashboard: React.FC = () => {
                 className="glass-card group hover:scale-[1.02] transition-all duration-300 cursor-pointer p-4"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-400 via-teal-500 to-cyan-600 shadow-cyan-500/30 flex items-center justify-center">
+                  <div className="p-2 rounded-xl bg-gradient-to-br from-[#8B00E8] via-[#A855F7] to-[#7C3AED] shadow-[#8B00E8]/30 flex items-center justify-center">
                     <Building2 size={18} className="text-white" />
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
@@ -262,8 +262,8 @@ const Dashboard: React.FC = () => {
       {/* Empty State */}
       {tenants.length === 0 && (
         <div className="glass-card p-8 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-400/20 via-teal-500/20 to-cyan-400/20 flex items-center justify-center">
-            <Building2 size={28} className="text-cyan-400" />
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#8B00E8]/20 via-[#A855F7]/20 to-[#7C3AED]/20 flex items-center justify-center">
+            <Building2 size={28} className="text-[#8B00E8]" />
           </div>
           <h3 className="text-lg font-semibold text-white mb-1">{t('dashboard.noTenantsYet')}</h3>
           <p className="text-sm text-glass-textSecondary mb-4">
