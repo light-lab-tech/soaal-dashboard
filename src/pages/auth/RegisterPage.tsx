@@ -261,19 +261,17 @@ const RegisterPage: React.FC = () => {
             </div>
           </form>
 
-          {/* Language Selector */}
-          <div className="absolute top-3 right-3">
-            <div className="glass-button-secondary px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
-              <Globe size={12} className="text-glass-textSecondary" />
-              <select
-                value={i18n.language}
-                onChange={(e) => changeLanguage(e.target.value)}
-                className="bg-transparent text-white text-xs font-medium outline-none cursor-pointer"
-              >
-                <option value="en" className="bg-slate-800 text-white">English</option>
-                <option value="ar" className="bg-slate-800 text-white">العربية</option>
-              </select>
-            </div>
+          {/* Language Footer */}
+          <div className="px-4 py-3 border-t border-white/5 flex items-center justify-center gap-2">
+            <Globe size={14} className="text-glass-textSecondary" />
+            <select
+              value={i18n.language}
+              onChange={(e) => changeLanguage(e.target.value)}
+              className="bg-transparent text-glass-textSecondary text-xs font-medium outline-none cursor-pointer hover:text-white transition-colors"
+            >
+              <option value="en" className="bg-slate-800 text-white">English</option>
+              <option value="ar" className="bg-slate-800 text-white">العربية</option>
+            </select>
           </div>
         </div>
       </div>
