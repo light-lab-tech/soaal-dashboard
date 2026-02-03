@@ -15,6 +15,7 @@ This documentation covers all APIs used by company owners (tenants) to manage th
    - [Create Additional API Key](#create-additional-api-key)
    - [List API Keys](#list-api-keys)
    - [Get API Key](#get-api-key)
+   - [Get Tenant Settings](#get-tenant-settings) / [Update Tenant Settings](#update-tenant-settings)
    - [List Tenant Chats](#list-tenant-chats)
    - [List Tenant Chat Messages](#list-tenant-chat-messages)
 3. [Billing & Subscriptions](#billing--subscriptions)
@@ -42,7 +43,6 @@ This documentation covers all APIs used by company owners (tenants) to manage th
 All API responses follow this format:
 
 **Success Response:**
-
 ```json
 {
   "success": true,
@@ -52,7 +52,6 @@ All API responses follow this format:
 ```
 
 **Error Response:**
-
 ```json
 {
   "success": false,
@@ -68,12 +67,12 @@ All API responses follow this format:
 
 **Token and link validity (SMTP emails):**
 
-| Link type           | Email trigger                                                       | Link URL pattern                      | Token validity       |
-| ------------------- | ------------------------------------------------------------------- | ------------------------------------- | -------------------- |
-| **Verify email**    | Register or [Resend Verification Email](#resend-verification-email) | `{BASE_URL}/verify-email?token=...`   | 24 hours, single-use |
-| **Forgot password** | [Forgot Password](#forgot-password)                                 | `{BASE_URL}/reset-password?token=...` | 1 hour, single-use   |
+| Link type | Email trigger | Link URL pattern | Token validity |
+|-----------|---------------|------------------|----------------|
+| **Verify email** | Register or [Resend Verification Email](#resend-verification-email) | `{FRONTEND_URL}/verify-email?token=...` | 24 hours, single-use |
+| **Forgot password** | [Forgot Password](#forgot-password) | `{FRONTEND_URL}/reset-password?token=...` | 1 hour, single-use |
 
-`BASE_URL` is the server config (e.g. your frontend origin) so the link points to the dashboard; the dashboard reads `token` from the query and calls the corresponding API.
+`FRONTEND_URL` is the frontend domain (set via `FRONTEND_URL` env var, falls back to `BASE_URL` if not set). Email links point to the frontend; the dashboard reads `token` from the query and calls the corresponding API.
 
 ### Register
 
@@ -84,7 +83,6 @@ POST /register
 ```
 
 **Request Body:**
-
 ```json
 {
   "email": "user@company.com",
@@ -93,14 +91,13 @@ POST /register
 }
 ```
 
-| Field    | Type   | Required | Description      |
-| -------- | ------ | -------- | ---------------- |
-| email    | string | Yes      | User email       |
-| password | string | Yes      | Min 6 characters |
-| name     | string | No       | Display name     |
+| Field    | Type   | Required | Description                          |
+|----------|--------|----------|--------------------------------------|
+| email    | string | Yes      | User email                           |
+| password | string | Yes      | Min 6 characters                     |
+| name     | string | No       | Display name                         |
 
 **Success Response (201):**
-
 ```json
 {
   "success": true,
@@ -132,7 +129,6 @@ POST /verify-email
 ```
 
 **Request Body:**
-
 ```json
 {
   "token": "token-from-verification-email-link"
@@ -142,7 +138,6 @@ POST /verify-email
 The token is the `token` query parameter from the verification link (e.g. `https://your-frontend.com/verify-email?token=...`). The dashboard should read it from the URL and send it in the body.
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -174,7 +169,6 @@ POST /resend-verification-email
 ```
 
 **Request Body:**
-
 ```json
 {
   "email": "user@company.com"
@@ -182,7 +176,6 @@ POST /resend-verification-email
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -203,7 +196,6 @@ POST /login
 ```
 
 **Request Body:**
-
 ```json
 {
   "email": "user@company.com",
@@ -212,7 +204,6 @@ POST /login
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -244,13 +235,11 @@ POST /logout
 ```
 
 **Headers:**
-
 ```
 Authorization: Bearer <jwt_token>
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -269,7 +258,6 @@ POST /forgot-password
 ```
 
 **Request Body:**
-
 ```json
 {
   "email": "user@company.com"
@@ -277,7 +265,6 @@ POST /forgot-password
 ```
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -298,7 +285,6 @@ POST /reset-password
 ```
 
 **Request Body:**
-
 ```json
 {
   "email": "user@company.com",
@@ -307,14 +293,13 @@ POST /reset-password
 }
 ```
 
-| Field    | Type   | Required | Description                              |
-| -------- | ------ | -------- | ---------------------------------------- |
-| email    | string | Yes      | Same email used in Forgot Password       |
-| token    | string | Yes      | Token from the reset link (`?token=...`) |
-| password | string | Yes      | New password (min 6 characters)          |
+| Field    | Type   | Required | Description                                |
+|----------|--------|----------|--------------------------------------------|
+| email    | string | Yes      | Same email used in Forgot Password         |
+| token    | string | Yes      | Token from the reset link (`?token=...`)   |
+| password | string | Yes      | New password (min 6 characters)           |
 
 **Success Response (200):**
-
 ```json
 {
   "success": true,
@@ -331,7 +316,6 @@ POST /reset-password
 All tenant APIs require JWT authentication.
 
 **Headers (for all requests below):**
-
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
@@ -346,7 +330,6 @@ POST /tenants
 ```
 
 **Request Body:**
-
 ```json
 {
   "name": "My Company Support",
@@ -354,13 +337,12 @@ POST /tenants
 }
 ```
 
-| Field | Type   | Required | Description                                              |
-| ----- | ------ | -------- | -------------------------------------------------------- |
-| name  | string | Yes      | Tenant name                                              |
-| plan  | string | No       | Plan type: `free`, `pro`, `enterprise` (default: `free`) |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| name | string | Yes | Tenant name |
+| plan | string | No | Plan type: `free`, `pro`, `enterprise` (default: `free`) |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -410,7 +392,6 @@ GET /tenants
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -441,7 +422,6 @@ GET /tenants/{tenant_id}
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -487,7 +467,6 @@ POST /tenants/{tenant_id}/api-keys
 ```
 
 **Request Body:**
-
 ```json
 {
   "type": "public",
@@ -495,13 +474,12 @@ POST /tenants/{tenant_id}/api-keys
 }
 ```
 
-| Field      | Type   | Required | Description                                        |
-| ---------- | ------ | -------- | -------------------------------------------------- |
-| type       | string | No       | `public` or `secret` (default: `secret`)           |
-| rate_limit | int    | No       | Requests per hour (default: 100, -1 for unlimited) |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| type | string | No | `public` or `secret` (default: `secret`) |
+| rate_limit | int | No | Requests per hour (default: 100, -1 for unlimited) |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -532,7 +510,6 @@ GET /tenants/{tenant_id}/api-keys
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -578,7 +555,6 @@ GET /tenants/{tenant_id}/api-keys/{key_id}
 | key_id | uuid | The API key's ID (from list or create response) |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -596,7 +572,6 @@ GET /tenants/{tenant_id}/api-keys/{key_id}
 ```
 
 **Error Response (Key Not Found):**
-
 ```json
 {
   "success": false,
@@ -605,7 +580,6 @@ GET /tenants/{tenant_id}/api-keys/{key_id}
 ```
 
 **Error Response (Key Cannot Be Retrieved):**
-
 ```json
 {
   "success": false,
@@ -616,7 +590,6 @@ GET /tenants/{tenant_id}/api-keys/{key_id}
 > **Note:** Keys created before encryption was enabled cannot be retrieved. Only keys created after the encryption feature was added can be retrieved using this endpoint.
 
 **Example:**
-
 ```bash
 # 1. List all keys to get the key ID
 curl http://localhost:8080/api/v1/tenants/{tenant_id}/api-keys \
@@ -625,6 +598,71 @@ curl http://localhost:8080/api/v1/tenants/{tenant_id}/api-keys \
 # 2. Retrieve the actual key using the ID
 curl http://localhost:8080/api/v1/tenants/{tenant_id}/api-keys/{key_id} \
   -H "Authorization: Bearer $JWT_TOKEN"
+```
+
+---
+
+### Get Tenant Settings
+
+Get per-tenant answer and chat settings (answer style, message limit per chat, extra settings). These affect how the assistant responds and how many messages are allowed per chat.
+
+```
+GET /tenants/{tenant_id}/settings
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "answer_style": "formal",
+    "message_limit_per_chat": 100,
+    "settings": {}
+  }
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| answer_style | string \| null | `short`, `formal`, `friendly`, `detailed`, or null for default |
+| message_limit_per_chat | number \| null | Max messages per chat; null = no limit |
+| settings | object | Extra key-value settings (e.g. language, max_tokens) |
+
+---
+
+### Update Tenant Settings
+
+Set answer style, message limit per chat, and optional extra settings. Affects all chats for this tenant.
+
+```
+PUT /tenants/{tenant_id}/settings
+```
+
+**Request Body:**
+```json
+{
+  "answer_style": "short",
+  "message_limit_per_chat": 50,
+  "settings": {}
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| answer_style | string | No | One of: `short`, `formal`, `friendly`, `detailed`; empty string = default |
+| message_limit_per_chat | number \| null | No | Max messages per chat; null = no limit. Must be ≥ 1 if set. |
+| settings | object | No | Extra key-value; use `{}` to clear |
+
+**Answer styles:** `short` = brief answers; `formal` = professional tone; `friendly` = warm tone; `detailed` = thorough when possible.
+
+When a chat reaches `message_limit_per_chat`, the API returns an error and the user must start a new chat or the tenant can increase the limit.
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Tenant settings updated"
+}
 ```
 
 ---
@@ -644,7 +682,6 @@ GET /tenants/{tenant_id}/chats
 | limit | int | 20 | Items per page (max 100) |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -682,7 +719,6 @@ GET /tenants/{tenant_id}/chats/{chat_id}/messages
 | limit | int | 20 | Items per page (max 100) |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -712,7 +748,6 @@ GET /tenants/{tenant_id}/chats/{chat_id}/messages
 All billing APIs require JWT authentication. Users can subscribe via **Stripe** or **CryptoCloud**, view their subscription, change plan or gateway (scheduled for next cycle), and cancel.
 
 **Headers (for all requests below):**
-
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
@@ -727,7 +762,6 @@ GET /billing/plans
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -769,7 +803,6 @@ POST /billing/checkout
 ```
 
 **Request Body:**
-
 ```json
 {
   "plan_id": "b6215202-d167-45c1-a2dd-6d037fafee50",
@@ -778,14 +811,13 @@ POST /billing/checkout
 }
 ```
 
-| Field    | Type          | Required | Description               |
-| -------- | ------------- | -------- | ------------------------- |
-| plan_id  | string (uuid) | Yes      | Plan to subscribe to      |
-| provider | string        | Yes      | `stripe` or `cryptocloud` |
-| period   | string        | Yes      | `monthly` or `yearly`     |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| plan_id | string (uuid) | Yes | Plan to subscribe to |
+| provider | string | Yes | `stripe` or `cryptocloud` |
+| period | string | Yes | `monthly` or `yearly` |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -811,7 +843,6 @@ GET /billing/subscription
 ```
 
 **Response (has subscription):**
-
 ```json
 {
   "success": true,
@@ -845,7 +876,6 @@ GET /billing/subscription
 ```
 
 **Response (no subscription):**
-
 ```json
 {
   "success": true,
@@ -867,19 +897,17 @@ POST /billing/subscription/change-plan
 ```
 
 **Request Body:**
-
 ```json
 {
   "plan_id": "b6215202-d167-45c1-a2dd-6d037fafee50"
 }
 ```
 
-| Field   | Type          | Required | Description    |
-| ------- | ------------- | -------- | -------------- |
-| plan_id | string (uuid) | Yes      | Target plan ID |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| plan_id | string (uuid) | Yes | Target plan ID |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -898,19 +926,17 @@ POST /billing/subscription/change-gateway
 ```
 
 **Request Body:**
-
 ```json
 {
   "provider": "cryptocloud"
 }
 ```
 
-| Field    | Type   | Required | Description               |
-| -------- | ------ | -------- | ------------------------- |
-| provider | string | Yes      | `stripe` or `cryptocloud` |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| provider | string | Yes | `stripe` or `cryptocloud` |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -929,7 +955,6 @@ POST /billing/subscription/cancel
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -943,10 +968,10 @@ POST /billing/subscription/cancel
 
 These endpoints are called by Stripe and CryptoCloud when payment events occur. They are **not** called by the dashboard; configure them in each provider's dashboard.
 
-| Method | Endpoint                        | Provider                                                                             |
-| ------ | ------------------------------- | ------------------------------------------------------------------------------------ |
-| POST   | `/webhooks/billing/stripe`      | Stripe – send **Stripe-Signature** header; configure in Stripe Dashboard             |
-| POST   | `/webhooks/billing/cryptocloud` | CryptoCloud – send **X-Signature** or **Signature** header; configure in CryptoCloud |
+| Method | Endpoint | Provider |
+|--------|----------|----------|
+| POST | `/webhooks/billing/stripe` | Stripe – send **Stripe-Signature** header; configure in Stripe Dashboard |
+| POST | `/webhooks/billing/cryptocloud` | CryptoCloud – send **X-Signature** or **Signature** header; configure in CryptoCloud |
 
 **Environment variables:** `STRIPE_WEBHOOK_SECRET`, `CRYPTOCLOUD_WEBHOOK_SECRET` (and `STRIPE_SECRET_KEY`, `CRYPTOCLOUD_API_KEY`, `CRYPTOCLOUD_SHOP_ID` for creating checkouts).
 
@@ -972,7 +997,6 @@ POST /tenants/{tenant_id}/documents
 | file | file | Yes | Document file (.txt, .md, .json, .html, .docx) |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -999,7 +1023,6 @@ POST /tenants/{tenant_id}/documents/ingest-url
 ```
 
 **Request Body:**
-
 ```json
 {
   "url": "https://example.com/about"
@@ -1007,7 +1030,6 @@ POST /tenants/{tenant_id}/documents/ingest-url
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1031,7 +1053,6 @@ GET /tenants/{tenant_id}/documents
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1061,7 +1082,6 @@ DELETE /tenants/{tenant_id}/documents/{document_id}
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1091,7 +1111,6 @@ GET /tenants/{tenant_id}/pending-questions
 | limit | int | No | Items per page (default: 20, max: 100) |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1126,7 +1145,6 @@ POST /tenants/{tenant_id}/pending-questions/{pending_question_id}/answer
 ```
 
 **Request Body:**
-
 ```json
 {
   "answer": "Our business hours are Monday to Friday, 9 AM to 6 PM.",
@@ -1134,13 +1152,12 @@ POST /tenants/{tenant_id}/pending-questions/{pending_question_id}/answer
 }
 ```
 
-| Field  | Type    | Required | Description                                        |
-| ------ | ------- | -------- | -------------------------------------------------- |
-| answer | string  | Yes      | The answer to the question                         |
-| is_faq | boolean | No       | Mark as FAQ for priority matching (default: false) |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| answer | string | Yes | The answer to the question |
+| is_faq | boolean | No | Mark as FAQ for priority matching (default: false) |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1175,7 +1192,6 @@ GET /tenants/{tenant_id}/feedback/stats
 | end_date | string | No | Filter to date (YYYY-MM-DD) |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1207,7 +1223,6 @@ GET /tenants/{tenant_id}/feedback
 | limit | int | No | Items per page (default: 20, max: 100) |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1244,7 +1259,6 @@ POST /tenants/{tenant_id}/chats/{chat_id}/messages/{message_id}/feedback
 ```
 
 **Request Body:**
-
 ```json
 {
   "feedback_type": "positive",
@@ -1253,7 +1267,6 @@ POST /tenants/{tenant_id}/chats/{chat_id}/messages/{message_id}/feedback
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1280,7 +1293,6 @@ POST /tenants/{tenant_id}/telegram/bot-token
 ```
 
 **Request Body:**
-
 ```json
 {
   "bot_token": "123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
@@ -1288,7 +1300,6 @@ POST /tenants/{tenant_id}/telegram/bot-token
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1301,9 +1312,7 @@ POST /tenants/{tenant_id}/telegram/bot-token
 ```
 
 **Next Steps:**
-
 1. Register the webhook with Telegram:
-
 ```bash
 curl "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook?url=https://your-domain.com/webhooks/telegram?token=<BOT_TOKEN>"
 ```
@@ -1318,26 +1327,26 @@ Administrative APIs for managing users and tenants. Access is controlled by user
 
 ### Role Hierarchy
 
-| Role          | Level | Description                                           |
-| ------------- | ----- | ----------------------------------------------------- |
-| `user`        | 1     | Standard user - can create and manage own tenants     |
-| `admin`       | 2     | Administrator - can manage users (except super_admin) |
-| `super_admin` | 3     | Super Administrator - full system access              |
-| `disabled`    | 0     | Disabled account - no access                          |
+| Role | Level | Description |
+|------|-------|-------------|
+| `user` | 1 | Standard user - can create and manage own tenants |
+| `admin` | 2 | Administrator - can manage users (except super_admin) |
+| `super_admin` | 3 | Super Administrator - full system access |
+| `disabled` | 0 | Disabled account - no access |
 
 ### Role Permissions Matrix
 
-| Action                    | user | admin | super_admin |
-| ------------------------- | ---- | ----- | ----------- |
-| Create/manage own tenants | ✅   | ✅    | ✅          |
-| List all users            | ❌   | ✅    | ✅          |
-| Update user roles         | ❌   | ✅    | ✅          |
-| Disable/delete users      | ❌   | ✅    | ✅          |
-| List all tenants          | ❌   | ❌    | ✅          |
-| Update tenant status      | ❌   | ❌    | ✅          |
-| Delete any tenant         | ❌   | ❌    | ✅          |
-| Manage plans (CRUD)       | ❌   | ❌    | ✅          |
-| Initialize admin          | ❌   | ✅    | ✅          |
+| Action | user | admin | super_admin |
+|--------|------|-------|-------------|
+| Create/manage own tenants | ✅ | ✅ | ✅ |
+| List all users | ❌ | ✅ | ✅ |
+| Update user roles | ❌ | ✅ | ✅ |
+| Disable/delete users | ❌ | ✅ | ✅ |
+| List all tenants | ❌ | ❌ | ✅ |
+| Update tenant status | ❌ | ❌ | ✅ |
+| Delete any tenant | ❌ | ❌ | ✅ |
+| Manage plans (CRUD) | ❌ | ❌ | ✅ |
+| Initialize admin | ❌ | ✅ | ✅ |
 
 ---
 
@@ -1346,7 +1355,6 @@ Administrative APIs for managing users and tenants. Access is controlled by user
 **Required Role:** `admin` or `super_admin`
 
 **Headers:**
-
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
@@ -1361,7 +1369,6 @@ POST /admin/init
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1380,7 +1387,6 @@ GET /admin/users
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1421,7 +1427,6 @@ PUT /admin/users/{user_id}/role
 | user_id | uuid | The user's ID |
 
 **Request Body:**
-
 ```json
 {
   "role": "admin"
@@ -1437,7 +1442,6 @@ PUT /admin/users/{user_id}/role
 | `disabled` | Disables the account |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1446,7 +1450,6 @@ PUT /admin/users/{user_id}/role
 ```
 
 **Example:**
-
 ```bash
 # Promote user to admin
 curl -X PUT http://localhost:8080/api/v1/admin/users/550e8400-e29b-41d4-a716-446655440000/role \
@@ -1477,7 +1480,6 @@ DELETE /admin/users/{user_id}
 | user_id | uuid | The user's ID |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1503,7 +1505,6 @@ DELETE /admin/users/{user_id}/delete
 | user_id | uuid | The user's ID |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1522,7 +1523,6 @@ DELETE /admin/users/{user_id}/delete
 APIs to view a user's current subscription, subscription history, and tenants they own.
 
 **Headers:**
-
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
@@ -1542,7 +1542,6 @@ GET /admin/users/{user_id}/subscription
 | user_id | uuid | The user's ID |
 
 **Response (has subscription):**
-
 ```json
 {
   "success": true,
@@ -1563,7 +1562,6 @@ GET /admin/users/{user_id}/subscription
 ```
 
 **Response (no subscription):**
-
 ```json
 {
   "success": true,
@@ -1591,7 +1589,6 @@ GET /admin/users/{user_id}/subscriptions
 | user_id | uuid | The user's ID |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1630,7 +1627,6 @@ GET /admin/users/{user_id}/tenants
 | user_id | uuid | The user's ID |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1667,7 +1663,6 @@ GET /admin/tenants
 ```
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1713,7 +1708,6 @@ PUT /admin/tenants/{tenant_id}/status
 | tenant_id | uuid | The tenant's ID |
 
 **Request Body:**
-
 ```json
 {
   "status": "suspended"
@@ -1728,7 +1722,6 @@ PUT /admin/tenants/{tenant_id}/status
 | `blocked` | Permanently blocked | APIs return 403 Forbidden |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1737,7 +1730,6 @@ PUT /admin/tenants/{tenant_id}/status
 ```
 
 **Example Use Cases:**
-
 ```bash
 # Suspend a tenant for non-payment
 curl -X PUT http://localhost:8080/api/v1/admin/tenants/550e8400-e29b-41d4-a716-446655440102/status \
@@ -1774,7 +1766,6 @@ DELETE /admin/tenants/{tenant_id}
 | tenant_id | uuid | The tenant's ID |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1783,7 +1774,6 @@ DELETE /admin/tenants/{tenant_id}
 ```
 
 **Error Response (if tenant has documents):**
-
 ```json
 {
   "success": false,
@@ -1802,7 +1792,6 @@ DELETE /admin/tenants/{tenant_id}
 APIs to view chats, messages, and analytics for any tenant (support and operations).
 
 **Headers:**
-
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
@@ -1869,7 +1858,6 @@ GET /admin/tenants/{tenant_id}/analytics
 | tenant_id | uuid | The tenant's ID |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -1904,7 +1892,6 @@ GET /admin/tenants/{tenant_id}/analytics
 These APIs allow super administrators to create and manage billing plans. Plans define pricing (monthly/yearly), limits (projects, messages, documents, etc.), and feature flags. When Stripe is configured (`STRIPE_SECRET_KEY`), creating a plan automatically creates a Stripe Product and recurring Prices (monthly and yearly) and stores the price IDs on the plan.
 
 **Headers:**
-
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
@@ -1931,7 +1918,6 @@ POST /admin/plans
 ```
 
 **Request Body:**
-
 ```json
 {
   "name": "Pro",
@@ -1954,21 +1940,20 @@ POST /admin/plans
 }
 ```
 
-| Field                                                                     | Type   | Required | Description              |
-| ------------------------------------------------------------------------- | ------ | -------- | ------------------------ |
-| name                                                                      | string | Yes      | Plan display name        |
-| slug                                                                      | string | Yes      | Unique slug (e.g. `pro`) |
-| currency                                                                  | string | Yes      | e.g. `USD`               |
-| price_monthly_cents                                                       | int    | Yes      | Monthly price in cents   |
-| price_yearly_cents                                                        | int    | No       | Yearly price in cents    |
-| is_active                                                                 | bool   | No       | Default `true`           |
-| sort_order                                                                | int    | No       | Display order            |
-| description, features_summary                                             | string | No       | For display              |
-| max_projects, max_messages_per_month, max_documents, max_document_size_mb | int    | No       | Plan limits              |
-| enable\_\*                                                                | bool   | No       | Feature flags            |
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| name | string | Yes | Plan display name |
+| slug | string | Yes | Unique slug (e.g. `pro`) |
+| currency | string | Yes | e.g. `USD` |
+| price_monthly_cents | int | Yes | Monthly price in cents |
+| price_yearly_cents | int | No | Yearly price in cents |
+| is_active | bool | No | Default `true` |
+| sort_order | int | No | Display order |
+| description, features_summary | string | No | For display |
+| max_projects, max_messages_per_month, max_documents, max_document_size_mb | int | No | Plan limits |
+| enable_* | bool | No | Feature flags |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -2009,7 +1994,6 @@ GET /admin/plans/{plan_id}
 | plan_id | uuid | The plan's ID |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -2049,7 +2033,6 @@ PUT /admin/plans/{plan_id}
 **Request Body:** Same fields as [Create Plan](#create-plan) (partial update supported).
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -2073,7 +2056,6 @@ DELETE /admin/plans/{plan_id}
 | plan_id | uuid | The plan's ID |
 
 **Response:**
-
 ```json
 {
   "success": true,
@@ -2087,37 +2069,37 @@ DELETE /admin/plans/{plan_id}
 
 ### User Management (admin, super_admin)
 
-| Method | Endpoint                          | Description                      |
-| ------ | --------------------------------- | -------------------------------- |
-| POST   | `/admin/init`                     | Initialize first admin           |
-| GET    | `/admin/users`                    | List all users                   |
-| PUT    | `/admin/users/{id}/role`          | Update user role                 |
-| DELETE | `/admin/users/{id}`               | Disable user                     |
-| DELETE | `/admin/users/{id}/delete`        | Delete user                      |
-| GET    | `/admin/users/{id}/subscription`  | Get user's current subscription  |
-| GET    | `/admin/users/{id}/subscriptions` | List user's subscription history |
-| GET    | `/admin/users/{id}/tenants`       | List tenants owned by user       |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/admin/init` | Initialize first admin |
+| GET | `/admin/users` | List all users |
+| PUT | `/admin/users/{id}/role` | Update user role |
+| DELETE | `/admin/users/{id}` | Disable user |
+| DELETE | `/admin/users/{id}/delete` | Delete user |
+| GET | `/admin/users/{id}/subscription` | Get user's current subscription |
+| GET | `/admin/users/{id}/subscriptions` | List user's subscription history |
+| GET | `/admin/users/{id}/tenants` | List tenants owned by user |
 
 ### Tenant Management (super_admin only)
 
-| Method | Endpoint                                       | Description                    |
-| ------ | ---------------------------------------------- | ------------------------------ |
-| GET    | `/admin/tenants`                               | List all tenants               |
-| GET    | `/admin/tenants/{id}/chats`                    | List tenant chats (paginated)  |
-| GET    | `/admin/tenants/{id}/chats/{chat_id}/messages` | List chat messages (paginated) |
-| GET    | `/admin/tenants/{id}/analytics`                | Get tenant analytics           |
-| PUT    | `/admin/tenants/{id}/status`                   | Update tenant status           |
-| DELETE | `/admin/tenants/{id}`                          | Delete tenant                  |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/admin/tenants` | List all tenants |
+| GET | `/admin/tenants/{id}/chats` | List tenant chats (paginated) |
+| GET | `/admin/tenants/{id}/chats/{chat_id}/messages` | List chat messages (paginated) |
+| GET | `/admin/tenants/{id}/analytics` | Get tenant analytics |
+| PUT | `/admin/tenants/{id}/status` | Update tenant status |
+| DELETE | `/admin/tenants/{id}` | Delete tenant |
 
 ### Plan Management (super_admin only)
 
-| Method | Endpoint            | Description                                                    |
-| ------ | ------------------- | -------------------------------------------------------------- |
-| GET    | `/admin/plans`      | List all plans                                                 |
-| POST   | `/admin/plans`      | Create plan (Stripe Product/Prices auto-created if configured) |
-| GET    | `/admin/plans/{id}` | Get plan by ID                                                 |
-| PUT    | `/admin/plans/{id}` | Update plan                                                    |
-| DELETE | `/admin/plans/{id}` | Deactivate plan                                                |
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/admin/plans` | List all plans |
+| POST | `/admin/plans` | Create plan (Stripe Product/Prices auto-created if configured) |
+| GET | `/admin/plans/{id}` | Get plan by ID |
+| PUT | `/admin/plans/{id}` | Update plan |
+| DELETE | `/admin/plans/{id}` | Deactivate plan |
 
 ---
 
@@ -2218,13 +2200,13 @@ curl http://localhost:8080/api/v1/billing/subscription \
 
 ## Error Codes
 
-| HTTP Code | Description                                         |
-| --------- | --------------------------------------------------- |
-| 400       | Bad Request - Invalid input                         |
-| 401       | Unauthorized - Missing or invalid token             |
-| 403       | Forbidden - Insufficient permissions                |
-| 404       | Not Found - Resource doesn't exist or access denied |
-| 500       | Internal Server Error                               |
+| HTTP Code | Description |
+|-----------|-------------|
+| 400 | Bad Request - Invalid input |
+| 401 | Unauthorized - Missing or invalid token |
+| 403 | Forbidden - Insufficient permissions |
+| 404 | Not Found - Resource doesn't exist or access denied |
+| 500 | Internal Server Error |
 
 ---
 
@@ -2281,8 +2263,8 @@ After creating a tenant, use the **public API key** in your client-side SDK:
 ```javascript
 // Web SDK Example
 const ragClient = new LightRAG({
-  publicKey: "pk_xxxxxxxx-xxxx-...",
-  baseUrl: "https://your-domain.com/api/v1",
+  publicKey: 'pk_xxxxxxxx-xxxx-...',
+  baseUrl: 'https://your-domain.com/api/v1'
 });
 
 // Create a chat session
@@ -2292,7 +2274,7 @@ const chat = await ragClient.createChat();
 const response = await ragClient.sendMessage(chat.id, "What are your hours?");
 
 // Submit feedback
-await ragClient.submitFeedback(chat.id, response.messageId, "positive");
+await ragClient.submitFeedback(chat.id, response.messageId, 'positive');
 ```
 
 For detailed SDK documentation, see [SDK_FLOW.md](./SDK_FLOW.md).

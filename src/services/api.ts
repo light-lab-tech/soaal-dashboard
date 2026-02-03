@@ -32,6 +32,8 @@ import type {
   CheckoutData,
   CreatePlanData,
   TenantAnalytics,
+  TenantSettings,
+  UpdateTenantSettingsData,
 } from '../types';
 
 class ApiClient {
@@ -163,6 +165,17 @@ class ApiClient {
 
   async getTenantChatMessages(tenantId: string, chatId: string, params?: { page?: number; limit?: number }): Promise<ApiResponse<{ messages: ChatMessage[]; total: number; page: number; limit: number }>> {
     const response = await this.client.get<ApiResponse<{ messages: ChatMessage[]; total: number; page: number; limit: number }>>(`/tenants/${tenantId}/chats/${chatId}/messages`, { params });
+    return response.data;
+  }
+
+  // Tenant Settings Endpoints
+  async getTenantSettings(tenantId: string): Promise<ApiResponse<TenantSettings>> {
+    const response = await this.client.get<ApiResponse<TenantSettings>>(`/tenants/${tenantId}/settings`);
+    return response.data;
+  }
+
+  async updateTenantSettings(tenantId: string, data: UpdateTenantSettingsData): Promise<ApiResponse<void>> {
+    const response = await this.client.put<ApiResponse<void>>(`/tenants/${tenantId}/settings`, data);
     return response.data;
   }
 

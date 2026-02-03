@@ -20,6 +20,7 @@ import {
   CreditCard,
   Activity,
   MessagesSquare,
+  Settings,
 } from 'lucide-react';
 
 const TenantDetails: React.FC = () => {
@@ -166,6 +167,16 @@ const TenantDetails: React.FC = () => {
       color: 'from-emerald-500 to-green-600',
       iconColor: 'text-emerald-400',
       hoverBg: 'hover:bg-emerald-500/10 hover:border-emerald-400/30',
+    },
+    {
+      id: 'settings',
+      icon: Settings,
+      label: t('nav.settings'),
+      description: t('tenants.settingsDesc'),
+      path: `/tenants/${tenantId}/settings`,
+      color: 'from-slate-500 to-gray-600',
+      iconColor: 'text-slate-400',
+      hoverBg: 'hover:bg-slate-500/10 hover:border-slate-400/30',
     },
   ];
 

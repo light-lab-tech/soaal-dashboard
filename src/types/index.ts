@@ -76,6 +76,19 @@ export interface CreateApiKeyData {
   rate_limit?: number;
 }
 
+// Tenant Settings Types
+export interface TenantSettings {
+  answer_style?: 'short' | 'formal' | 'friendly' | 'detailed' | null;
+  message_limit_per_chat?: number | null;
+  settings: Record<string, any>;
+}
+
+export interface UpdateTenantSettingsData {
+  answer_style?: string;
+  message_limit_per_chat?: number | null;
+  settings?: Record<string, any>;
+}
+
 // Document Types
 export interface Document {
   id: string;
