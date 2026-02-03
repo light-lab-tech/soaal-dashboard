@@ -90,7 +90,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
   return (
     <div className="min-h-screen flex">
       <aside
-        className={`fixed inset-y-0 z-50 w-64 bg-gradient-to-b from-slate-800/98 to-slate-900/98 backdrop-blur-xl border-r border-slate-700/50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed inset-y-0 z-50 w-64 bg-slate-900/98 backdrop-blur-xl border-r border-slate-700/50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isRTL ? 'right-0' : 'left-0'
         } ${
           isSidebarOpen
@@ -100,8 +100,11 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
               : '-translate-x-full'
         }`}
       >
+        {/* Top accent line */}
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED]"></div>
+
         <div className="flex flex-col h-full">
-          <div className="px-5 py-5 border-b border-slate-700/50 bg-gradient-to-r from-[#8B00E8]/10 to-transparent">
+          <div className="px-5 py-5 border-b border-slate-700/50">
             <Link to="/dashboard" className="flex items-center gap-3 group">
               <div className="w-10 h-10 rounded-xl bg-brand-gradient flex items-center justify-center shadow-lg shadow-[#8B00E8]/40 group-hover:scale-105 transition-all">
                 <Logo size={20} variant="icon-only" />
@@ -123,7 +126,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
 
               // Get color for each nav item
               const getNavColor = () => {
-                if (item.path.includes('dashboard') || item.path.includes('admin')) return 'text-cyan-400';
+                if (item.path.includes('dashboard') || item.path.includes('admin')) return 'text-[#8B00E8]';
                 if (item.path.includes('tenant')) return 'text-emerald-400';
                 if (item.path.includes('billing') || item.path.includes('plan')) return 'text-amber-400';
                 if (item.path.includes('user')) return 'text-pink-400';
@@ -131,7 +134,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
               };
 
               const getActiveGradient = () => {
-                if (item.path.includes('dashboard') || item.path.includes('admin')) return 'from-cyan-600/20 to-teal-600/20 text-cyan-300 border-cyan-500/30 shadow-cyan-500/10';
+                if (item.path.includes('dashboard') || item.path.includes('admin')) return 'from-[#8B00E8]/20 to-[#7C3AED]/20 text-[#8B00E8] border-[#8B00E8]/30 shadow-[#8B00E8]/10';
                 if (item.path.includes('tenant')) return 'from-emerald-600/20 to-green-600/20 text-emerald-300 border-emerald-500/30 shadow-emerald-500/10';
                 if (item.path.includes('billing') || item.path.includes('plan')) return 'from-amber-600/20 to-orange-600/20 text-amber-300 border-amber-500/30 shadow-amber-500/10';
                 if (item.path.includes('user')) return 'from-pink-600/20 to-rose-600/20 text-pink-300 border-pink-500/30 shadow-pink-500/10';
@@ -150,10 +153,10 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
                   className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group ${
                     reallyActive
                       ? `bg-gradient-to-r ${getActiveGradient()}`
-                      : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                      : 'text-slate-300 hover:bg-slate-800/50 hover:text-white'
                   }`}
                 >
-                  <Icon size={18} className={`flex-shrink-0 ${reallyActive ? '' : navColor}`} />
+                  <Icon size={18} className={`flex-shrink-0 ${reallyActive ? 'text-white' : navColor}`} />
                   <span className="font-medium text-sm">{item.label}</span>
                   {reallyActive && <ChevronRight size={14} className={`opacity-70 rtl-flip ${isRTL ? 'mr-auto' : 'ml-auto'}`} />}
                 </button>
@@ -182,24 +185,32 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
         </div>
       </aside>
 
-      <div className={`flex-1 min-h-screen ${isRTL ? 'lg:mr-64' : 'lg:ml-64'}`}>
-        <header className="sticky top-0 z-40 bg-gradient-to-r from-slate-800/90 via-slate-800/80 to-slate-900/90 backdrop-blur-xl border-b border-slate-700/50 px-4 lg:px-6 py-4">
+      <div className={`flex-1 min-h-screen flex flex-col ${isRTL ? 'lg:mr-64' : 'lg:ml-64'}`}>
+        {/* Top accent line */}
+        <div className="h-0.5 bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED]"></div>
+
+        <header className="sticky top-0 z-40 bg-slate-900/98 backdrop-blur-xl px-4 lg:px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="lg:hidden p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-colors"
+                className="lg:hidden p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 hover:text-white transition-colors border border-slate-700/50"
               >
                 {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
-              <div className="flex items-center gap-2">
-                <div className="hidden sm:block w-1 h-6 rounded-full bg-gradient-to-b from-[#8B00E8] to-[#A855F7]"></div>
-                <h2 className="text-xl font-bold text-white truncate">{getActiveLabel()}</h2>
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex w-8 h-8 rounded-lg bg-gradient-to-br from-[#8B00E8]/20 to-[#7C3AED]/20 items-center justify-center border border-[#8B00E8]/30">
+                  <LayoutDashboard size={16} className="text-[#8B00E8]" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-white">{getActiveLabel()}</h2>
+                  <p className="text-xs text-slate-400">{user?.role === 'super_admin' || user?.role === 'admin' ? t('admin.title') : t('nav.dashboard')}</p>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="bg-slate-700/50 border border-slate-600/50 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-700/70 transition-colors">
-                <Globe size={16} className="text-slate-400" />
+              <div className="bg-slate-800/50 border border-slate-700/50 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-700/50 transition-colors">
+                <Globe size={16} className="text-[#8B00E8]" />
                 <select
                   value={i18n.language}
                   onChange={(e) => handleLanguageChange(e.target.value)}
@@ -213,7 +224,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
           </div>
         </header>
 
-        <main className="p-4 lg:p-6">
+        <main className="flex-1 p-4 lg:p-6">
           <Outlet />
         </main>
       </div>
