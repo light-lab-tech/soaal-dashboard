@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthRedirect from './components/AuthRedirect';
 import AdminRoute from './components/AdminRoute';
@@ -45,16 +46,17 @@ function App() {
   };
 
   return (
-    <AuthProvider>
-      {/* Background Orbs - Fixed position container */}
-      <div className="background-container">
-        <div className="background-orb orb-1"></div>
-        <div className="background-orb orb-2"></div>
-        <div className="background-orb orb-3"></div>
-        <div className="background-orb orb-4"></div>
-      </div>
+    <ToastProvider>
+      <AuthProvider>
+        {/* Background Orbs - Fixed position container */}
+        <div className="background-container">
+          <div className="background-orb orb-1"></div>
+          <div className="background-orb orb-2"></div>
+          <div className="background-orb orb-3"></div>
+          <div className="background-orb orb-4"></div>
+        </div>
 
-      <div className="min-h-screen relative">
+        <div className="min-h-screen relative">
 
         <Routes>
           {/* Auth Routes - Redirect authenticated users to dashboard */}
@@ -108,7 +110,8 @@ function App() {
           <Route path="*" element={<NotFoundRedirect />} />
         </Routes>
       </div>
-    </AuthProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 
