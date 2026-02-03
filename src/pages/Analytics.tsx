@@ -105,7 +105,7 @@ const Analytics: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
         <div className="glass-card flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
           <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
 import type { Plan, Subscription } from '../types';
 import {
@@ -14,6 +15,7 @@ import {
 
 const Billing: React.FC = () => {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [currentPlan, setCurrentPlan] = useState<Plan | null>(null);
@@ -57,7 +59,7 @@ const Billing: React.FC = () => {
         window.location.href = res.data.checkout_url;
       }
     } catch (err: any) {
-      alert(err.message || 'Checkout failed');
+      showToast(err.message || 'Checkout failed', 'error');
     } finally {
       setCheckoutLoading(null);
     }
@@ -69,8 +71,9 @@ const Billing: React.FC = () => {
       setActionLoading('change-plan');
       await api.changePlan(planId);
       await loadData();
+      showToast(t('billing.planChanged'), 'success');
     } catch (err: any) {
-      alert(err.message || 'Failed to change plan');
+      showToast(err.message || 'Failed to change plan', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -82,8 +85,9 @@ const Billing: React.FC = () => {
       setActionLoading('change-gateway');
       await api.changeGateway(provider);
       await loadData();
+      showToast(t('billing.gatewayChanged'), 'success');
     } catch (err: any) {
-      alert(err.message || 'Failed to change payment method');
+      showToast(err.message || 'Failed to change payment method', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -95,8 +99,9 @@ const Billing: React.FC = () => {
       setActionLoading('cancel');
       await api.cancelSubscription();
       await loadData();
+      showToast(t('billing.subscriptionCancelled'), 'success');
     } catch (err: any) {
-      alert(err.message || 'Failed to cancel');
+      showToast(err.message || 'Failed to cancel', 'error');
     } finally {
       setActionLoading(null);
     }
@@ -105,72 +110,74 @@ const Billing: React.FC = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[300px]">
-        <div className="card flex items-center gap-3 p-6">
+        <div className="glass-card flex items-center gap-3">
           <Loader2 size={24} className="animate-spin text-cyan-400" />
-          <span className="text-white">{t('common.loading')}</span>
+          <span className="text-glass-text text-sm">{t('common.loading')}</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-white mb-1">{t('billing.title')}</h1>
-        <p className="text-slate-400 text-sm">{t('billing.mySubscription')}</p>
+        <h1 className="text-xl font-semibold text-white mb-0.5">{t('billing.title')}</h1>
+        <p className="text-sm text-glass-textSecondary">{t('billing.mySubscription')}</p>
       </div>
 
       {error && (
-        <div className="card p-4 border-red-500/30 bg-red-500/10 text-red-400 text-sm">
-          {error}
-          <button onClick={loadData} className="ml-3 btn-secondary px-3 py-1 rounded text-xs">
-            {t('questions.tryAgain')}
-          </button>
+        <div className="glass-card p-4 border-red-500/30 bg-red-500/10">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <span className="text-red-400 text-sm">{error}</span>
+            <button onClick={loadData} className="glass-button-secondary px-3 py-1 rounded-lg text-xs">
+              {t('questions.tryAgain')}
+            </button>
+          </div>
         </div>
       )}
 
       {/* Current Subscription */}
       {subscription && currentPlan && (
-        <div className="card p-6 border-cyan-500/30 bg-cyan-500/5">
-          <div className="flex items-start justify-between flex-wrap gap-4">
-            <div>
-              <h2 className="text-lg font-semibold text-white mb-1">{t('billing.currentPlan')}</h2>
+        <div className="glass-card p-4 border-cyan-500/30 bg-cyan-500/5">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex-1">
+              <h2 className="text-base font-semibold text-white mb-1">{t('billing.currentPlan')}</h2>
               <p className="text-cyan-400 font-medium">{currentPlan.name}</p>
-              <div className="flex flex-wrap gap-4 mt-3 text-sm text-slate-400">
+              <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3 text-xs text-glass-textSecondary">
                 <span className="flex items-center gap-1">
-                  <Calendar size={14} />
+                  <Calendar size={12} />
                   {t('billing.periodStarts')}: {new Date(subscription.current_period_start).toLocaleDateString()}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Calendar size={14} />
+                  <Calendar size={12} />
                   {t('billing.periodEnds')}: {new Date(subscription.current_period_end).toLocaleDateString()}
                 </span>
                 <span className="flex items-center gap-1">
-                  <CreditCard size={14} />
+                  <CreditCard size={12} />
                   {t('billing.provider')}: {subscription.provider === 'stripe' ? t('billing.stripe') : t('billing.cryptocloud')}
                 </span>
               </div>
               {subscription.cancel_at_period_end && (
-                <p className="mt-2 text-amber-400 text-sm">{t('billing.cancelAtPeriodEnd')}</p>
+                <p className="mt-2 text-amber-400 text-xs">{t('billing.cancelAtPeriodEnd')}</p>
               )}
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-row sm:flex-col gap-2">
               <button
                 onClick={() => handleChangeGateway(subscription.provider === 'stripe' ? 'cryptocloud' : 'stripe')}
                 disabled={!!actionLoading}
-                className="btn-secondary px-4 py-2 text-sm flex items-center gap-2"
+                className="glass-button-secondary px-3 py-2 text-xs flex items-center gap-1.5"
               >
-                {actionLoading === 'change-gateway' ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                {actionLoading === 'change-gateway' ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
                 {t('billing.changeGateway')}
               </button>
               {!subscription.cancel_at_period_end && (
                 <button
                   onClick={handleCancelSubscription}
                   disabled={!!actionLoading}
-                  className="btn-ghost text-red-400 hover:bg-red-500/10 px-4 py-2 text-sm"
+                  className="glass-button-secondary px-3 py-2 text-xs flex items-center gap-1.5 text-red-400 hover:bg-red-500/10"
                 >
-                  {actionLoading === 'cancel' ? <Loader2 size={14} className="animate-spin" /> : <X size={14} />}
+                  {actionLoading === 'cancel' ? <Loader2 size={12} className="animate-spin" /> : <X size={12} />}
                   {t('billing.cancelSubscription')}
                 </button>
               )}
@@ -181,44 +188,44 @@ const Billing: React.FC = () => {
 
       {/* No subscription */}
       {!subscription && (
-        <div className="card p-6 text-center border-slate-600/50">
-          <CreditCard size={40} className="mx-auto mb-3 text-slate-500" />
-          <h3 className="text-lg font-semibold text-white mb-1">{t('billing.noSubscription')}</h3>
-          <p className="text-slate-400 text-sm mb-4">{t('billing.noSubscriptionDesc')}</p>
+        <div className="glass-card p-6 text-center">
+          <CreditCard size={36} className="mx-auto mb-3 text-glass-textSecondary" />
+          <h3 className="text-base font-semibold text-white mb-1">{t('billing.noSubscription')}</h3>
+          <p className="text-sm text-glass-textSecondary">{t('billing.noSubscriptionDesc')}</p>
         </div>
       )}
 
       {/* Plans */}
       <div>
-        <h2 className="text-base font-semibold text-white mb-3">{t('billing.plans')}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h2 className="text-sm font-medium text-glass-textSecondary mb-3">{t('billing.plans')}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {plans.filter(p => p.is_active !== false).map((plan) => {
             const isCurrent = currentPlan?.id === plan.id;
             return (
               <div
                 key={plan.id}
-                className={`card p-6 ${isCurrent ? 'border-cyan-500/50 ring-1 ring-cyan-500/30' : ''}`}
+                className={`glass-card p-4 ${isCurrent ? 'ring-2 ring-cyan-400/50' : ''}`}
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-white">{plan.name}</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-white">{plan.name}</h3>
                   {isCurrent && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-cyan-500/20 text-cyan-400">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-cyan-500/20 text-cyan-400">
                       {t('billing.currentPlan')}
                     </span>
                   )}
                 </div>
                 {plan.description && (
-                  <p className="text-slate-400 text-sm mb-3">{plan.description}</p>
+                  <p className="text-glass-textSecondary text-xs mb-2">{plan.description}</p>
                 )}
                 {plan.features_summary && (
-                  <p className="text-slate-500 text-xs mb-4">{plan.features_summary}</p>
+                  <p className="text-glass-text text-[10px] mb-3">{plan.features_summary}</p>
                 )}
-                <div className="mb-4">
-                  <span className="text-2xl font-bold text-white">
+                <div className="mb-3">
+                  <span className="text-xl font-bold text-white">
                     {formatPrice(plan.price_monthly_cents, 'monthly')}
                   </span>
                   {plan.price_yearly_cents != null && (
-                    <p className="text-slate-500 text-xs mt-1">
+                    <p className="text-glass-text text-[10px] mt-1">
                       {formatPrice(plan.price_yearly_cents, 'yearly')} — {t('billing.saveYearly')}
                     </p>
                   )}
@@ -228,23 +235,23 @@ const Billing: React.FC = () => {
                     <button
                       onClick={() => handleCheckout(plan.id, 'stripe', 'monthly')}
                       disabled={!!checkoutLoading}
-                      className="btn-primary w-full py-2 text-sm flex items-center justify-center gap-2"
+                      className="glass-button w-full py-2 text-xs flex items-center justify-center gap-1.5"
                     >
                       {checkoutLoading === `${plan.id}-stripe-monthly` ? (
-                        <Loader2 size={16} className="animate-spin" />
+                        <Loader2 size={12} className="animate-spin" />
                       ) : (
                         <>
-                          {t('billing.checkout')} (Stripe) <ExternalLink size={14} className="rtl-flip" />
+                          {t('billing.checkout')} (Stripe) <ExternalLink size={12} className="rtl-flip" />
                         </>
                       )}
                     </button>
                     <button
                       onClick={() => handleCheckout(plan.id, 'cryptocloud', 'monthly')}
                       disabled={!!checkoutLoading}
-                      className="btn-secondary w-full py-2 text-sm flex items-center justify-center gap-2"
+                      className="glass-button-secondary w-full py-2 text-xs flex items-center justify-center gap-1.5"
                     >
                       {checkoutLoading === `${plan.id}-cryptocloud-monthly` ? (
-                        <Loader2 size={16} className="animate-spin" />
+                        <Loader2 size={12} className="animate-spin" />
                       ) : (
                         t('billing.checkout') + ' (Crypto)'
                       )}
@@ -254,9 +261,9 @@ const Billing: React.FC = () => {
                   <button
                     onClick={() => handleChangePlan(plan.id)}
                     disabled={!!actionLoading}
-                    className="btn-secondary w-full py-2 text-sm flex items-center justify-center gap-2"
+                    className="glass-button-secondary w-full py-2 text-xs flex items-center justify-center gap-1.5"
                   >
-                    {actionLoading === 'change-plan' ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                    {actionLoading === 'change-plan' ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                     {t('billing.changePlan')}
                   </button>
                 )}
@@ -265,7 +272,7 @@ const Billing: React.FC = () => {
           })}
         </div>
         {plans.length === 0 && !error && (
-          <div className="card p-8 text-center text-slate-400">
+          <div className="glass-card p-6 text-center text-glass-textSecondary">
             {t('billing.noSubscriptionDesc')}
           </div>
         )}

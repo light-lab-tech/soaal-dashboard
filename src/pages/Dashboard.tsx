@@ -193,7 +193,7 @@ const Dashboard: React.FC = () => {
       {/* Recent Tenants */}
       {tenants.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 gap-3">
             <h2 className="text-base font-semibold text-white flex items-center gap-2">
               <Building2 className="text-cyan-400" size={18} />
               <span className="bg-gradient-to-r from-cyan-400 via-teal-500 to-cyan-400 bg-clip-text text-transparent">
@@ -205,12 +205,10 @@ const Dashboard: React.FC = () => {
             </h2>
             <button
               onClick={() => navigate('/tenants')}
-              className="glass-button-secondary px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-1.5 group"
+              className="glass-button-secondary px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 shrink-0"
             >
-              <span>{t('dashboard.viewAll')}</span>
-              <span className="inline-flex opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all arrow-slide-rtl rtl-flip">
-              <ArrowRight size={14} className="group-hover:text-white" />
-            </span>
+              {t('dashboard.viewAll')}
+              <ArrowRight size={14} className="rtl-flip" />
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

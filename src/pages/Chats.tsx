@@ -86,21 +86,21 @@ const Chats: React.FC = () => {
   // Show messages view
   if (selectedChat) {
     return (
-      <div className="space-y-5 animate-fade-in">
+      <div className="space-y-4 animate-fade-in">
         {/* Header */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button
             onClick={handleBackToChats}
-            className="p-2.5 rounded-xl bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-all duration-200 hover:scale-105"
+            className="p-2 rounded-lg glass-button-secondary shrink-0"
           >
-            <ArrowLeft size={20} className="rtl-flip" />
+            <ArrowLeft size={18} className="rtl-flip" />
           </button>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg font-semibold text-white truncate">
               {selectedChat.title || `${t('chats.chatTitle')} #${selectedChat.id.slice(0, 8)}`}
             </h1>
-            <p className="text-slate-400 text-sm flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <p className="text-xs text-glass-textSecondary flex items-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></span>
               {new Date(selectedChat.created_at).toLocaleString()}
             </p>
           </div>
@@ -110,52 +110,49 @@ const Chats: React.FC = () => {
         {isLoadingMessages ? (
           <div className="flex items-center justify-center min-h-[200px]">
             <div className="flex flex-col items-center gap-3">
-              <Loader2 size={32} className="animate-spin text-cyan-400" />
-              <span className="text-slate-400 text-sm">{t('common.loading')}</span>
+              <Loader2 size={28} className="animate-spin text-cyan-400" />
+              <span className="text-glass-textSecondary text-sm">{t('common.loading')}</span>
             </div>
           </div>
         ) : messages.length === 0 ? (
-          <div className="glass-card p-12 text-center">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-slate-700/50 flex items-center justify-center empty-state-icon">
-              <MessageSquare size={36} className="text-slate-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-white mb-2">{t('chats.noMessages')}</h3>
-            <p className="text-slate-400 text-sm">Messages will appear here when the conversation starts</p>
+          <div className="glass-card p-8 text-center">
+            <MessageSquare size={32} className="mx-auto mb-3 text-glass-textSecondary" />
+            <h3 className="text-base font-semibold text-white mb-1">{t('chats.noMessages')}</h3>
+            <p className="text-sm text-glass-textSecondary">Messages will appear here when the conversation starts</p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {messages.map((message, index) => (
               <div
                 key={message.id}
-                className={`glass-card p-5 animate-slide-up ${
+                className={`glass-card p-4 ${
                   message.role === 'user'
                     ? 'border-l-4 border-cyan-500/70 bg-cyan-500/5'
                     : message.role === 'assistant'
                     ? 'border-l-4 border-purple-500/70 bg-purple-500/5'
-                    : 'border-l-4 border-slate-500/50'
+                    : 'border-l-4 border-glass-textSecondary/30'
                 }`}
-                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`p-2 rounded-lg ${
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`p-1.5 rounded-lg shrink-0 ${
                     message.role === 'user' ? 'bg-cyan-500/20' : 'bg-purple-500/20'
                   }`}>
                     {message.role === 'user' ? (
-                      <User size={16} className="text-cyan-400" />
+                      <User size={14} className="text-cyan-400" />
                     ) : (
-                      <Bot size={16} className="text-purple-400" />
+                      <Bot size={14} className="text-purple-400" />
                     )}
                   </div>
-                  <span className={`text-sm font-semibold ${
+                  <span className={`text-xs font-semibold ${
                     message.role === 'user' ? 'text-cyan-400' : 'text-purple-400'
                   }`}>
                     {message.role === 'user' ? t('chats.user') : t('chats.assistant')}
                   </span>
-                  <span className="text-xs text-slate-500 ml-auto">
+                  <span className="text-[10px] text-glass-textSecondary ml-auto">
                     {new Date(message.created_at).toLocaleTimeString()}
                   </span>
                 </div>
-                <p className="text-white whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                <p className="text-sm text-white whitespace-pre-wrap leading-relaxed">{message.content}</p>
               </div>
             ))}
           </div>
@@ -166,47 +163,45 @@ const Chats: React.FC = () => {
 
   // Show chats list
   return (
-    <div className="space-y-5 animate-fade-in">
+    <div className="space-y-4 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => navigate(`/tenants/${tenantId}`)}
-            className="p-2.5 rounded-xl bg-slate-700/50 hover:bg-slate-700/70 text-slate-300 hover:text-white transition-all duration-200 hover:scale-105"
+            className="p-2 rounded-lg glass-button-secondary shrink-0"
           >
-            <ArrowLeft size={20} className="rtl-flip" />
+            <ArrowLeft size={18} className="rtl-flip" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-              <span className="p-2 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20">
-                <MessageSquare size={20} className="text-emerald-400" />
+            <h1 className="text-xl font-semibold text-white flex items-center gap-2">
+              <span className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500/20 to-green-500/20">
+                <MessageSquare size={16} className="text-emerald-400" />
               </span>
               {t('chats.title')}
             </h1>
-            <p className="text-slate-400 text-sm mt-1 flex items-center gap-2">
+            <p className="text-xs text-glass-textSecondary flex items-center gap-2 mt-0.5">
               {tenant?.name}
-              <span className="w-1 h-1 rounded-full bg-slate-500"></span>
-              <span className="text-emerald-400 font-medium">{totalChats}</span> {t('chats.totalChats').toLowerCase()}
+              <span className="w-1 h-1 rounded-full bg-glass-textSecondary"></span>
+              <span className="text-emerald-400">{totalChats}</span> {t('chats.totalChats').toLowerCase()}
             </p>
           </div>
         </div>
         <button
           onClick={loadData}
-          className="glass-button-secondary px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 hover:scale-105 transition-transform"
+          className="glass-button-secondary px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 self-start sm:self-auto"
         >
-          <RefreshCw size={16} />
+          <RefreshCw size={14} />
           {t('common.update')}
         </button>
       </div>
 
       {/* Chats List */}
       {chats.length === 0 ? (
-        <div className="glass-card p-16 text-center">
-          <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-slate-700/50 flex items-center justify-center empty-state-icon">
-            <MessageSquare size={40} className="text-slate-400" />
-          </div>
-          <h3 className="text-xl font-semibold text-white mb-2">{t('chats.noChats')}</h3>
-          <p className="text-slate-400 text-sm max-w-md mx-auto">{t('chats.noChatsDesc')}</p>
+        <div className="glass-card p-8 text-center">
+          <MessageSquare size={36} className="mx-auto mb-3 text-glass-textSecondary" />
+          <h3 className="text-base font-semibold text-white mb-1">{t('chats.noChats')}</h3>
+          <p className="text-sm text-glass-textSecondary max-w-md mx-auto">{t('chats.noChatsDesc')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -214,27 +209,26 @@ const Chats: React.FC = () => {
             <div
               key={chat.id}
               onClick={() => loadMessages(chat)}
-              className="glass-card p-5 cursor-pointer hover:scale-[1.01] transition-all group card-hover-lift animate-slide-up"
-              style={{ animationDelay: `${index * 50}ms` }}
+              className="glass-card p-4 cursor-pointer hover:scale-[1.01] transition-all group"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20 group-hover:from-emerald-500/30 group-hover:to-green-500/30 transition-colors">
-                    <MessageSquare size={22} className="text-emerald-400" />
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500/20 to-green-500/20 group-hover:from-emerald-500/30 group-hover:to-green-500/30 transition-colors shrink-0">
+                    <MessageSquare size={18} className="text-emerald-400" />
                   </div>
-                  <div>
-                    <h3 className="text-white font-semibold group-hover:text-emerald-300 transition-colors">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-semibold text-white truncate group-hover:text-emerald-300 transition-colors">
                       {chat.title || `${t('chats.chatTitle')} #${chat.id.slice(0, 8)}`}
                     </h3>
-                    <p className="text-slate-400 text-sm flex items-center gap-2 mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <p className="text-xs text-glass-textSecondary flex items-center gap-1.5 mt-0.5">
+                      <span className="w-1 h-1 rounded-full bg-emerald-400"></span>
                       {new Date(chat.created_at).toLocaleString()}
                     </p>
                   </div>
                 </div>
                 <ChevronRight
-                  size={22}
-                  className="text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-2 transition-all duration-300 rtl-flip"
+                  size={18}
+                  className="text-glass-textSecondary group-hover:text-emerald-400 group-hover:translate-x-1 transition-all duration-300 rtl-flip shrink-0"
                 />
               </div>
             </div>
@@ -248,17 +242,17 @@ const Chats: React.FC = () => {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 rounded-lg bg-slate-700/50 text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700/70 transition-colors"
+            className="glass-button-secondary px-4 py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('common.previous')}
           </button>
-          <span className="px-4 py-2 text-slate-400">
+          <span className="px-4 py-2 text-glass-textSecondary text-sm">
             {page} / {Math.ceil(totalChats / limit)}
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={page >= Math.ceil(totalChats / limit)}
-            className="px-4 py-2 rounded-lg bg-slate-700/50 text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-700/70 transition-colors"
+            className="glass-button-secondary px-4 py-2 rounded-lg text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('common.next')}
           </button>

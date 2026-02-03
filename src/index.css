@@ -65,17 +65,34 @@
   .text-primary {
     @apply text-white;
   }
-  
+
   .text-secondary {
     @apply text-slate-400;
   }
-  
+
   .text-muted {
     @apply text-slate-500;
   }
-  
+
   .text-accent {
     @apply text-cyan-400;
+  }
+
+  /* Glass text colors - for consistent dark mode text */
+  .text-glass {
+    @apply text-slate-300;
+  }
+
+  .text-glass-text {
+    @apply text-slate-300;
+  }
+
+  .text-glass-textSecondary {
+    @apply text-slate-400;
+  }
+
+  .glass-card-surface {
+    @apply bg-slate-700/30 border border-slate-600/30 rounded-xl;
   }
   
   /* Scrollbar */
