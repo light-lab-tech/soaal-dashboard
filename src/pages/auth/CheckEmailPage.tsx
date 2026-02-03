@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../services/api';
-import { Mail, ArrowLeft, Globe, Send } from 'lucide-react';
+import { Mail, Globe, Send } from 'lucide-react';
 import { Logo } from '../../components/Logo';
 
 /** Check if login failed due to unverified email (for redirect from login) */
@@ -124,7 +124,7 @@ const CheckEmailPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading || success || !email.trim()}
-                className="glass-button w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 bg-brand-gradient text-white hover:opacity-90 transition-opacity shadow-lg shadow-[#8B00E8]/30"
               >
                 {isLoading ? (
                   <>
@@ -143,9 +143,8 @@ const CheckEmailPage: React.FC = () => {
             <div className="text-center pt-3 border-t border-white/10">
               <Link
                 to="/login"
-                className="inline-flex items-center gap-1.5 text-[#A855F7] hover:text-[#8B00E8] font-medium text-sm"
+                className="text-[#A855F7] hover:text-[#8B00E8] font-medium text-sm transition-colors"
               >
-                <ArrowLeft size={14} className="rtl-flip" />
                 {t('auth.login')}
               </Link>
             </div>

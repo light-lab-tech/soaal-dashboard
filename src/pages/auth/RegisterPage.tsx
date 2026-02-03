@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { UserPlus, Mail, Lock, User, ArrowRight, Globe } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Globe } from 'lucide-react';
 import { Logo } from '../../components/Logo';
 
 const RegisterPage: React.FC = () => {
@@ -241,7 +241,6 @@ const RegisterPage: React.FC = () => {
                   <>
                     <UserPlus size={16} />
                     <span>{t('auth.register')}</span>
-                    <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all rtl-flip" />
                   </>
                 )}
               </button>
@@ -254,10 +253,9 @@ const RegisterPage: React.FC = () => {
               </p>
               <Link
                 to="/login"
-                className="glass-button-secondary inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium group"
+                className="text-[#A855F7] hover:text-[#8B00E8] font-medium text-sm transition-colors"
               >
-                <span>{t('auth.login')}</span>
-                <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all rtl-flip" />
+                {t('auth.login')}
               </Link>
             </div>
           </form>

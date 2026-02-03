@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../services/api';
-import { Mail, Lock, ArrowLeft, Globe } from 'lucide-react';
+import { Mail, Lock, Globe } from 'lucide-react';
 import { Logo } from '../../components/Logo';
 
 const ResetPasswordPage: React.FC = () => {
@@ -201,9 +201,8 @@ const ResetPasswordPage: React.FC = () => {
             <div className="text-center pt-3 border-t border-white/10">
               <Link
                 to="/login"
-                className="inline-flex items-center gap-1.5 text-[#A855F7] hover:text-[#8B00E8] font-medium text-sm"
+                className="text-[#A855F7] hover:text-[#8B00E8] font-medium text-sm transition-colors"
               >
-                <ArrowLeft size={14} className="rtl-flip" />
                 {t('auth.login')}
               </Link>
             </div>

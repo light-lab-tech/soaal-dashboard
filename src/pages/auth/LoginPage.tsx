@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { isUnverifiedEmailError } from './CheckEmailPage';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { LogIn, Mail, Lock, ArrowRight, Globe } from 'lucide-react';
+import { LogIn, Mail, Lock, Globe } from 'lucide-react';
 import { Logo } from '../../components/Logo';
 
 const LoginPage: React.FC = () => {
@@ -149,10 +149,9 @@ const LoginPage: React.FC = () => {
             <div className="text-end">
               <Link
                 to="/forgot-password"
-                className="text-xs text-[#A855F7] hover:text-[#8B00E8] font-medium transition-colors inline-flex items-center gap-1 group"
+                className="text-xs text-[#A855F7] hover:text-[#8B00E8] font-medium transition-colors"
               >
                 {t('auth.forgotPassword')}
-                <ArrowRight size={12} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all rtl-flip" />
               </Link>
             </div>
 
@@ -160,7 +159,7 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="glass-button w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 group disabled:opacity-50"
+              className="w-full py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-50 bg-brand-gradient text-white hover:opacity-90 transition-opacity shadow-lg shadow-[#8B00E8]/30"
             >
               {isLoading ? (
                 <>
@@ -171,7 +170,6 @@ const LoginPage: React.FC = () => {
                 <>
                   <LogIn size={16} />
                   <span>{t('auth.login')}</span>
-                  <ArrowRight size={16} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all rtl-flip" />
                 </>
               )}
             </button>
@@ -183,10 +181,9 @@ const LoginPage: React.FC = () => {
               </p>
               <Link
                 to="/register"
-                className="glass-button-secondary inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium group"
+                className="text-[#A855F7] hover:text-[#8B00E8] font-medium text-sm transition-colors"
               >
-                <span>{t('auth.register')}</span>
-                <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all rtl-flip" />
+                {t('auth.register')}
               </Link>
             </div>
           </form>
