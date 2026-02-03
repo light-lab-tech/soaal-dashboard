@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { UserPlus, Mail, Lock, User, ArrowRight, Sparkles, Globe } from 'lucide-react';
 
 const RegisterPage: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,6 +14,7 @@ const RegisterPage: React.FC = () => {
     confirmPassword: '',
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -43,19 +43,32 @@ const RegisterPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess(false);
 
     if (formData.password !== formData.confirmPassword) {
       setError(t('auth.passwordMismatch'));
       return;
     }
 
+    if (formData.password.length < 6) {
+      setError(t('auth.passwordTooShort'));
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await login(formData.email, formData.password);
-      navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Registration failed');
+      await register(formData.email, formData.password, formData.name || undefined);
+      setSuccess(true);
+      // Clear form on success
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setIsLoading(false);
     }
@@ -98,109 +111,129 @@ const RegisterPage: React.FC = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="px-8 pb-8 space-y-6">
+            {success && (
+              <div className="glass p-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm animate-slide-up">
+                {t('auth.checkEmailVerify')}
+                <div className="mt-3">
+                  <Link
+                    to="/login"
+                    className="text-emerald-300 hover:text-emerald-200 font-medium underline"
+                  >
+                    {t('auth.login')}
+                  </Link>
+                </div>
+              </div>
+            )}
             {error && (
               <div className="glass p-4 rounded-2xl border border-pink-500/30 bg-pink-500/10 text-pink-400 text-sm animate-slide-up">
                 {error}
               </div>
             )}
 
-            <div className="space-y-5">
-              {/* Name Input */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-glass-text px-1">
-                  {t('auth.name')}
-                </label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors z-10">
-                    <User size={20} />
+            {!success && (
+              <div className="space-y-5">
+                {/* Name Input */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-glass-text px-1">
+                    {t('auth.name')}
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors z-10">
+                      <User size={20} />
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-base"
+                      placeholder="John Doe"
+                      required
+                      autoComplete="name"
+                      disabled={isLoading}
+                    />
                   </div>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-base"
-                    placeholder="John Doe"
-                    required
-                    autoComplete="name"
-                  />
                 </div>
-              </div>
 
-              {/* Email Input */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-glass-text px-1">
-                  {t('auth.email')}
-                </label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors z-10">
-                    <Mail size={20} />
+                {/* Email Input */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-glass-text px-1">
+                    {t('auth.email')}
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors z-10">
+                      <Mail size={20} />
+                    </div>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-base"
+                      placeholder="user@company.com"
+                      required
+                      autoComplete="email"
+                      disabled={isLoading}
+                    />
                   </div>
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-base"
-                    placeholder="user@company.com"
-                    required
-                    autoComplete="email"
-                  />
                 </div>
-              </div>
 
-              {/* Password Input */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-glass-text px-1">
-                  {t('auth.password')}
-                </label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors z-10">
-                    <Lock size={20} />
+                {/* Password Input */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-glass-text px-1">
+                    {t('auth.password')} <span className="text-xs text-glass-textSecondary">({t('auth.min6Chars')})</span>
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors z-10">
+                      <Lock size={20} />
+                    </div>
+                    <input
+                      type="password"
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-base"
+                      placeholder="••••••••••"
+                      required
+                      autoComplete="new-password"
+                      minLength={6}
+                      disabled={isLoading}
+                    />
                   </div>
-                  <input
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-base"
-                    placeholder="••••••••••"
-                    required
-                    autoComplete="new-password"
-                    minLength={6}
-                  />
                 </div>
-              </div>
 
-              {/* Confirm Password Input */}
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-glass-text px-1">
-                  {t('auth.confirmPassword')}
-                </label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors z-10">
-                    <Lock size={20} />
+                {/* Confirm Password Input */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold text-glass-text px-1">
+                    {t('auth.confirmPassword')}
+                  </label>
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-glass-textSecondary group-focus-within:text-pink-400 transition-colors z-10">
+                      <Lock size={20} />
+                    </div>
+                    <input
+                      type="password"
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      className="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-base"
+                      placeholder="••••••••••"
+                      required
+                      autoComplete="new-password"
+                      minLength={6}
+                      disabled={isLoading}
+                    />
                   </div>
-                  <input
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-base"
-                    placeholder="••••••••••"
-                    required
-                    autoComplete="new-password"
-                    minLength={6}
-                  />
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="glass-button w-full py-4 rounded-2xl text-base font-semibold flex items-center justify-center gap-3 shadow-lg group"
-              style={{
-                background: 'linear-gradient(to right, #c084fc, #db2777)',
-              }}
-            >
+            {!success && (
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="glass-button w-full py-4 rounded-2xl text-base font-semibold flex items-center justify-center gap-3 shadow-lg group disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: 'linear-gradient(to right, #c084fc, #db2777)',
+                }}
+              >
               {isLoading ? (
                 <>
                   <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -213,7 +246,8 @@ const RegisterPage: React.FC = () => {
                   <ArrowRight size={20} className="opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300 rtl-flip" />
                 </>
               )}
-            </button>
+              </button>
+            )}
 
             {/* Login Link */}
             <div className="text-center pt-4 border-t border-white/10">

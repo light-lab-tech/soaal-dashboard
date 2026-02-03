@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AuthRedirect from './components/AuthRedirect';
 import AdminRoute from './components/AdminRoute';
 import AdminSuperAdminRoute from './components/AdminSuperAdminRoute';
 import UserRoute from './components/UserRoute';
@@ -10,6 +11,10 @@ import RoleBasedRedirect from './components/RoleBasedRedirect';
 import BaseLayout from './layouts/BaseLayout';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import VerifyEmailPage from './pages/auth/VerifyEmailPage';
+import CheckEmailPage from './pages/auth/CheckEmailPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 import Dashboard from './pages/Dashboard';
 import Tenants from './pages/Tenants';
 import TenantDetails from './pages/TenantDetails';
@@ -51,9 +56,16 @@ function App() {
       <div className="min-h-screen relative">
 
         <Routes>
-          {/* Auth Routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          {/* Auth Routes - Redirect authenticated users to dashboard */}
+          <Route element={<AuthRedirect />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/check-email" element={<CheckEmailPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+          </Route>
+          {/* Verify email can be accessed even when authenticated (for re-verification) */}
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>

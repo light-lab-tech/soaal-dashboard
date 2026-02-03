@@ -23,8 +23,8 @@ const Login: React.FC = () => {
     try {
       await login(formData.email, formData.password);
       navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.error || t('auth.invalidCredentials'));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('auth.invalidCredentials'));
     } finally {
       setIsLoading(false);
     }

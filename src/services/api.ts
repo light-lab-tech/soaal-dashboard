@@ -5,7 +5,9 @@ import type {
   ApiError,
   LoginCredentials,
   RegisterData,
+  RegisterResponse,
   AuthResponse,
+  VerifyEmailData,
   ForgotPasswordData,
   ResetPasswordData,
   Tenant,
@@ -64,10 +66,17 @@ class ApiClient {
       },
       (error: AxiosError<ApiError>) => {
         if (error.response?.status === 401) {
-          // Clear token and redirect to login
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = '/login';
+          const isAuthRequest = 
+            error.config?.url === '/login' || 
+            error.config?.url === '/verify-email' ||
+            error.config?.url === '/resend-verification-email' ||
+            error.config?.url === '/forgot-password' ||
+            error.config?.url === '/reset-password';
+          if (!isAuthRequest) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+          }
         }
         // Extract error message from API response if available
         if (error.response?.data && typeof error.response.data === 'object' && 'error' in error.response.data) {
@@ -85,8 +94,18 @@ class ApiClient {
     return response.data;
   }
 
-  async register(data: RegisterData): Promise<ApiResponse<AuthResponse>> {
-    const response = await this.client.post<ApiResponse<AuthResponse>>('/register', data);
+  async register(data: RegisterData): Promise<ApiResponse<RegisterResponse>> {
+    const response = await this.client.post<ApiResponse<RegisterResponse>>('/register', data);
+    return response.data;
+  }
+
+  async verifyEmail(data: VerifyEmailData): Promise<ApiResponse<AuthResponse>> {
+    const response = await this.client.post<ApiResponse<AuthResponse>>('/verify-email', data);
+    return response.data;
+  }
+
+  async resendVerificationEmail(email: string): Promise<ApiResponse<void>> {
+    const response = await this.client.post<ApiResponse<void>>('/resend-verification-email', { email });
     return response.data;
   }
 

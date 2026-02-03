@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { isUnverifiedEmailError } from './CheckEmailPage';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { LogIn, Mail, Lock, ArrowRight, Sparkles, Globe } from 'lucide-react';
@@ -46,8 +47,13 @@ const LoginPage: React.FC = () => {
     try {
       await login(formData.email, formData.password);
       navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.error || t('auth.invalidCredentials'));
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('auth.invalidCredentials');
+      if (isUnverifiedEmailError(message)) {
+        navigate('/check-email', { state: { email: formData.email }, replace: true });
+        return;
+      }
+      setError(message);
     } finally {
       setIsLoading(false);
     }
