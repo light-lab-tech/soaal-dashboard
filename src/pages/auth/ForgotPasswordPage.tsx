@@ -62,7 +62,7 @@ const ForgotPasswordPage: React.FC = () => {
             </div>
             <h1 className="text-xl font-bold mb-0.5">
               <span className="bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
-                SoaAL
+                Soaal
               </span>
             </h1>
             <p className="text-sm text-glass-textSecondary">{t('auth.forgotPasswordTitle')}</p>

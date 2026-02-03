@@ -11,7 +11,7 @@ export const Logo: React.FC<LogoProps> = ({ size = 32, variant = 'full', classNa
     return (
       <div className={`flex items-center gap-2 ${className}`}>
         <span className="text-xl font-bold bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
-          SoaAL
+          Soaal
         </span>
       </div>
     );
@@ -53,7 +53,7 @@ export const Logo: React.FC<LogoProps> = ({ size = 32, variant = 'full', classNa
         <ellipse cx="904.873" cy="501.636" rx="43.1272" ry="43.1273" fill="#EDEDED"/>
       </svg>
       <span className="text-xl font-bold bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED] bg-clip-text text-transparent">
-        SoaAL
+        Soaal
       </span>
     </div>
   );

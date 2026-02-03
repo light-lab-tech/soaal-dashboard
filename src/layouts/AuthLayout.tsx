@@ -41,7 +41,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
         {/* Auth Card */}
         <div className="glass-card p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold gradient-text mb-2">SoaAL</h1>
+            <h1 className="text-3xl font-bold gradient-text mb-2">Soaal</h1>
             <p className="text-glass-textSecondary">RAG Dashboard</p>
           </div>
           {children}

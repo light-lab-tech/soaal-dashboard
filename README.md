@@ -1,4 +1,4 @@
-# SoaAL RAG Dashboard
+# Soaal RAG Dashboard
 
 A modern ReactJS dashboard for managing RAG (Retrieval-Augmented Generation) services with beautiful glass morphism UI design, built-in multi-language support, and comprehensive tenant management features.
 
@@ -77,7 +77,7 @@ The optimized build will be in the `dist` directory.
 ## Project Structure
 
 ```
-soaal-rag-dashboard/
+Soaal-rag-dashboard/
 ├── src/
 │   ├── components/          # Reusable components
 │   │   └── ProtectedRoute.tsx

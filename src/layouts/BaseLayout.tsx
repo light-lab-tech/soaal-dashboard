@@ -110,7 +110,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
                 <Logo size={20} variant="icon-only" />
               </div>
               <div>
-                <h1 className="text-lg font-bold bg-gradient-to-r from-[#A855F7] to-[#8B00E8] bg-clip-text text-transparent">SoaAL</h1>
+                <h1 className="text-lg font-bold bg-gradient-to-r from-[#A855F7] to-[#8B00E8] bg-clip-text text-transparent">Soaal</h1>
                 <p className="text-xs text-slate-400">RAG Dashboard</p>
               </div>
             </Link>
