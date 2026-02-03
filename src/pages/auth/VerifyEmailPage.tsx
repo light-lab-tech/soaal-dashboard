@@ -18,6 +18,7 @@ const VerifyEmailPage: React.FC = () => {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hasCheckedToken, setHasCheckedToken] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -29,32 +30,50 @@ const VerifyEmailPage: React.FC = () => {
   }, [i18n.language]);
 
   useEffect(() => {
-    if (!mounted || !token) {
-      if (!token) setStatus('error');
-      return;
-    }
+    if (!mounted) return;
+    
     let cancelled = false;
-    setStatus('loading');
-    setErrorMessage('');
-
-    verifyEmail(token)
-      .then(() => {
-        if (!cancelled) {
-          setStatus('success');
-          setTimeout(() => navigate('/dashboard', { replace: true }), 1500);
-        }
-      })
-      .catch((err: unknown) => {
+    
+    // Small delay to ensure searchParams are fully parsed
+    const checkToken = setTimeout(() => {
+      setHasCheckedToken(true);
+      const currentToken = searchParams.get('token');
+      
+      if (!currentToken) {
+        // No token found after parsing
         if (!cancelled) {
           setStatus('error');
-          setErrorMessage(err instanceof Error ? err.message : t('auth.verifyEmailInvalid'));
+          setErrorMessage(t('auth.verifyEmailMissingToken'));
         }
-      });
+        return;
+      }
+
+      // Token exists, proceed with verification
+      if (!cancelled) {
+        setStatus('loading');
+        setErrorMessage('');
+      }
+
+      verifyEmail(currentToken)
+        .then(() => {
+          if (!cancelled) {
+            setStatus('success');
+            setTimeout(() => navigate('/dashboard', { replace: true }), 1500);
+          }
+        })
+        .catch((err: unknown) => {
+          if (!cancelled) {
+            setStatus('error');
+            setErrorMessage(err instanceof Error ? err.message : t('auth.verifyEmailInvalid'));
+          }
+        });
+    }, 100);
 
     return () => {
       cancelled = true;
+      clearTimeout(checkToken);
     };
-  }, [token, mounted, verifyEmail, navigate, t]);
+  }, [mounted, searchParams, verifyEmail, navigate, t]);
 
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
@@ -106,6 +125,13 @@ const VerifyEmailPage: React.FC = () => {
           </div>
 
           <div className="px-8 pb-8 space-y-6">
+            {(status === 'idle' || !hasCheckedToken) && (
+              <div className="flex flex-col items-center gap-4 py-6">
+                <div className="w-12 h-12 border-3 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin" />
+                <p className="text-glass-textSecondary">{t('common.loading')}</p>
+              </div>
+            )}
+
             {status === 'loading' && (
               <div className="flex flex-col items-center gap-4 py-6">
                 <div className="w-12 h-12 border-3 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin" />
