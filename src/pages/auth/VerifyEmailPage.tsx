@@ -171,7 +171,7 @@ const VerifyEmailPage: React.FC = () => {
                   <div className="w-12 h-12 rounded-full border-3 border-emerald-500/30 border-t-emerald-500 animate-spin" />
                   <div className="absolute inset-0 w-12 h-12 rounded-full border-3 border-transparent border-b-emerald-400/50 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
                 </div>
-                <p className="text-slate-400 text-sm">Verifying your email...</p>
+                <p className="text-slate-400 text-sm">{t('auth.verifyingEmail')}</p>
               </div>
             )}
 
@@ -183,7 +183,7 @@ const VerifyEmailPage: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-medium">{t('auth.verifyEmailSuccess')}</p>
-                    <p className="text-xs text-emerald-300/70">Redirecting to dashboard...</p>
+                    <p className="text-xs text-emerald-300/70">{t('auth.redirecting')}</p>
                   </div>
                 </div>
               </div>
@@ -229,7 +229,7 @@ const VerifyEmailPage: React.FC = () => {
                                  text-white placeholder-slate-500
                                  focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 
                                  focus:bg-slate-800/80 outline-none transition-all duration-300"
-                        placeholder="user@company.com"
+                        placeholder={t('auth.emailPlaceholder')}
                         required
                         autoComplete="email"
                       />

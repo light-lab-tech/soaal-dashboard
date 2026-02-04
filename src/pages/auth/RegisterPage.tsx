@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { UserPlus, Mail, Lock, User, Globe, Sparkles, CheckCircle2 } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Globe, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Logo } from '../../components/Logo';
 import { AnimatedButton } from '../../components/ui/AnimatedButton';
 
@@ -195,7 +195,7 @@ const RegisterPage: React.FC = () => {
                                text-white placeholder-slate-500
                                focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 
                                focus:bg-slate-800/80 outline-none transition-all duration-300"
-                      placeholder="John Doe"
+                      placeholder={t('auth.namePlaceholder')}
                       autoComplete="name"
                       disabled={isLoading}
                     />
@@ -227,7 +227,7 @@ const RegisterPage: React.FC = () => {
                                text-white placeholder-slate-500
                                focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 
                                focus:bg-slate-800/80 outline-none transition-all duration-300"
-                      placeholder="user@company.com"
+                      placeholder={t('auth.emailPlaceholder')}
                       required
                       autoComplete="email"
                       disabled={isLoading}
@@ -260,7 +260,7 @@ const RegisterPage: React.FC = () => {
                                text-white placeholder-slate-500
                                focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 
                                focus:bg-slate-800/80 outline-none transition-all duration-300"
-                      placeholder="••••••••"
+                      placeholder={t('auth.passwordPlaceholder')}
                       required
                       autoComplete="new-password"
                       minLength={6}
@@ -277,7 +277,7 @@ const RegisterPage: React.FC = () => {
                         />
                       </div>
                       <span className="text-[10px] text-slate-500">
-                        {passwordStrength <= 1 ? 'Weak' : passwordStrength <= 3 ? 'Medium' : 'Strong'}
+                        {passwordStrength <= 1 ? t('auth.passwordWeak') : passwordStrength <= 3 ? t('auth.passwordMedium') : t('auth.passwordStrong')}
                       </span>
                     </div>
                   )}
@@ -308,7 +308,7 @@ const RegisterPage: React.FC = () => {
                                text-white placeholder-slate-500
                                focus:border-pink-500/50 focus:ring-2 focus:ring-pink-500/20 
                                focus:bg-slate-800/80 outline-none transition-all duration-300"
-                      placeholder="••••••••"
+                      placeholder={t('auth.passwordPlaceholder')}
                       required
                       autoComplete="new-password"
                       minLength={6}
@@ -342,7 +342,7 @@ const RegisterPage: React.FC = () => {
                 className="inline-flex items-center gap-2 text-pink-400 hover:text-pink-300 font-semibold text-sm transition-all hover:gap-3"
               >
                 {t('auth.login')}
-                <span className="transition-transform">→</span>
+                <ArrowRight size={16} className="rtl-flip" />
               </Link>
             </div>
           </form>

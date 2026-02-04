@@ -273,7 +273,7 @@ const Documents: React.FC = () => {
           {isDragReject && (
             <p className="mt-3 text-sm text-red-400 flex items-center justify-center gap-1">
               <AlertCircle size={14} />
-              Invalid file type
+              {t('documents.invalidFileType')}
             </p>
           )}
         </div>
@@ -384,7 +384,7 @@ const Documents: React.FC = () => {
                          text-white placeholder-slate-500
                          focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
                          outline-none transition-all duration-300"
-                placeholder="https://example.com/about"
+                placeholder="https://..."
                 required
               />
             </div>

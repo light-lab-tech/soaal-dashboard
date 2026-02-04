@@ -171,7 +171,7 @@ const CheckEmailPage: React.FC = () => {
                              focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 
                              focus:bg-slate-800/80 outline-none transition-all duration-300
                              ${hasEmailFromState ? 'opacity-75 cursor-not-allowed' : ''}`}
-                    placeholder="user@company.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     required
                     autoComplete="email"
                     disabled={isLoading || success}
@@ -206,7 +206,7 @@ const CheckEmailPage: React.FC = () => {
                 className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium text-sm transition-all"
               >
                 <ArrowLeft size={16} />
-                {t('auth.login')}
+                {t('auth.backToLogin')}
               </Link>
             </div>
           </div>

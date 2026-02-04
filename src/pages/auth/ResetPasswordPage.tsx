@@ -150,7 +150,7 @@ const ResetPasswordPage: React.FC = () => {
                   </div>
                   <div>
                     <p className="font-medium">{t('auth.resetPasswordSuccess')}</p>
-                    <p className="text-xs text-emerald-300/70">Redirecting to login...</p>
+                    <p className="text-xs text-emerald-300/70">{t('auth.redirecting')}</p>
                   </div>
                 </div>
               </div>
@@ -191,7 +191,7 @@ const ResetPasswordPage: React.FC = () => {
                                focus:border-amber-500/50 focus:ring-2 focus:ring-amber-500/20 
                                focus:bg-slate-800/80 outline-none transition-all duration-300
                                ${emailFromUrl ? 'opacity-75 cursor-not-allowed' : ''}`}
-                      placeholder="user@company.com"
+                      placeholder={t('auth.emailPlaceholder')}
                       required
                       autoComplete="email"
                       disabled={isLoading}
@@ -253,7 +253,7 @@ const ResetPasswordPage: React.FC = () => {
                             />
                           </div>
                           <span className="text-[10px] text-slate-500">
-                            {passwordStrength <= 1 ? 'Weak' : passwordStrength <= 3 ? 'Medium' : 'Strong'}
+                            {passwordStrength <= 1 ? t('auth.passwordWeak') : passwordStrength <= 3 ? t('auth.passwordMedium') : t('auth.passwordStrong')}
                           </span>
                         </div>
                       )}

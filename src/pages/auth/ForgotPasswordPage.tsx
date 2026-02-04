@@ -115,7 +115,7 @@ const ForgotPasswordPage: React.FC = () => {
             {!success && (
               <>
                 <p className="text-sm text-slate-400 text-center">
-                  Enter your email address and we&apos;ll send you a link to reset your password.
+                  t('auth.forgotPasswordDesc')
                 </p>
 
                 {/* Email Input */}
@@ -143,7 +143,7 @@ const ForgotPasswordPage: React.FC = () => {
                                text-white placeholder-slate-500
                                focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 
                                focus:bg-slate-800/80 outline-none transition-all duration-300"
-                      placeholder="user@company.com"
+                      placeholder={t('auth.emailPlaceholder')}
                       required
                       autoComplete="email"
                       disabled={isLoading}
@@ -177,7 +177,7 @@ const ForgotPasswordPage: React.FC = () => {
                 className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-medium text-sm transition-all"
               >
                 <ArrowLeft size={16} />
-                {t('auth.login')}
+                {t('auth.backToLogin')}
               </Link>
             </div>
           </form>

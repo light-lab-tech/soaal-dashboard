@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { isUnverifiedEmailError } from './CheckEmailPage';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { LogIn, Mail, Lock, Globe, Sparkles } from 'lucide-react';
+import { LogIn, Mail, Lock, Globe, Sparkles, ArrowRight } from 'lucide-react';
 import { Logo } from '../../components/Logo';
 import { AnimatedButton } from '../../components/ui/AnimatedButton';
 
@@ -148,7 +148,7 @@ const LoginPage: React.FC = () => {
                            text-white placeholder-slate-500
                            focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
                            focus:bg-slate-800/80 outline-none transition-all duration-300"
-                  placeholder="user@company.com"
+                  placeholder={t('auth.emailPlaceholder')}
                   required
                   autoComplete="email"
                 />
@@ -185,7 +185,7 @@ const LoginPage: React.FC = () => {
                            text-white placeholder-slate-500
                            focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
                            focus:bg-slate-800/80 outline-none transition-all duration-300"
-                  placeholder="••••••••"
+                  placeholder={t('auth.passwordPlaceholder')}
                   required
                   autoComplete="current-password"
                 />
@@ -231,7 +231,7 @@ const LoginPage: React.FC = () => {
                 className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 font-semibold text-sm transition-all hover:gap-3"
               >
                 {t('auth.register')}
-                <span className="transition-transform">→</span>
+                <ArrowRight size={16} className="rtl-flip" />
               </Link>
             </div>
           </form>
