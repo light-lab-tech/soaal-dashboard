@@ -12,8 +12,13 @@ import {
   EyeOff,
   Building2,
   ArrowRight,
-  X,
+  Search,
 } from 'lucide-react';
+import { GlassCard } from '../components/ui/GlassCard';
+import { AnimatedButton, IconButton } from '../components/ui/AnimatedButton';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Modal } from '../components/ui/Modal';
+import { Badge } from '../components/ui/Badge';
 
 const Tenants: React.FC = () => {
   const { t } = useTranslation();
@@ -34,6 +39,8 @@ const Tenants: React.FC = () => {
     type: 'secret',
     rate_limit: 100,
   });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   // Super admin manages tenants under Admin; redirect to Admin > Tenants
   useEffect(() => {
@@ -66,7 +73,6 @@ const Tenants: React.FC = () => {
       setShowCreateModal(false);
       setNewTenantData({ name: '', plan: 'free' });
       
-      // Show API keys modal with the newly created keys
       if (response.data.api_keys) {
         const allKeys = [
           response.data.api_keys.public_key,
@@ -75,7 +81,6 @@ const Tenants: React.FC = () => {
         setApiKeys(allKeys);
         setSelectedTenant(response.data.tenant);
         setShowApiKeysModal(true);
-        // Show keys immediately since they're provided in the response
         allKeys.forEach((key) => {
           if (key.id) {
             setVisibleKeys((prev) => ({ ...prev, [key.id!]: true }));
@@ -105,9 +110,7 @@ const Tenants: React.FC = () => {
     try {
       const response = await api.createApiKey(selectedTenant.id, newApiKey);
       if (response.data.api_key) {
-        // Add the new key to the list (it will have the actual key in the response)
         setApiKeys([...apiKeys, response.data.api_key]);
-        // If the key is provided, show it immediately
         if (response.data.api_key.key && response.data.api_key.id) {
           setVisibleKeys((prev) => ({ ...prev, [response.data.api_key.id!]: true }));
         }
@@ -118,25 +121,24 @@ const Tenants: React.FC = () => {
     }
   };
 
-  const copyToClipboard = (key: string) => {
-    navigator.clipboard.writeText(key);
+  const copyToClipboard = async (key: string, keyId: string) => {
+    await navigator.clipboard.writeText(key);
+    setCopiedKey(keyId);
+    setTimeout(() => setCopiedKey(null), 2000);
   };
 
   const toggleKeyVisibility = async (keyId: string) => {
     if (!keyId) return;
     
-    // If already visible, just toggle
     if (visibleKeys[keyId]) {
       setVisibleKeys((prev) => ({ ...prev, [keyId]: !prev[keyId] }));
       return;
     }
 
-    // If not visible, try to fetch the actual key
     if (!selectedTenant) return;
     try {
       const response = await api.getApiKey(selectedTenant.id, keyId);
       if (response.data.api_key.key) {
-        // Update the API key in the list with the actual key
         setApiKeys((prev) =>
           prev.map((key) =>
             (key.id || key.prefix) === keyId
@@ -148,258 +150,285 @@ const Tenants: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Error retrieving API key:', error);
-      // Show error message to user
       const errorMessage = error.response?.data?.error || 'Failed to retrieve API key';
       alert(errorMessage);
     }
   };
 
+  const filteredTenants = tenants.filter(t => 
+    t.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[300px]">
-        <div className="glass-card flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-glass-text text-sm">{t('common.loading')}</span>
+      <div className="space-y-6 animate-page-enter">
+        <div className="h-8 w-48 bg-slate-800/50 rounded animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-40 bg-slate-800/50 rounded-xl animate-pulse" />
+          ))}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 animate-page-enter">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-white mb-0.5">{t('tenants.title')}</h1>
-          <p className="text-sm text-glass-textSecondary">{t('tenants.description')}</p>
+          <h1 className="text-2xl font-bold text-white mb-1">{t('tenants.title')}</h1>
+          <p className="text-slate-400">{t('tenants.description')}</p>
         </div>
-        <button
+        <AnimatedButton
+          variant="gradient"
           onClick={() => setShowCreateModal(true)}
-          className="glass-button px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5"
+          icon={<Plus size={18} />}
         >
-          <Plus size={16} />
           {t('tenants.createTenant')}
-        </button>
+        </AnimatedButton>
       </div>
+
+      {/* Search */}
+      {tenants.length > 0 && (
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search tenants..."
+            className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 
+                     text-white placeholder-slate-500
+                     focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
+                     outline-none transition-all duration-300"
+          />
+        </div>
+      )}
 
       {/* Tenants Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {tenants.map((tenant) => (
-          <div
-            key={tenant.id}
-            onClick={() => navigate(`/tenants/${tenant.id}`)}
-            className="glass-card group transition-all duration-200 p-4 cursor-pointer hover:scale-[1.02]"
-          >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8] to-[#7C3AED]">
-                  <Building2 size={16} className="text-white" />
+      {filteredTenants.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 stagger-children">
+          {filteredTenants.map((tenant, index) => (
+            <GlassCard
+              key={tenant.id}
+              variant="interactive"
+              hover="lift"
+              onClick={() => navigate(`/tenants/${tenant.id}`)}
+              className="group cursor-pointer"
+              animate
+            >
+              <div className="p-5" style={{ animationDelay: `${index * 50}ms` }}>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/20">
+                      <Building2 size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white group-hover:text-purple-300 transition-colors">
+                        {tenant.name}
+                      </h3>
+                      <p className="text-xs text-slate-400 capitalize">{tenant.plan} Plan</p>
+                    </div>
+                  </div>
+                  <Badge 
+                    variant={tenant.status === 'active' ? 'success' : tenant.status === 'suspended' ? 'warning' : 'danger'}
+                    size="sm"
+                  >
+                    {tenant.status}
+                  </Badge>
                 </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-white group-hover:text-glow transition-all">{tenant.name}</h3>
-                  <p className="text-[11px] text-glass-textSecondary capitalize">{tenant.plan} Plan</p>
+
+                <p className="text-sm text-slate-400 mb-4">
+                  {t('dashboard.created')} {new Date(tenant.created_at).toLocaleDateString()}
+                </p>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between pt-4 border-t border-slate-700/50">
+                  <button
+                    onClick={() => handleViewApiKeys(tenant)}
+                    className="px-3 py-1.5 rounded-lg bg-slate-700/50 text-white text-xs font-medium 
+                             flex items-center gap-1.5 hover:bg-slate-700/70 transition-colors
+                             border border-slate-600/50"
+                  >
+                    <Key size={12} />
+                    API Keys
+                  </button>
+                  <div className="flex items-center gap-1 text-sm text-slate-400 group-hover:text-white transition-colors">
+                    <span>{t('tenants.viewDetails')}</span>
+                    <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                  </div>
                 </div>
               </div>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                tenant.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' :
-                tenant.status === 'suspended' ? 'bg-amber-500/20 text-amber-400' :
-                'bg-red-500/20 text-red-400'
-              }`}>
-                {tenant.status}
-              </span>
-            </div>
-
-            <p className="text-xs text-glass-textSecondary mb-3">
-              {t('dashboard.created')} {new Date(tenant.created_at).toLocaleDateString()}
-            </p>
-
-            {/* Footer */}
-            <div className="flex items-center justify-between pt-3 border-t border-white/10">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleViewApiKeys(tenant);
-                }}
-                className="glass-button-secondary px-2.5 py-1 rounded-md text-[11px] font-medium flex items-center gap-1"
-              >
-                <Key size={12} />
-                API Keys
-              </button>
-              <div className="flex items-center gap-1 text-xs text-glass-textSecondary group-hover:text-white transition-all">
-                <span>{t('tenants.viewDetails')}</span>
-                <span className="inline-flex opacity-0 group-hover:opacity-100 translate-x-1 group-hover:translate-x-0 transition-all arrow-slide-rtl rtl-flip">
-                <ArrowRight size={14} className="group-hover:text-white" />
-              </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {tenants.length === 0 && (
-        <div className="glass-card p-8 text-center">
-          <Building2 size={40} className="mx-auto mb-3 text-glass-textSecondary" />
-          <h3 className="text-base font-semibold text-white mb-1">{t('tenants.noTenantsYet')}</h3>
-          <p className="text-sm text-glass-textSecondary mb-4">
-            {t('tenants.createFirstTenant')}
-          </p>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="glass-button px-4 py-2 rounded-lg text-sm inline-flex items-center gap-1.5"
-          >
-            <Plus size={16} />
-            Create Tenant
-          </button>
+            </GlassCard>
+          ))}
         </div>
+      ) : (
+        <EmptyState
+          icon={Building2}
+          title={searchQuery ? 'No tenants found' : t('tenants.noTenantsYet')}
+          description={searchQuery ? 'Try adjusting your search' : t('tenants.createFirstTenant')}
+          action={!searchQuery ? {
+            label: t('tenants.createTenant'),
+            onClick: () => setShowCreateModal(true),
+            icon: <Plus size={18} />,
+          } : undefined}
+          color="purple"
+        />
       )}
 
       {/* Create Tenant Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass-strong w-full max-w-sm p-5 rounded-xl">
-            <h2 className="text-lg font-semibold text-white mb-4">{t('tenants.createTenant')}</h2>
-            <form onSubmit={handleCreateTenant} className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-glass-text mb-1.5">
-                  {t('tenants.tenantName')}
-                </label>
-                <input
-                  type="text"
-                  value={newTenantData.name}
-                  onChange={(e) => setNewTenantData({ ...newTenantData, name: e.target.value })}
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm"
-                  placeholder="My Company Support"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-glass-text mb-1.5">
-                  {t('tenants.plan')}
-                </label>
-                <select
-                  value={newTenantData.plan}
-                  onChange={(e) => setNewTenantData({ ...newTenantData, plan: e.target.value as any })}
-                  className="glass-input w-full px-3 py-2 rounded-lg text-sm"
-                >
-                  <option value="free" className="bg-slate-900">Free</option>
-                  <option value="pro" className="bg-slate-900">Pro</option>
-                  <option value="enterprise" className="bg-slate-900">Enterprise</option>
-                </select>
-              </div>
-              <div className="flex gap-2 pt-3">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="flex-1 glass-button-secondary px-4 py-2 rounded-lg text-sm"
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 glass-button px-4 py-2 rounded-lg text-sm"
-                >
-                  {t('common.create')}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        title={t('tenants.createTenant')}
+        size="sm"
+      >
+        <form onSubmit={handleCreateTenant} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              {t('tenants.tenantName')}
+            </label>
+            <input
+              type="text"
+              value={newTenantData.name}
+              onChange={(e) => setNewTenantData({ ...newTenantData, name: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 
+                       text-white placeholder-slate-500
+                       focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
+                       outline-none transition-all duration-300"
+              placeholder="My Company Support"
+              required
+            />
           </div>
-        </div>
-      )}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              {t('tenants.plan')}
+            </label>
+            <select
+              value={newTenantData.plan}
+              onChange={(e) => setNewTenantData({ ...newTenantData, plan: e.target.value as any })}
+              className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 
+                       text-white
+                       focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
+                       outline-none transition-all duration-300"
+            >
+              <option value="free" className="bg-slate-900">Free</option>
+              <option value="pro" className="bg-slate-900">Pro</option>
+              <option value="enterprise" className="bg-slate-900">Enterprise</option>
+            </select>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <AnimatedButton
+              variant="ghost"
+              onClick={() => setShowCreateModal(false)}
+              fullWidth
+            >
+              {t('common.cancel')}
+            </AnimatedButton>
+            <AnimatedButton
+              type="submit"
+              variant="gradient"
+              fullWidth
+            >
+              {t('common.create')}
+            </AnimatedButton>
+          </div>
+        </form>
+      </Modal>
 
       {/* API Keys Modal */}
-      {showApiKeysModal && selectedTenant && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass-strong w-full max-w-lg max-h-[80vh] overflow-y-auto p-5 rounded-xl scrollbar-glass">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">
-                API Keys - {selectedTenant.name}
-              </h2>
-              <button
-                onClick={() => setShowApiKeysModal(false)}
-                className="p-1.5 rounded-lg glass-button-secondary"
+      <Modal
+        isOpen={showApiKeysModal}
+        onClose={() => setShowApiKeysModal(false)}
+        title={`API Keys - ${selectedTenant?.name}`}
+        size="lg"
+      >
+        <div className="space-y-4">
+          {/* Create New API Key */}
+          <GlassCard variant="outlined" className="p-4">
+            <h3 className="text-sm font-medium text-white mb-3">
+              {t('tenants.createKey')}
+            </h3>
+            <div className="flex gap-2">
+              <select
+                value={newApiKey.type}
+                onChange={(e) => setNewApiKey({ ...newApiKey, type: e.target.value as any })}
+                className="px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 
+                         text-white text-sm
+                         focus:border-purple-500/50 outline-none"
               >
-                <X size={16} />
-              </button>
+                <option value="public" className="bg-slate-900">Public</option>
+                <option value="secret" className="bg-slate-900">Secret</option>
+              </select>
+              <input
+                type="number"
+                value={newApiKey.rate_limit}
+                onChange={(e) => setNewApiKey({ ...newApiKey, rate_limit: parseInt(e.target.value) || -1 })}
+                className="flex-1 px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 
+                         text-white text-sm
+                         focus:border-purple-500/50 outline-none"
+                placeholder="-1 for unlimited"
+              />
+              <AnimatedButton
+                onClick={handleCreateApiKey}
+                variant="gradient"
+                size="sm"
+                icon={<Plus size={14} />}
+              >
+                {t('common.create')}
+              </AnimatedButton>
             </div>
+          </GlassCard>
 
-            {/* Create New API Key */}
-            <div className="glass-card p-3 mb-4">
-              <h3 className="text-sm font-medium text-white mb-3">
-                {t('tenants.createKey')}
-              </h3>
-              <div className="flex gap-2">
-                <select
-                  value={newApiKey.type}
-                  onChange={(e) => setNewApiKey({ ...newApiKey, type: e.target.value as any })}
-                  className="glass-input px-3 py-1.5 rounded-lg text-sm"
-                >
-                  <option value="public" className="bg-slate-900">Public</option>
-                  <option value="secret" className="bg-slate-900">Secret</option>
-                </select>
-                <input
-                  type="number"
-                  value={newApiKey.rate_limit}
-                  onChange={(e) => setNewApiKey({ ...newApiKey, rate_limit: parseInt(e.target.value) || -1 })}
-                  className="glass-input flex-1 px-3 py-1.5 rounded-lg text-sm"
-                  placeholder="-1 for unlimited"
-                />
-                <button
-                  onClick={handleCreateApiKey}
-                  className="glass-button px-3 py-1.5 rounded-lg text-sm flex items-center gap-1.5"
-                >
-                  <Plus size={14} />
-                  {t('common.create')}
-                </button>
-              </div>
-            </div>
-
-            {/* Existing API Keys */}
-            <div className="space-y-3">
-              {apiKeys.map((apiKey) => (
-                <div key={apiKey.id || apiKey.prefix} className="glass-card p-3">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-1.5">
-                      <Key size={14} className="text-[#8B00E8]" />
-                      <span className="text-sm font-medium text-white">{apiKey.prefix}</span>
-                      <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium ${
-                        apiKey.type === 'public' ? 'bg-[#A855F7]/20 text-[#8B00E8]' :
-                        'bg-[#7C3AED]/20 text-[#7C3AED]'
-                      }`}>
-                        {apiKey.type}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => toggleKeyVisibility(apiKey.id || apiKey.prefix)}
-                        className="p-1.5 rounded-lg glass-button-secondary"
-                      >
-                        {visibleKeys[apiKey.id || apiKey.prefix] ? <EyeOff size={14} /> : <Eye size={14} />}
-                      </button>
-                      {apiKey.key && (
-                        <button
-                          onClick={() => copyToClipboard(apiKey.key!)}
-                          className="p-1.5 rounded-lg glass-button-secondary"
-                        >
+          {/* Existing API Keys */}
+          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
+            {apiKeys.map((apiKey) => (
+              <GlassCard key={apiKey.id || apiKey.prefix} variant="outlined" className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Key size={16} className="text-purple-400" />
+                    <span className="font-medium text-white">{apiKey.prefix}</span>
+                    <Badge 
+                      variant={apiKey.type === 'public' ? 'info' : 'primary'}
+                      size="sm"
+                    >
+                      {apiKey.type}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => toggleKeyVisibility(apiKey.id || apiKey.prefix)}
+                      icon={visibleKeys[apiKey.id || apiKey.prefix] ? <EyeOff size={14} /> : <Eye size={14} />}
+                    />
+                    {apiKey.key && (
+                      <IconButton
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(apiKey.key!, apiKey.id || apiKey.prefix)}
+                        icon={copiedKey === (apiKey.id || apiKey.prefix) ? 
+                          <span className="text-emerald-400 text-xs">Copied!</span> : 
                           <Copy size={14} />
-                        </button>
-                      )}
-                    </div>
+                        }
+                      />
+                    )}
                   </div>
-                  <div className="text-xs text-glass-textSecondary">
-                    Rate Limit: {apiKey.rate_limit === -1 ? t('tenants.unlimited') : `${apiKey.rate_limit} ${t('tenants.requestsPerHour')}`}
-                  </div>
-                  {apiKey.key && visibleKeys[apiKey.id || apiKey.prefix] && (
-                    <div className="mt-2 glass-input p-2 rounded-lg text-xs break-all font-mono">
-                      {apiKey.key}
-                    </div>
-                  )}
                 </div>
-              ))}
-            </div>
+                <p className="text-xs text-slate-400">
+                  Rate Limit: {apiKey.rate_limit === -1 ? t('tenants.unlimited') : `${apiKey.rate_limit} ${t('tenants.requestsPerHour')}`}
+                </p>
+                {apiKey.key && visibleKeys[apiKey.id || apiKey.prefix] && (
+                  <div className="mt-3 p-3 rounded-lg bg-slate-800/80 border border-slate-700/50 font-mono text-xs break-all text-slate-300">
+                    {apiKey.key}
+                  </div>
+                )}
+              </GlassCard>
+            ))}
           </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };

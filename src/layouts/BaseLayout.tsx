@@ -15,6 +15,9 @@ import {
   Users,
 } from 'lucide-react';
 import { Logo } from '../components/Logo';
+import { GlassCard } from '../components/ui/GlassCard';
+import { IconButton } from '../components/ui/AnimatedButton';
+
 
 interface BaseLayoutProps {
   changeLanguage: (lang: string) => void;
@@ -48,6 +51,7 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const navItems = getNavItems(t, user?.role);
 
@@ -58,6 +62,14 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
       document.documentElement.setAttribute('dir', 'ltr');
     }
   }, [i18n.language]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -87,61 +99,53 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
     return t('nav.dashboard');
   };
 
+  const getNavColor = (path: string) => {
+    if (path.includes('dashboard') || path.includes('admin')) return { color: 'text-purple-400', gradient: 'from-purple-500/20 to-purple-600/10 border-purple-500/30' };
+    if (path.includes('tenant')) return { color: 'text-emerald-400', gradient: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/30' };
+    if (path.includes('billing') || path.includes('plan')) return { color: 'text-amber-400', gradient: 'from-amber-500/20 to-amber-600/10 border-amber-500/30' };
+    if (path.includes('user')) return { color: 'text-pink-400', gradient: 'from-pink-500/20 to-pink-600/10 border-pink-500/30' };
+    return { color: 'text-purple-400', gradient: 'from-purple-500/20 to-purple-600/10 border-purple-500/30' };
+  };
+
   return (
     <div className="min-h-screen flex">
+      {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 z-50 w-64 bg-slate-900/98 backdrop-blur-xl border-r border-slate-700/50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          isRTL ? 'right-0' : 'left-0'
-        } ${
-          isSidebarOpen
-            ? 'translate-x-0'
-            : isRTL
-              ? 'translate-x-full'
-              : '-translate-x-full'
-        }`}
+        className={`
+          fixed inset-y-0 z-50 w-64 bg-slate-900/98 backdrop-blur-xl border-r border-slate-700/50
+          transform transition-transform duration-300 ease-out lg:translate-x-0
+          ${isRTL ? 'right-0 border-l border-r-0' : 'left-0'}
+          ${isSidebarOpen ? 'translate-x-0' : isRTL ? 'translate-x-full lg:translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
       >
         {/* Top accent line */}
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED]"></div>
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
 
         <div className="flex flex-col h-full">
+          {/* Logo */}
           <div className="px-5 py-5 border-b border-slate-700/50">
-            <Link to="/dashboard" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-brand-gradient flex items-center justify-center shadow-lg shadow-[#8B00E8]/40 group-hover:scale-105 transition-all">
+            <Link to={user?.role === 'super_admin' || user?.role === 'admin' ? '/admin' : '/dashboard'} className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-105 transition-transform">
                 <Logo size={20} variant="icon-only" />
               </div>
               <div>
-                <h1 className="text-lg font-bold bg-gradient-to-r from-[#A855F7] to-[#8B00E8] bg-clip-text text-transparent">Soaal</h1>
+                <h1 className="text-lg font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Soaal
+                </h1>
                 <p className="text-xs text-slate-400">RAG Dashboard</p>
               </div>
             </Link>
           </div>
 
-          <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto scrollbar-modern">
-            {navItems.map((item) => {
+          {/* Navigation */}
+          <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-thin">
+            {navItems.map((item, index) => {
               const Icon = item.icon;
               const isActive =
                 location.pathname === item.path ||
                 (item.path !== '/admin' && location.pathname.startsWith(item.path + '/'));
               const reallyActive = item.path.startsWith('/admin') ? location.pathname === item.path : isActive;
-
-              // Get color for each nav item
-              const getNavColor = () => {
-                if (item.path.includes('dashboard') || item.path.includes('admin')) return 'text-[#8B00E8]';
-                if (item.path.includes('tenant')) return 'text-emerald-400';
-                if (item.path.includes('billing') || item.path.includes('plan')) return 'text-amber-400';
-                if (item.path.includes('user')) return 'text-pink-400';
-                return 'text-violet-400';
-              };
-
-              const getActiveGradient = () => {
-                if (item.path.includes('dashboard') || item.path.includes('admin')) return 'from-[#8B00E8]/20 to-[#7C3AED]/20 text-[#8B00E8] border-[#8B00E8]/30 shadow-[#8B00E8]/10';
-                if (item.path.includes('tenant')) return 'from-emerald-600/20 to-green-600/20 text-emerald-300 border-emerald-500/30 shadow-emerald-500/10';
-                if (item.path.includes('billing') || item.path.includes('plan')) return 'from-amber-600/20 to-orange-600/20 text-amber-300 border-amber-500/30 shadow-amber-500/10';
-                if (item.path.includes('user')) return 'from-pink-600/20 to-rose-600/20 text-pink-300 border-pink-500/30 shadow-pink-500/10';
-                return 'from-violet-600/20 to-purple-600/20 text-violet-300 border-violet-500/30 shadow-violet-500/10';
-              };
-
-              const navColor = getNavColor();
+              const colors = getNavColor(item.path);
 
               return (
                 <button
@@ -150,88 +154,117 @@ const BaseLayout: React.FC<BaseLayoutProps> = ({ changeLanguage }) => {
                     navigate(item.path);
                     setIsSidebarOpen(false);
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 group ${
-                    reallyActive
-                      ? `bg-gradient-to-r ${getActiveGradient()}`
-                      : 'text-slate-300 hover:bg-slate-800/50 hover:text-white'
-                  }`}
+                  className={`
+                    w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+                    ${reallyActive
+                      ? `bg-gradient-to-r ${colors.gradient} text-white shadow-lg`
+                      : 'text-slate-400 hover:bg-slate-800/50 hover:text-white'}
+                  `}
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <Icon size={18} className={`flex-shrink-0 ${reallyActive ? 'text-white' : navColor}`} />
+                  <Icon size={18} className={`flex-shrink-0 ${reallyActive ? 'text-white' : colors.color}`} />
                   <span className="font-medium text-sm">{item.label}</span>
-                  {reallyActive && <ChevronRight size={14} className={`opacity-70 rtl-flip ${isRTL ? 'mr-auto' : 'ml-auto'}`} />}
+                  {reallyActive && (
+                    <ChevronRight 
+                      size={14} 
+                      className={`opacity-70 flex-shrink-0 ${isRTL ? 'mr-auto rotate-180' : 'ml-auto'}`} 
+                    />
+                  )}
                 </button>
               );
             })}
           </nav>
 
-          <div className="p-4 border-t border-slate-700/50 space-y-2">
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gradient-to-r from-[#8B00E8]/20 to-transparent border border-[#8B00E8]/30">
-              <div className="w-9 h-9 rounded-lg bg-brand-gradient flex items-center justify-center shadow-md shadow-[#8B00E8]/30">
-                <User size={16} className="text-white" />
+          {/* User Section */}
+          <div className="p-4 border-t border-slate-700/50 space-y-3">
+            <GlassCard variant="outlined" className="p-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-md shadow-purple-500/20">
+                  <User size={18} className="text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
+                  <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
-                <p className="text-xs text-slate-400 truncate">{user?.email}</p>
-              </div>
-            </div>
+            </GlassCard>
+            
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 border border-transparent hover:border-red-500/20 transition-all duration-200 text-sm font-medium"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 text-sm font-medium group"
             >
-              <LogOut size={16} />
+              <LogOut size={16} className="group-hover:scale-110 transition-transform" />
               <span>{t('nav.logout')}</span>
             </button>
           </div>
         </div>
       </aside>
 
+      {/* Main Content */}
       <div className={`flex-1 min-h-screen flex flex-col ${isRTL ? 'lg:mr-64' : 'lg:ml-64'}`}>
         {/* Top accent line */}
-        <div className="h-0.5 bg-gradient-to-r from-[#8B00E8] via-[#A855F7] to-[#7C3AED]"></div>
+        <div className="h-0.5 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500" />
 
-        <header className="sticky top-0 z-40 bg-slate-900/98 backdrop-blur-xl px-4 lg:px-6 py-3">
+        {/* Header */}
+        <header className={`
+          sticky top-0 z-40 px-4 lg:px-6 py-4 transition-all duration-300
+          ${isScrolled ? 'bg-slate-900/95 backdrop-blur-xl shadow-lg shadow-black/10' : 'bg-transparent'}
+        `}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <button
+              <IconButton
+                variant="secondary"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="lg:hidden p-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 text-slate-300 hover:text-white transition-colors border border-slate-700/50"
-              >
-                {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-              </button>
+                className="lg:hidden"
+                icon={isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              />
               <div className="flex items-center gap-3">
-                <div className="hidden sm:flex w-8 h-8 rounded-lg bg-gradient-to-br from-[#8B00E8]/20 to-[#7C3AED]/20 items-center justify-center border border-[#8B00E8]/30">
-                  <LayoutDashboard size={16} className="text-[#8B00E8]" />
+                <div className="hidden sm:flex w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/20 items-center justify-center border border-purple-500/30">
+                  <LayoutDashboard size={18} className="text-purple-400" />
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-white">{getActiveLabel()}</h2>
-                  <p className="text-xs text-slate-400">{user?.role === 'super_admin' || user?.role === 'admin' ? t('admin.title') : t('nav.dashboard')}</p>
+                  <p className="text-xs text-slate-400">
+                    {user?.role === 'super_admin' || user?.role === 'admin' ? t('admin.title') : t('nav.dashboard')}
+                  </p>
                 </div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="bg-slate-800/50 border border-slate-700/50 px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-slate-700/50 transition-colors">
-                <Globe size={16} className="text-[#8B00E8]" />
-                <select
-                  value={i18n.language}
-                  onChange={(e) => handleLanguageChange(e.target.value)}
-                  className="bg-transparent text-white text-sm font-medium outline-none cursor-pointer"
-                >
-                  <option value="en" className="bg-slate-800 text-white">English</option>
-                  <option value="ar" className="bg-slate-800 text-white">العربية</option>
-                </select>
+
+            {/* Right Actions */}
+            <div className="flex items-center gap-2">
+              {/* Language Selector */}
+              <div className="flex items-center gap-1 bg-slate-800/50 rounded-full p-1">
+                <Globe size={14} className="ml-2 text-slate-500" />
+                {['en', 'ar'].map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => handleLanguageChange(lang)}
+                    className={`
+                      px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300
+                      ${i18n.language === lang 
+                        ? 'bg-purple-500 text-white' 
+                        : 'text-slate-400 hover:text-white'}
+                    `}
+                  >
+                    {lang.toUpperCase()}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
         </header>
 
+        {/* Page Content */}
         <main className="flex-1 p-4 lg:p-6">
           <Outlet />
         </main>
       </div>
 
+      {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden animate-fade-in"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}

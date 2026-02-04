@@ -10,7 +10,13 @@ import {
   Clock,
   Star,
   X,
+  Filter,
 } from 'lucide-react';
+import { GlassCard } from '../components/ui/GlassCard';
+import { AnimatedButton } from '../components/ui/AnimatedButton';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Modal } from '../components/ui/Modal';
+import { Badge } from '../components/ui/Badge';
 
 const Questions: React.FC = () => {
   const { t } = useTranslation();
@@ -35,7 +41,6 @@ const Questions: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      // Only pass status filter if it's not 'all'
       const params = statusFilter !== 'all' ? { status: statusFilter } : undefined;
       const [questionsResponse, tenantResponse] = await Promise.all([
         api.getPendingQuestions(tenantId, params),
@@ -63,7 +68,6 @@ const Questions: React.FC = () => {
         is_faq: isFaq,
       });
       
-      // Remove the question from the list
       setQuestions(questions.filter(q => q.id !== selectedQuestion.id));
       setSelectedQuestion(null);
       setAnswer('');
@@ -81,53 +85,64 @@ const Questions: React.FC = () => {
     setIsFaq(false);
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusConfig = (status: string) => {
     switch (status) {
       case 'answered':
-        return <CheckCircle2 size={14} className="text-emerald-400" />;
+        return { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10', badge: 'success' as const };
       case 'pending':
       default:
-        return <Clock size={14} className="text-amber-400" />;
+        return { icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/10', badge: 'warning' as const };
     }
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[300px]">
-        <div className="glass-card flex items-center gap-3">
-          <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-glass-text text-sm">{t('common.loading')}</span>
+      <div className="space-y-6 animate-page-enter">
+        <div className="h-8 w-64 bg-slate-800/50 rounded animate-pulse" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-48 bg-slate-800/50 rounded-xl animate-pulse" />
+          ))}
         </div>
       </div>
     );
   }
 
+  const pendingCount = questions.filter(q => q.status === 'pending').length;
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 animate-page-enter">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-white mb-0.5">
-            {t('questions.title')} - {tenant?.name}
+          <h1 className="text-2xl font-bold text-white mb-1">
+            {t('questions.title')}
           </h1>
-          <p className="text-sm text-glass-textSecondary">
-            {questions.filter(q => q.status === 'pending').length} {t('questions.pendingCount')}
+          <p className="text-slate-400">
+            {tenant?.name} • {pendingCount} pending
           </p>
         </div>
 
         {/* Filter */}
-        <div className="glass px-3 py-1.5 rounded-full flex items-center gap-1.5">
+        <div className="flex items-center gap-2 bg-slate-800/50 rounded-full p-1">
+          <Filter size={14} className="ml-3 text-slate-500" />
           {(['all', 'pending', 'answered'] as const).map((filter) => (
             <button
               key={filter}
               onClick={() => setStatusFilter(filter)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                statusFilter === filter
-                  ? 'bg-amber-500 text-white'
-                  : 'text-glass-text hover:text-white'
-              }`}
+              className={`
+                px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
+                ${statusFilter === filter
+                  ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/25'
+                  : 'text-slate-400 hover:text-white'}
+              `}
             >
               {t(`questions.${filter}`)}
+              {filter === 'pending' && pendingCount > 0 && (
+                <span className="ml-1.5 px-1.5 py-0.5 text-xs bg-amber-500 text-white rounded-full">
+                  {pendingCount}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -135,183 +150,183 @@ const Questions: React.FC = () => {
 
       {/* Error State */}
       {error && (
-        <div className="glass-card p-4 border-red-500/30 bg-red-500/10">
+        <GlassCard variant="outlined" className="p-4 border-red-500/30">
           <div className="flex items-center gap-2 text-red-400">
-            <X size={16} />
-            <span className="text-sm font-medium">{t('questions.error')}: {error}</span>
+            <X size={18} />
+            <span className="font-medium">{t('questions.error')}: {error}</span>
           </div>
-          <button
+          <AnimatedButton
+            variant="secondary"
+            size="sm"
             onClick={loadData}
-            className="mt-3 glass-button-secondary px-3 py-1.5 rounded-lg text-xs"
+            className="mt-3"
           >
             {t('questions.tryAgain')}
-          </button>
-        </div>
+          </AnimatedButton>
+        </GlassCard>
       )}
 
       {/* Questions Grid */}
       {!error && questions.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {questions.map((question) => (
-            <div
-              key={question.id}
-              onClick={() => question.status === 'pending' && setSelectedQuestion(question)}
-              className={`glass-card group hover:scale-[1.02] transition-all duration-200 p-4 ${
-                question.status === 'answered' ? 'opacity-60 cursor-default' : 'cursor-pointer'
-              }`}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8] to-[#7C3AED]">
-                  <MessageSquare size={16} className="text-white" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 stagger-children">
+          {questions.map((question, index) => {
+            const config = getStatusConfig(question.status);
+
+            
+            return (
+              <GlassCard
+                key={question.id}
+                variant={question.status === 'pending' ? 'interactive' : 'default'}
+                hover={question.status === 'pending' ? 'lift' : 'none'}
+                onClick={() => question.status === 'pending' && setSelectedQuestion(question)}
+                className={`group ${question.status === 'answered' ? 'opacity-60' : 'cursor-pointer'}`}
+                animate
+              >
+                <div className="p-5" style={{ animationDelay: `${index * 50}ms` }}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`
+                      p-3 rounded-xl 
+                      ${question.status === 'pending' 
+                        ? 'bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-500/20' 
+                        : 'bg-slate-700/50'}
+                    `}>
+                      <MessageSquare size={20} className="text-white" />
+                    </div>
+                    <Badge 
+                      variant={config.badge}
+                      size="sm"
+                      dot={question.status === 'pending'}
+                      pulse={question.status === 'pending'}
+                    >
+                      {question.status}
+                    </Badge>
+                  </div>
+
+                  <h3 className="font-medium text-white mb-3 line-clamp-3 leading-relaxed">
+                    {question.question}
+                  </h3>
+
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <Clock size={12} />
+                    {new Date(question.created_at).toLocaleString()}
+                  </div>
+
+                  {question.status === 'pending' && (
+                    <div className="mt-4 pt-4 border-t border-slate-700/50">
+                      <button
+                        onClick={() => setSelectedQuestion(question)}
+                        className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 
+                                 text-white text-sm font-medium flex items-center justify-center gap-2
+                                 hover:from-purple-500 hover:to-purple-600 transition-all
+                                 shadow-lg shadow-purple-500/25"
+                      >
+                        <Send size={14} />
+                        {t('questions.answerQuestion')}
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  {getStatusIcon(question.status)}
-                  <span className={`text-[10px] font-medium ${
-                    question.status === 'answered' ? 'text-emerald-400' : 'text-amber-400'
-                  }`}>
-                    {question.status}
-                  </span>
-                </div>
-              </div>
-
-              <h3 className="text-sm font-medium text-white mb-2 line-clamp-3">
-                {question.question}
-              </h3>
-
-              <div className="text-[10px] text-glass-textSecondary mb-3">
-                {new Date(question.created_at).toLocaleString()}
-              </div>
-
-              {question.status === 'pending' && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedQuestion(question);
-                  }}
-                  className="w-full glass-button px-3 py-1.5 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5"
-                >
-                  <Send size={14} />
-                  {t('questions.answerQuestion')}
-                </button>
-              )}
-            </div>
-          ))}
+              </GlassCard>
+            );
+          })}
         </div>
       ) : !error && (
-        <div className="glass-card p-8 text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#8B00E8]/20 via-[#A855F7]/20 to-[#7C3AED]/20 flex items-center justify-center">
-            <MessageSquare size={28} className="text-[#8B00E8]" />
-          </div>
-          <h3 className="text-base font-semibold text-white mb-1">
-            {statusFilter === 'pending' ? t('questions.noPendingQuestions') : 
-             statusFilter === 'answered' ? t('questions.noAnsweredQuestions') : 
-             t('questions.noQuestionsYet')}
-          </h3>
-          <p className="text-sm text-glass-textSecondary mb-4">
-            {statusFilter === 'pending'
+        <EmptyState
+          icon={MessageSquare}
+          title={
+            statusFilter === 'pending' ? t('questions.noPendingQuestions') : 
+            statusFilter === 'answered' ? t('questions.noAnsweredQuestions') : 
+            t('questions.noQuestionsYet')
+          }
+          description={
+            statusFilter === 'pending'
               ? t('questions.allAnswered')
               : statusFilter === 'answered'
               ? t('questions.noAnsweredYet')
-              : t('questions.questionsWillAppear')}
-          </p>
-          {statusFilter !== 'all' && (
-            <button
-              onClick={() => setStatusFilter('all')}
-              className="glass-button-secondary px-4 py-2 rounded-lg text-xs font-medium"
-            >
-              {t('questions.viewAllQuestions')}
-            </button>
-          )}
-        </div>
+              : t('questions.questionsWillAppear')
+          }
+          color="purple"
+        />
       )}
 
       {/* Answer Modal */}
-      {selectedQuestion && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass-strong w-full max-w-lg max-h-[90vh] overflow-y-auto p-5 rounded-xl scrollbar-glass">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">{t('questions.answerQuestion')}</h2>
-              <button
-                onClick={handleCloseModal}
-                className="p-1.5 rounded-lg glass-button-secondary"
-              >
-                <X size={16} />
-              </button>
+      <Modal
+        isOpen={!!selectedQuestion}
+        onClose={handleCloseModal}
+        title={t('questions.answerQuestion')}
+        size="lg"
+      >
+        <form onSubmit={handleSubmitAnswer} className="space-y-4">
+          {/* Question */}
+          <GlassCard variant="outlined" className="p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <MessageSquare size={16} className="text-purple-400" />
+              <span className="text-sm font-medium text-slate-300">
+                {t('questions.question')}
+              </span>
             </div>
+            <p className="text-white leading-relaxed">{selectedQuestion?.question}</p>
+          </GlassCard>
 
-            <form onSubmit={handleSubmitAnswer} className="space-y-4">
-              {/* Question */}
-              <div className="glass-card p-3">
-                <label className="block text-xs font-medium text-glass-text mb-1.5">
-                  {t('questions.question')}
-                </label>
-                <p className="text-sm text-white">{selectedQuestion.question}</p>
-              </div>
-
-              {/* Answer */}
-              <div>
-                <label className="block text-xs font-medium text-glass-text mb-1.5">
-                  {t('questions.answer')}
-                </label>
-                <textarea
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  className="glass-input w-full px-3 py-2 rounded-lg min-h-[120px] resize-none text-sm"
-                  placeholder={t('questions.enterAnswer')}
-                  required
-                />
-              </div>
-
-              {/* FAQ Toggle */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsFaq(!isFaq)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all ${
-                    isFaq
-                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                      : 'glass-button-secondary'
-                  }`}
-                >
-                  <Star size={14} className={isFaq ? 'fill-current' : ''} />
-                  {t('questions.markAsFaq')}
-                </button>
-                <p className="text-[10px] text-glass-textSecondary">
-                  {t('questions.prioritizeForSimilar')}
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-2 pt-3">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="flex-1 glass-button-secondary px-4 py-2 rounded-lg text-sm"
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !answer.trim()}
-                  className="flex-1 glass-button px-4 py-2 rounded-lg text-sm flex items-center justify-center gap-1.5"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      {t('common.loading')}
-                    </>
-                  ) : (
-                    <>
-                      <Send size={14} />
-                      {t('questions.submitAnswer')}
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
+          {/* Answer */}
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              {t('questions.answer')}
+            </label>
+            <textarea
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 
+                       text-white placeholder-slate-500 min-h-[140px] resize-none
+                       focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
+                       outline-none transition-all duration-300"
+              placeholder={t('questions.enterAnswer')}
+              required
+            />
           </div>
-        </div>
-      )}
+
+          {/* FAQ Toggle */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsFaq(!isFaq)}
+              className={`
+                flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all
+                ${isFaq
+                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                  : 'bg-slate-800/50 text-slate-400 border border-slate-700/50 hover:text-white'}
+              `}
+            >
+              <Star size={16} className={isFaq ? 'fill-current' : ''} />
+              {t('questions.markAsFaq')}
+            </button>
+            <p className="text-xs text-slate-500">
+              {t('questions.prioritizeForSimilar')}
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-2">
+            <AnimatedButton
+              variant="ghost"
+              onClick={handleCloseModal}
+              fullWidth
+            >
+              {t('common.cancel')}
+            </AnimatedButton>
+            <AnimatedButton
+              type="submit"
+              variant="gradient"
+              isLoading={isSubmitting}
+              isDisabled={!answer.trim()}
+              fullWidth
+              icon={<Send size={16} />}
+            >
+              {t('questions.submitAnswer')}
+            </AnimatedButton>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };
