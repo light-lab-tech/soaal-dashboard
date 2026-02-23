@@ -13,6 +13,8 @@ import {
   Loader2,
   RefreshCw,
 } from 'lucide-react';
+import { StructuredResponseArtifacts } from '../../components/ui/StructuredResponseArtifacts';
+import { extractStructuredArtifacts, getDisplayMessageContent } from '../../utils/chatResponse';
 
 const AdminTenantChats: React.FC = () => {
   const { t } = useTranslation();
@@ -127,33 +129,38 @@ const AdminTenantChats: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`glass-card p-4 ${
-                  message.role === 'user'
-                    ? 'border-l-4 border-[#8B00E8]/50'
-                    : message.role === 'assistant'
-                    ? 'border-l-4 border-[#7C3AED]/50'
-                    : 'border-l-4 border-slate-500/50'
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  {message.role === 'user' ? (
-                    <User size={16} className="text-[#8B00E8]" />
-                  ) : (
-                    <Bot size={16} className="text-[#7C3AED]" />
-                  )}
-                  <span className="text-sm font-medium text-slate-300 capitalize">
-                    {message.role === 'user' ? t('chats.user') : t('chats.assistant')}
-                  </span>
-                  <span className="text-xs text-slate-500 ml-auto">
-                    {new Date(message.created_at).toLocaleTimeString()}
-                  </span>
+            {messages.map((message) => {
+              const artifacts = extractStructuredArtifacts(message);
+              const displayContent = getDisplayMessageContent(message);
+              return (
+                <div
+                  key={message.id}
+                  className={`glass-card p-4 ${
+                    message.role === 'user'
+                      ? 'border-l-4 border-[#8B00E8]/50'
+                      : message.role === 'assistant'
+                      ? 'border-l-4 border-[#7C3AED]/50'
+                      : 'border-l-4 border-slate-500/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    {message.role === 'user' ? (
+                      <User size={16} className="text-[#8B00E8]" />
+                    ) : (
+                      <Bot size={16} className="text-[#7C3AED]" />
+                    )}
+                    <span className="text-sm font-medium text-slate-300 capitalize">
+                      {message.role === 'user' ? t('chats.user') : t('chats.assistant')}
+                    </span>
+                    <span className="text-xs text-slate-500 ml-auto">
+                      {new Date(message.created_at).toLocaleTimeString()}
+                    </span>
+                  </div>
+                  <p className="text-white whitespace-pre-wrap">{displayContent}</p>
+                  {message.role === 'assistant' && <StructuredResponseArtifacts artifacts={artifacts} />}
                 </div>
-                <p className="text-white whitespace-pre-wrap">{message.content}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
