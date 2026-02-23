@@ -185,6 +185,9 @@ const resources = {
         excludedPaths: 'Excluded Paths',
         allowedPaths: 'Allowed Paths',
         startCrawl: 'Start Crawling',
+        crawlSuccess: 'Crawled {{count}} pages successfully',
+        ingestSuccess: 'URL ingestion started',
+        ingestError: 'Failed to ingest URL',
       },
       // Pending Questions
       questions: {
@@ -580,6 +583,9 @@ const resources = {
         excludedPaths: 'المسارات المستثناة',
         allowedPaths: 'المسارات المسموحة',
         startCrawl: 'بدء الزحف',
+        crawlSuccess: 'تم زحف {{count}} صفحة بنجاح',
+        ingestSuccess: 'بدأ استيراد الرابط',
+        ingestError: 'فشل استيراد الرابط',
       },
       // Pending Questions
       questions: {

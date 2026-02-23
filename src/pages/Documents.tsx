@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
+import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
 import type { Document, Tenant, CrawlOptions } from '../types';
 import {
@@ -30,6 +31,7 @@ const Documents: React.FC = () => {
   const { t } = useTranslation();
   const { tenantId } = useParams<{ tenantId: string }>();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [tenant, setTenant] = useState<Tenant | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -144,13 +146,22 @@ const Documents: React.FC = () => {
 
       // Show appropriate message based on response
       if (crawlEnabled && response.data.pages_crawled) {
-        // TODO: Show toast with pages crawled info
-        console.log(`Crawled ${response.data.pages_crawled} pages`);
+        showToast(
+          t('documents.crawlSuccess', 'Crawled {{count}} pages successfully', { count: response.data.pages_crawled }),
+          'success'
+        );
+      } else {
+        showToast(
+          t('documents.ingestSuccess', 'URL ingestion started'),
+          'success'
+        );
       }
 
       await loadData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error ingesting URL:', error);
+      const errorMessage = error?.response?.data?.error || error?.message || t('documents.ingestError', 'Failed to ingest URL');
+      showToast(errorMessage, 'error');
     } finally {
       setIsUploading(false);
     }
