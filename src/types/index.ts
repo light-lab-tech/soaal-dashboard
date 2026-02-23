@@ -49,7 +49,6 @@ export interface ResetPasswordData {
 export interface Tenant {
   id: string;
   name: string;
-  plan: 'free' | 'pro' | 'enterprise';
   status: 'active' | 'suspended' | 'blocked';
   created_at: string;
   updated_at: string;
@@ -68,7 +67,6 @@ export interface ApiKey {
 
 export interface CreateTenantData {
   name: string;
-  plan?: 'free' | 'pro' | 'enterprise';
 }
 
 export interface CreateApiKeyData {
@@ -219,14 +217,20 @@ export interface Plan {
   is_active?: boolean;
   sort_order?: number;
   features_summary?: string;
+  // Plan limits (applied at user level, across all tenants)
   max_projects?: number;
   max_messages_per_month?: number;
   max_documents?: number;
   max_document_size_mb?: number;
+  max_urls_ingest_per_month?: number;
+  max_api_keys_per_tenant?: number;
+  max_feedback_events_per_month?: number;
+  // Feature flags
   enable_telegram_integration?: boolean;
   enable_feedback?: boolean;
   enable_custom_system_prompt?: boolean;
   enable_rag_enhancements?: boolean;
+  // Stripe price IDs
   gateway_one_price_id?: string;
   gateway_one_yearly_price_id?: string;
   created_at?: string;
@@ -266,10 +270,15 @@ export interface CreatePlanData {
   is_active?: boolean;
   sort_order?: number;
   features_summary?: string;
+  // Plan limits (applied at user level, across all tenants)
   max_projects?: number;
   max_messages_per_month?: number;
   max_documents?: number;
   max_document_size_mb?: number;
+  max_urls_ingest_per_month?: number;
+  max_api_keys_per_tenant?: number;
+  max_feedback_events_per_month?: number;
+  // Feature flags
   enable_telegram_integration?: boolean;
   enable_feedback?: boolean;
   enable_custom_system_prompt?: boolean;

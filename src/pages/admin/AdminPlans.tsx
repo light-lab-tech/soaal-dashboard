@@ -59,6 +59,10 @@ const AdminPlans: React.FC = () => {
       max_projects: undefined,
       max_messages_per_month: undefined,
       max_documents: undefined,
+      max_document_size_mb: undefined,
+      max_urls_ingest_per_month: undefined,
+      max_api_keys_per_tenant: undefined,
+      max_feedback_events_per_month: undefined,
     });
     setShowPlanModal(true);
   };
@@ -78,6 +82,10 @@ const AdminPlans: React.FC = () => {
       max_projects: plan.max_projects,
       max_messages_per_month: plan.max_messages_per_month,
       max_documents: plan.max_documents,
+      max_document_size_mb: plan.max_document_size_mb,
+      max_urls_ingest_per_month: plan.max_urls_ingest_per_month,
+      max_api_keys_per_tenant: plan.max_api_keys_per_tenant,
+      max_feedback_events_per_month: plan.max_feedback_events_per_month,
     });
     setShowPlanModal(true);
   };
@@ -208,6 +216,91 @@ const AdminPlans: React.FC = () => {
                 <label className="block text-sm font-medium text-slate-300 mb-1">{t('admin.featuresSummary')}</label>
                 <input type="text" value={planForm.features_summary || ''} onChange={(e) => setPlanForm({ ...planForm, features_summary: e.target.value })} className="input w-full px-3 py-2" />
               </div>
+
+              {/* Plan Limits */}
+              <div className="border-t border-slate-700/50 pt-4">
+                <h3 className="text-sm font-medium text-slate-300 mb-3">Plan Limits</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Max Projects</label>
+                    <input
+                      type="number"
+                      min={-1}
+                      placeholder="-1 = unlimited"
+                      value={planForm.max_projects ?? ''}
+                      onChange={(e) => setPlanForm({ ...planForm, max_projects: e.target.value ? parseInt(e.target.value) : undefined })}
+                      className="input w-full px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Max Documents</label>
+                    <input
+                      type="number"
+                      min={-1}
+                      placeholder="-1 = unlimited"
+                      value={planForm.max_documents ?? ''}
+                      onChange={(e) => setPlanForm({ ...planForm, max_documents: e.target.value ? parseInt(e.target.value) : undefined })}
+                      className="input w-full px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Max Messages/Month</label>
+                    <input
+                      type="number"
+                      min={-1}
+                      placeholder="-1 = unlimited"
+                      value={planForm.max_messages_per_month ?? ''}
+                      onChange={(e) => setPlanForm({ ...planForm, max_messages_per_month: e.target.value ? parseInt(e.target.value) : undefined })}
+                      className="input w-full px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Max Document Size (MB)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      placeholder="10"
+                      value={planForm.max_document_size_mb ?? ''}
+                      onChange={(e) => setPlanForm({ ...planForm, max_document_size_mb: e.target.value ? parseInt(e.target.value) : undefined })}
+                      className="input w-full px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Max URL Ingests/Month</label>
+                    <input
+                      type="number"
+                      min={-1}
+                      placeholder="-1 = unlimited"
+                      value={planForm.max_urls_ingest_per_month ?? ''}
+                      onChange={(e) => setPlanForm({ ...planForm, max_urls_ingest_per_month: e.target.value ? parseInt(e.target.value) : undefined })}
+                      className="input w-full px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Max API Keys/Tenant</label>
+                    <input
+                      type="number"
+                      min={-1}
+                      placeholder="-1 = unlimited"
+                      value={planForm.max_api_keys_per_tenant ?? ''}
+                      onChange={(e) => setPlanForm({ ...planForm, max_api_keys_per_tenant: e.target.value ? parseInt(e.target.value) : undefined })}
+                      className="input w-full px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Max Feedback Events/Month</label>
+                    <input
+                      type="number"
+                      min={-1}
+                      placeholder="-1 = unlimited"
+                      value={planForm.max_feedback_events_per_month ?? ''}
+                      onChange={(e) => setPlanForm({ ...planForm, max_feedback_events_per_month: e.target.value ? parseInt(e.target.value) : undefined })}
+                      className="input w-full px-3 py-2 text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="flex gap-2 pt-4">
                 <button type="button" onClick={() => setShowPlanModal(false)} className="btn-secondary flex-1 py-2">{t('common.cancel')}</button>
                 <button type="submit" className="btn-primary flex-1 py-2">{editingPlan ? t('common.update') : t('common.create')}</button>

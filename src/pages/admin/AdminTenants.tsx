@@ -100,7 +100,6 @@ const AdminTenants: React.FC = () => {
               <thead>
                 <tr className="border-b border-slate-700/50">
                   <th className="text-start p-4 text-sm font-medium text-slate-400">{t('tenants.tenantName')}</th>
-                  <th className="text-start p-4 text-sm font-medium text-slate-400">{t('tenants.plan')}</th>
                   <th className="text-start p-4 text-sm font-medium text-slate-400">{t('tenants.status')}</th>
                   <th className="text-start p-4 text-sm font-medium text-slate-400">{t('admin.createdAt')}</th>
                   <th className="text-end p-4 text-sm font-medium text-slate-400">{t('common.actions')}</th>
@@ -117,7 +116,6 @@ const AdminTenants: React.FC = () => {
                         {tenant.name}
                       </button>
                     </td>
-                    <td className="p-4"><span className="text-slate-300 capitalize">{tenant.plan}</span></td>
                     <td className="p-4">
                       <select
                         value={tenant.status}

@@ -17,7 +17,6 @@ import {
   Plus,
   X,
   Calendar,
-  CreditCard,
   Activity,
   MessagesSquare,
   Settings,
@@ -241,15 +240,6 @@ const TenantDetails: React.FC = () => {
 
       {/* Tenant Info Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="glass-card p-4">
-          <div className="flex items-start justify-between mb-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8] to-[#7C3AED]">
-              <CreditCard size={14} className="text-white" />
-            </div>
-          </div>
-          <p className="text-xs text-glass-textSecondary mb-1">{t('tenants.plan')}</p>
-          <p className="text-sm font-semibold text-white capitalize">{tenant.plan}</p>
-        </div>
         <div className="glass-card p-4">
           <div className="flex items-start justify-between mb-3">
             <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600">

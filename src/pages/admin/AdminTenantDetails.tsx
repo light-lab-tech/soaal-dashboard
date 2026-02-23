@@ -138,10 +138,6 @@ const AdminTenantDetails: React.FC = () => {
                 } shadow-lg`}>
                   {tenant.status}
                 </span>
-                <span className="text-slate-400 text-sm capitalize flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                  {tenant.plan} plan
-                </span>
               </div>
             </div>
           </div>

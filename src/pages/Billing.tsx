@@ -11,11 +11,31 @@ import {
   Loader2,
   X,
   RefreshCw,
+  FolderKanban,
+  FileText,
+  MessageSquare,
+  HardDrive,
+  Globe,
+  Key as KeyIcon,
+  ThumbsUp,
 } from 'lucide-react';
 
 const Billing: React.FC = () => {
   const { t } = useTranslation();
   const { showToast } = useToast();
+
+  // Helper to render plan limit
+  const renderLimit = (value: number | undefined, icon: React.ReactNode, label: string) => {
+    if (value === undefined || value === null) return null;
+    const displayValue = value === -1 || value === 999999 ? t('billing.unlimited') : value.toLocaleString();
+    return (
+      <div className="flex items-center gap-2 text-xs text-glass-text">
+        {icon}
+        <span>{label}:</span>
+        <span className="text-white font-medium">{displayValue}</span>
+      </div>
+    );
+  };
   const [plans, setPlans] = useState<Plan[]>([]);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [currentPlan, setCurrentPlan] = useState<Plan | null>(null);
@@ -220,6 +240,16 @@ const Billing: React.FC = () => {
                 {plan.features_summary && (
                   <p className="text-glass-text text-[10px] mb-3">{plan.features_summary}</p>
                 )}
+                {/* Plan Limits */}
+                <div className="space-y-1.5 mb-3 pb-3 border-b border-glass-border">
+                  {renderLimit(plan.max_projects, <FolderKanban size={12} />, t('billing.projects'))}
+                  {renderLimit(plan.max_documents, <FileText size={12} />, t('billing.documents'))}
+                  {renderLimit(plan.max_messages_per_month, <MessageSquare size={12} />, t('billing.messagesPerMonth'))}
+                  {renderLimit(plan.max_document_size_mb, <HardDrive size={12} />, t('billing.documentSizeMb'))}
+                  {renderLimit(plan.max_urls_ingest_per_month, <Globe size={12} />, t('billing.urlIngests'))}
+                  {renderLimit(plan.max_api_keys_per_tenant, <KeyIcon size={12} />, t('billing.apiKeysPerTenant'))}
+                  {renderLimit(plan.max_feedback_events_per_month, <ThumbsUp size={12} />, t('billing.feedbackEvents'))}
+                </div>
                 <div className="mb-3">
                   <span className="text-xl font-bold text-white">
                     {formatPrice(plan.price_monthly_cents, 'monthly')}

@@ -12,7 +12,6 @@ import {
   Plus,
   ArrowRight,
   Activity,
-  Users,
   BarChart3,
   RefreshCw,
   Sparkles,
@@ -330,10 +329,6 @@ const Dashboard: React.FC = () => {
                   </h3>
                   
                   <div className="space-y-2 mt-3">
-                    <div className="flex items-center gap-2 text-sm text-slate-400">
-                      <Users size={14} />
-                      <span className="capitalize">{tenant.plan} {t('tenants.plan')}</span>
-                    </div>
                     <div className="flex items-center gap-2 text-sm text-slate-400">
                       <Activity size={14} />
                       <span>{t('dashboard.created')} {new Date(tenant.created_at).toLocaleDateString()}</span>

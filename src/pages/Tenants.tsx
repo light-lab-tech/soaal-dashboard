@@ -32,7 +32,6 @@ const Tenants: React.FC = () => {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [newTenantData, setNewTenantData] = useState<CreateTenantData>({
     name: '',
-    plan: 'free',
   });
   const [visibleKeys, setVisibleKeys] = useState<Record<string, boolean>>({});
   const [newApiKey, setNewApiKey] = useState<CreateApiKeyData>({
@@ -71,7 +70,7 @@ const Tenants: React.FC = () => {
     try {
       const response = await api.createTenant(newTenantData);
       setShowCreateModal(false);
-      setNewTenantData({ name: '', plan: 'free' });
+      setNewTenantData({ name: '' });
       
       if (response.data.api_keys) {
         const allKeys = [
@@ -228,7 +227,6 @@ const Tenants: React.FC = () => {
                       <h3 className="font-semibold text-white group-hover:text-purple-300 transition-colors">
                         {tenant.name}
                       </h3>
-                      <p className="text-xs text-slate-400 capitalize">{tenant.plan} Plan</p>
                     </div>
                   </div>
                   <Badge 
@@ -300,23 +298,6 @@ const Tenants: React.FC = () => {
               placeholder="..."
               required
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              {t('tenants.plan')}
-            </label>
-            <select
-              value={newTenantData.plan}
-              onChange={(e) => setNewTenantData({ ...newTenantData, plan: e.target.value as any })}
-              className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 
-                       text-white
-                       focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
-                       outline-none transition-all duration-300"
-            >
-              <option value="free" className="bg-slate-900">{t('documents.statusFree')}</option>
-              <option value="pro" className="bg-slate-900">{t('documents.statusPro')}</option>
-              <option value="enterprise" className="bg-slate-900">{t('documents.statusEnterprise')}</option>
-            </select>
           </div>
           <div className="flex gap-3 pt-2">
             <AnimatedButton

@@ -6,6 +6,7 @@ This documentation covers all APIs used by company owners (tenants) to manage th
 
 ## Table of Contents
 
+0. [Plan Limitations](#plan-limitations)
 1. [Authentication](#authentication)
    - [Register](#register), [Verify Email](#verify-email), [Resend Verification Email](#resend-verification-email), [Login](#login), [Logout](#logout), [Forgot Password](#forgot-password), [Reset Password](#reset-password)
 2. [Tenant Management](#tenant-management)
@@ -58,6 +59,68 @@ All API responses follow this format:
   "error": "Error description"
 }
 ```
+
+---
+
+## Plan Limitations
+
+**Important:** Plans are attached at the **user level**, not the tenant level. Your subscription determines the limits and features for **all** of your tenants (projects).
+
+### Limit Types
+
+| Resource | Limit | Applied To |
+|----------|-------|------------|
+| **Projects/Tenants** | `max_projects` | Total number of tenants a user can create |
+| **Documents** | `max_documents` | Total documents across all user's tenants |
+| **Document Size** | `max_document_size_mb` | Maximum file size per document upload |
+| **URL Ingests** | `max_urls_ingest_per_month` | Website scrapings per month (all tenants) |
+| **Messages** | `max_messages_per_month` | Chat messages per month (all tenants) |
+| **API Keys** | `max_api_keys_per_tenant` | API keys per individual tenant |
+| **Feedback Events** | `max_feedback_events_per_month` | Feedback submissions per month |
+
+### Default Plan Limits
+
+| Feature | Free | Pro | Enterprise |
+|---------|------|-----|------------|
+| Projects (tenants) | 1 | 5 | Unlimited |
+| Documents | 10 | 1000 | Unlimited |
+| Document Size | 10 MB | 20 MB | 100 MB |
+| Messages/Month | 1,000 | 50,000 | Unlimited |
+| URL Ingests/Month | 10 | 500 | Unlimited |
+| API Keys/Tenant | 5 | 10 | Unlimited |
+| Telegram Integration | ❌ | ✅ | ✅ |
+| Feedback Analytics | ❌ | ✅ | ✅ |
+| Custom System Prompt | ❌ | ✅ | ✅ |
+| RAG Enhancements | ❌ | ✅ | ✅ |
+
+### Limit Enforcement
+
+When a limit is reached, the API returns a **403 Forbidden** response with an error message indicating the limit that was reached:
+
+```json
+{
+  "success": false,
+  "error": "You have reached your plan limit of 1 projects/tenants. Upgrade your plan to create more."
+}
+```
+
+```json
+{
+  "success": false,
+  "error": "You have reached your plan limit of 1000 documents. Upgrade your plan to upload more."
+}
+```
+
+```json
+{
+  "success": false,
+  "error": "You have reached your plan limit of 50,000 messages per month. Upgrade your plan for more."
+}
+```
+
+### Checking Your Plan
+
+Use the **[Get My Subscription](#get-my-subscription)** endpoint to check your current plan and limits.
 
 ---
 
@@ -323,7 +386,7 @@ Content-Type: application/json
 
 ### Create Tenant
 
-Create a new tenant (project/workspace).
+Create a new tenant (project/workspace). The tenant uses the limits and features from your subscription plan.
 
 ```
 POST /tenants
@@ -332,15 +395,19 @@ POST /tenants
 **Request Body:**
 ```json
 {
-  "name": "My Company Support",
-  "plan": "pro"
+  "name": "My Company Support"
 }
 ```
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | name | string | Yes | Tenant name |
-| plan | string | No | Plan type: `free`, `pro`, `enterprise` (default: `free`) |
+
+**Limitations:**
+- You can create up to the number of projects/tenants allowed by your subscription plan
+- Free plan: 1 tenant
+- Pro plan: 5 tenants (default, configurable)
+- Enterprise plan: unlimited tenants
 
 **Response:**
 ```json
@@ -350,10 +417,14 @@ POST /tenants
     "tenant": {
       "id": "uuid",
       "name": "My Company Support",
-      "plan": "pro",
       "status": "active",
       "created_at": "2026-01-24T10:00:00Z",
       "updated_at": "2026-01-24T10:00:00Z"
+    },
+    "plan": {
+      "id": "plan-uuid",
+      "name": "Pro",
+      "slug": "pro"
     },
     "api_keys": {
       "public_key": {
@@ -381,6 +452,14 @@ POST /tenants
 
 > **Important:** Save both API keys securely when they are shown. You can retrieve them later using `GET /tenants/{tenant_id}/api-keys/{key_id}` with the key ID.
 
+**Error Response (Tenant Limit Reached):**
+```json
+{
+  "success": false,
+  "error": "You have reached your plan limit of 1 projects/tenants. Upgrade your plan to create more."
+}
+```
+
 ---
 
 ### List My Tenants
@@ -400,7 +479,6 @@ GET /tenants
       {
         "id": "uuid",
         "name": "My Company Support",
-        "plan": "pro",
         "status": "active",
         "created_at": "2026-01-24T10:00:00Z",
         "updated_at": "2026-01-24T10:00:00Z"
@@ -429,7 +507,6 @@ GET /tenants/{tenant_id}
     "tenant": {
       "id": "uuid",
       "name": "My Company Support",
-      "plan": "pro",
       "status": "active",
       "created_at": "2026-01-24T10:00:00Z",
       "updated_at": "2026-01-24T10:00:00Z"

@@ -175,7 +175,6 @@ const AdminUserDetails: React.FC = () => {
                 >
                   <div>
                     <span className="text-white font-medium">{tenant.name}</span>
-                    <span className="ml-2 text-slate-400 text-xs">({tenant.plan})</span>
                   </div>
                   <span className={`text-xs ${tenant.status === 'active' ? 'text-emerald-400' : 'text-slate-400'}`}>
                     {tenant.status}
