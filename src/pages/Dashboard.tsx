@@ -189,7 +189,7 @@ const Dashboard: React.FC = () => {
                 </span>
               </h1>
               <p className="text-slate-400 max-w-md">
-                Manage your tenants, documents, and analyze performance all in one place.
+                t('dashboard.manageDescription')
               </p>
             </div>
             
@@ -258,7 +258,7 @@ const Dashboard: React.FC = () => {
                     </div>
                     <ArrowRight 
                       size={18} 
-                      className="text-slate-500 transition-all duration-300 group-hover:text-white group-hover:translate-x-1" 
+                      className="text-slate-500 transition-all duration-300 group-hover:text-white group-hover:translate-x-1 rtl-flip" 
                     />
                   </div>
                   
@@ -295,7 +295,7 @@ const Dashboard: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/tenants')}
-              icon={<ArrowRight size={16} />}
+              icon={<ArrowRight size={16} className="rtl-flip" />}
               iconPosition="right"
             >
               {t('dashboard.viewAll')}
@@ -332,7 +332,7 @@ const Dashboard: React.FC = () => {
                   <div className="space-y-2 mt-3">
                     <div className="flex items-center gap-2 text-sm text-slate-400">
                       <Users size={14} />
-                      <span className="capitalize">{tenant.plan} Plan</span>
+                      <span className="capitalize">{tenant.plan} {t('tenants.plan')}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-slate-400">
                       <Activity size={14} />

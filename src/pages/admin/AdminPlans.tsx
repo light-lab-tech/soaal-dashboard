@@ -139,7 +139,7 @@ const AdminPlans: React.FC = () => {
                 <th className="text-start p-4 text-sm font-medium text-slate-400">{t('admin.planName')}</th>
                 <th className="text-start p-4 text-sm font-medium text-slate-400">{t('admin.planSlug')}</th>
                 <th className="text-start p-4 text-sm font-medium text-slate-400">Price (monthly)</th>
-                <th className="text-start p-4 text-sm font-medium text-slate-400">Active</th>
+                <th className="text-start p-4 text-sm font-medium text-slate-400">{t('documents.tableActive')}</th>
                 <th className="text-end p-4 text-sm font-medium text-slate-400">{t('common.actions')}</th>
               </tr>
             </thead>
@@ -169,7 +169,7 @@ const AdminPlans: React.FC = () => {
             </tbody>
           </table>
         </div>
-        {plans.length === 0 && <div className="p-8 text-center text-slate-400">No plans yet. Create one to get started.</div>}
+        {plans.length === 0 && <div className="p-8 text-center text-slate-400">{t('billing.noPlansYet')}</div>}
       </div>
 
       {showPlanModal && (

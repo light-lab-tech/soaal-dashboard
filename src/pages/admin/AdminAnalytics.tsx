@@ -151,7 +151,7 @@ const AdminAnalytics: React.FC = () => {
                   <p className="text-sm text-slate-400">{stat.label}</p>
                 </div>
                 <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
-                <ArrowRight size={20} className="text-slate-500 group-hover:text-[#8B00E8]" />
+                <ArrowRight size={20} className="text-slate-500 group-hover:text-[#8B00E8] rtl-flip" />
               </span>
               </div>
             </div>
@@ -179,7 +179,7 @@ const AdminAnalytics: React.FC = () => {
                 <Users size={18} className="text-white" />
               </div>
               <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
-              <ArrowRight size={16} className="text-slate-400 group-hover:text-white" />
+              <ArrowRight size={16} className="text-slate-400 group-hover:text-white rtl-flip" />
             </span>
             </div>
             <h3 className="text-sm font-medium text-white group-hover:text-glow transition-all">
@@ -197,7 +197,7 @@ const AdminAnalytics: React.FC = () => {
                     <Building2 size={18} className="text-white" />
                   </div>
                   <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
-              <ArrowRight size={16} className="text-slate-400 group-hover:text-white" />
+              <ArrowRight size={16} className="text-slate-400 group-hover:text-white rtl-flip" />
             </span>
                 </div>
                 <h3 className="text-sm font-medium text-white group-hover:text-glow transition-all">
@@ -213,7 +213,7 @@ const AdminAnalytics: React.FC = () => {
                     <CreditCard size={18} className="text-white" />
                   </div>
                   <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
-              <ArrowRight size={16} className="text-slate-400 group-hover:text-white" />
+              <ArrowRight size={16} className="text-slate-400 group-hover:text-white rtl-flip" />
             </span>
                 </div>
                 <h3 className="text-sm font-medium text-white group-hover:text-glow transition-all">

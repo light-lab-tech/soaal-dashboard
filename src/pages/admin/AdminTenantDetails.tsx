@@ -251,7 +251,7 @@ const AdminTenantDetails: React.FC = () => {
                     <p className="text-slate-400 text-sm mt-1">{action.description}</p>
                   </div>
                 <span className="inline-flex arrow-card-rtl rtl-flip group-hover:translate-x-1 transition-all">
-                  <ArrowRight size={20} className="text-slate-500 group-hover:text-[#8B00E8]" />
+                  <ArrowRight size={20} className="text-slate-500 group-hover:text-[#8B00E8] rtl-flip" />
                 </span>
                 </div>
               </button>

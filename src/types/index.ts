@@ -158,7 +158,7 @@ export interface ChatMessage {
   chat_id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
-  token_usage?: Record<string, number>;
+  token_usage?: Record<string, unknown>;
   created_at: string;
 }
 

@@ -404,7 +404,7 @@ const TenantDetails: React.FC = () => {
                   value={newApiKey.rate_limit}
                   onChange={(e) => setNewApiKey({ ...newApiKey, rate_limit: parseInt(e.target.value) || -1 })}
                   className="glass-input w-full px-3 py-2 rounded-lg text-sm"
-                  placeholder="-1 for unlimited"
+                  placeholder={t('tenants.unlimited')}
                 />
               </div>
               <div className="flex gap-2 pt-3">

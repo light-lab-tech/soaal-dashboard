@@ -252,11 +252,11 @@ const Tenants: React.FC = () => {
                              border border-slate-600/50"
                   >
                     <Key size={12} />
-                    API Keys
+                    {t('tenants.apiKeys')}
                   </button>
                   <div className="flex items-center gap-1 text-sm text-slate-400 group-hover:text-white transition-colors">
                     <span>{t('tenants.viewDetails')}</span>
-                    <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                    <ArrowRight size={16} className="transition-transform group-hover:translate-x-1 rtl-flip" />
                   </div>
                 </div>
               </div>
@@ -266,7 +266,7 @@ const Tenants: React.FC = () => {
       ) : (
         <EmptyState
           icon={Building2}
-          title={searchQuery ? 'No tenants found' : t('tenants.noTenantsYet')}
+          title={searchQuery ? t('tenants.noSearchResults') : t('tenants.noTenantsYet')}
           description={searchQuery ? 'Try adjusting your search' : t('tenants.createFirstTenant')}
           action={!searchQuery ? {
             label: t('tenants.createTenant'),
@@ -297,7 +297,7 @@ const Tenants: React.FC = () => {
                        text-white placeholder-slate-500
                        focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
                        outline-none transition-all duration-300"
-              placeholder="My Company Support"
+              placeholder="..."
               required
             />
           </div>
@@ -313,9 +313,9 @@ const Tenants: React.FC = () => {
                        focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
                        outline-none transition-all duration-300"
             >
-              <option value="free" className="bg-slate-900">Free</option>
-              <option value="pro" className="bg-slate-900">Pro</option>
-              <option value="enterprise" className="bg-slate-900">Enterprise</option>
+              <option value="free" className="bg-slate-900">{t('documents.statusFree')}</option>
+              <option value="pro" className="bg-slate-900">{t('documents.statusPro')}</option>
+              <option value="enterprise" className="bg-slate-900">{t('documents.statusEnterprise')}</option>
             </select>
           </div>
           <div className="flex gap-3 pt-2">
@@ -341,7 +341,7 @@ const Tenants: React.FC = () => {
       <Modal
         isOpen={showApiKeysModal}
         onClose={() => setShowApiKeysModal(false)}
-        title={`API Keys - ${selectedTenant?.name}`}
+        title={`${t('tenants.apiKeys')} - ${selectedTenant?.name}`}
         size="lg"
       >
         <div className="space-y-4">
@@ -358,8 +358,8 @@ const Tenants: React.FC = () => {
                          text-white text-sm
                          focus:border-purple-500/50 outline-none"
               >
-                <option value="public" className="bg-slate-900">Public</option>
-                <option value="secret" className="bg-slate-900">Secret</option>
+                <option value="public" className="bg-slate-900">{t('tenants.public')}</option>
+                <option value="secret" className="bg-slate-900">{t('tenants.secret')}</option>
               </select>
               <input
                 type="number"
@@ -368,7 +368,7 @@ const Tenants: React.FC = () => {
                 className="flex-1 px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 
                          text-white text-sm
                          focus:border-purple-500/50 outline-none"
-                placeholder="-1 for unlimited"
+                placeholder={t('tenants.unlimited')}
               />
               <AnimatedButton
                 onClick={handleCreateApiKey}
@@ -409,7 +409,7 @@ const Tenants: React.FC = () => {
                         size="sm"
                         onClick={() => copyToClipboard(apiKey.key!, apiKey.id || apiKey.prefix)}
                         icon={copiedKey === (apiKey.id || apiKey.prefix) ? 
-                          <span className="text-emerald-400 text-xs">Copied!</span> : 
+                          <span className="text-emerald-400 text-xs">{t('common.copied')}</span> : 
                           <Copy size={14} />
                         }
                       />

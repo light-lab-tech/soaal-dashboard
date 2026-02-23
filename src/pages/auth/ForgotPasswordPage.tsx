@@ -176,7 +176,7 @@ const ForgotPasswordPage: React.FC = () => {
                 to="/login"
                 className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-medium text-sm transition-all"
               >
-                <ArrowLeft size={16} />
+                <ArrowLeft size={16} className="rtl-flip" />
                 {t('auth.backToLogin')}
               </Link>
             </div>

@@ -157,11 +157,11 @@ const Documents: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge variant="success" size="sm" dot>Completed</Badge>;
+        return <Badge variant="success" size="sm" dot>{t('documents.completed')}</Badge>;
       case 'processing':
-        return <Badge variant="warning" size="sm" dot pulse>Processing</Badge>;
+        return <Badge variant="warning" size="sm" dot pulse>{t('documents.processing')}</Badge>;
       case 'failed':
-        return <Badge variant="danger" size="sm" dot>Failed</Badge>;
+        return <Badge variant="danger" size="sm" dot>{t('documents.failed')}</Badge>;
       default:
         return <Badge variant="default" size="sm">{status}</Badge>;
     }
@@ -197,7 +197,7 @@ const Documents: React.FC = () => {
           <IconButton
             variant="ghost"
             onClick={() => navigate(`/tenants/${tenantId}`)}
-            icon={<ArrowLeft size={20} />}
+            icon={<ArrowLeft size={20} className="rtl-flip" />}
           />
           <div>
             <h1 className="text-2xl font-bold text-white mb-1">

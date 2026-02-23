@@ -146,7 +146,7 @@ const AdminUserDetails: React.FC = () => {
                 </span>
               </div>
               {subscription.cancel_at_period_end && (
-                <p className="text-amber-400 text-xs">Cancels at period end</p>
+                <p className="text-amber-400 text-xs">{t('billing.cancelsAtPeriodEnd')}</p>
               )}
             </div>
           ) : (
