@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
-import type { Tenant, ApiKey, CreateTenantData, CreateApiKeyData } from '../types';
+import type { Tenant, ApiKey, CreateTenantData, CreateApiKeyData, Plan } from '../types';
 import {
   Plus,
   Key,
@@ -13,6 +14,8 @@ import {
   Building2,
   ArrowRight,
   Search,
+  CreditCard,
+  AlertCircle,
 } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { AnimatedButton, IconButton } from '../components/ui/AnimatedButton';
@@ -23,6 +26,7 @@ import { Badge } from '../components/ui/Badge';
 const Tenants: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,6 +44,8 @@ const Tenants: React.FC = () => {
   });
   const [searchQuery, setSearchQuery] = useState('');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [currentPlan, setCurrentPlan] = useState<Plan | null>(null);
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
 
   // Super admin manages tenants under Admin; redirect to Admin > Tenants
   useEffect(() => {
@@ -51,6 +57,7 @@ const Tenants: React.FC = () => {
   useEffect(() => {
     if (user?.role === 'super_admin') return;
     loadTenants();
+    loadSubscription();
   }, [user?.role]);
 
   const loadTenants = async () => {
@@ -65,13 +72,46 @@ const Tenants: React.FC = () => {
     }
   };
 
+  const loadSubscription = async () => {
+    try {
+      const response = await api.getSubscription();
+      setCurrentPlan(response.data.plan || null);
+      setHasActiveSubscription(!!response.data.subscription);
+    } catch (error) {
+      console.error('Error loading subscription:', error);
+    }
+  };
+
+  const openCreateModal = () => {
+    // Check if user has reached tenant limit
+    if (currentPlan && currentPlan.max_projects !== undefined && currentPlan.max_projects !== -1) {
+      if (tenants.length >= currentPlan.max_projects) {
+        showToast(
+          t('billing.tenantLimitReached', 'You have reached your plan limit of {{max}} projects/tenants. Upgrade your plan to create more.', { max: currentPlan.max_projects }),
+          'error'
+        );
+        return;
+      }
+    }
+    setShowCreateModal(true);
+  };
+
   const handleCreateTenant = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if user has an active subscription or plan
+    if (!hasActiveSubscription && !currentPlan) {
+      setShowCreateModal(false);
+      showToast(t('billing.needSubscription', 'You need an active subscription to create a tenant. Please subscribe to a plan first.'), 'error');
+      navigate('/billing');
+      return;
+    }
+
     try {
       const response = await api.createTenant(newTenantData);
       setShowCreateModal(false);
       setNewTenantData({ name: '' });
-      
+
       if (response.data.api_keys) {
         const allKeys = [
           response.data.api_keys.public_key,
@@ -86,10 +126,11 @@ const Tenants: React.FC = () => {
           }
         });
       }
-      
+
       loadTenants();
-    } catch (error) {
-      console.error('Error creating tenant:', error);
+    } catch (error: any) {
+      const errorMessage = error?.message || t('tenants.createError', 'Failed to create tenant');
+      showToast(errorMessage, 'error');
     }
   };
 
@@ -181,7 +222,7 @@ const Tenants: React.FC = () => {
         </div>
         <AnimatedButton
           variant="gradient"
-          onClick={() => setShowCreateModal(true)}
+          onClick={openCreateModal}
           icon={<Plus size={18} />}
         >
           {t('tenants.createTenant')}
@@ -268,7 +309,7 @@ const Tenants: React.FC = () => {
           description={searchQuery ? 'Try adjusting your search' : t('tenants.createFirstTenant')}
           action={!searchQuery ? {
             label: t('tenants.createTenant'),
-            onClick: () => setShowCreateModal(true),
+            onClick: openCreateModal,
             icon: <Plus size={18} />,
           } : undefined}
           color="purple"
@@ -283,6 +324,59 @@ const Tenants: React.FC = () => {
         size="sm"
       >
         <form onSubmit={handleCreateTenant} className="space-y-4">
+          {/* Plan/Limit Warning */}
+          {!hasActiveSubscription && !currentPlan && (
+            <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+              <AlertCircle size={18} className="text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm text-amber-200 font-medium">{t('billing.noActivePlan', 'No Active Plan')}</p>
+                <p className="text-xs text-amber-300/80 mt-1">
+                  {t('billing.noActivePlanDesc', 'You need an active subscription to create tenants.')}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    navigate('/billing');
+                  }}
+                  className="mt-2 text-xs text-amber-400 hover:text-amber-300 underline flex items-center gap-1"
+                >
+                  <CreditCard size={12} />
+                  {t('billing.viewPlans', 'View Plans')}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Tenant Usage Info */}
+          {currentPlan && currentPlan.max_projects !== undefined && currentPlan.max_projects !== -1 && (
+            <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-slate-400">{t('billing.projectsUsage', 'Projects Usage')}</span>
+                <span className="text-white font-medium">
+                  {tenants.length} / {currentPlan.max_projects}
+                </span>
+              </div>
+              <div className="mt-2 h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    tenants.length >= currentPlan.max_projects
+                      ? 'bg-red-500'
+                      : tenants.length >= currentPlan.max_projects * 0.8
+                      ? 'bg-amber-500'
+                      : 'bg-emerald-500'
+                  }`}
+                  style={{ width: `${Math.min((tenants.length / currentPlan.max_projects) * 100, 100)}%` }}
+                />
+              </div>
+              {tenants.length >= currentPlan.max_projects && (
+                <p className="text-xs text-red-400 mt-2">
+                  {t('billing.tenantLimitReached', 'You have reached your plan limit. Upgrade to create more.')}
+                </p>
+              )}
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
               {t('tenants.tenantName')}
@@ -291,12 +385,13 @@ const Tenants: React.FC = () => {
               type="text"
               value={newTenantData.name}
               onChange={(e) => setNewTenantData({ ...newTenantData, name: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 
+              className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50
                        text-white placeholder-slate-500
-                       focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
+                       focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20
                        outline-none transition-all duration-300"
               placeholder="..."
               required
+              disabled={!hasActiveSubscription && !currentPlan}
             />
           </div>
           <div className="flex gap-3 pt-2">
@@ -311,6 +406,7 @@ const Tenants: React.FC = () => {
               type="submit"
               variant="gradient"
               fullWidth
+              isDisabled={!hasActiveSubscription && !currentPlan}
             >
               {t('common.create')}
             </AnimatedButton>

@@ -143,6 +143,7 @@ const resources = {
         detailedDesc: 'Comprehensive and thorough answers',
         answerStylesGuide: 'Answer Style Guide',
         settingsSaved: 'Settings saved successfully',
+        createError: 'Failed to create tenant',
       },
       // Documents
       documents: {
@@ -307,6 +308,12 @@ const resources = {
         planChanged: 'Plan changed successfully',
         gatewayChanged: 'Payment method changed successfully',
         subscriptionCancelled: 'Subscription cancelled',
+        noActivePlan: 'No Active Plan',
+        noActivePlanDesc: 'You need an active subscription to create tenants.',
+        viewPlans: 'View Plans',
+        projectsUsage: 'Projects Usage',
+        tenantLimitReached: 'You have reached your plan limit. Upgrade to create more.',
+        needSubscription: 'You need an active subscription to create a tenant. Please subscribe to a plan first.',
       },
       // Admin
       admin: {
@@ -520,6 +527,7 @@ const resources = {
         detailedDesc: 'إجابات شاملة ووافية',
         answerStylesGuide: 'دليل أنماط الإجابة',
         settingsSaved: 'تم حفظ الإعدادات بنجاح',
+        createError: 'فشل إنشاء المستأجر',
       },
       // Documents
       documents: {
@@ -684,6 +692,12 @@ const resources = {
         planChanged: 'تم تغيير الخطة بنجاح',
         gatewayChanged: 'تم تغيير طريقة الدفع بنجاح',
         subscriptionCancelled: 'تم إلغاء الاشتراك',
+        noActivePlan: 'لا يوجد خطة نشطة',
+        noActivePlanDesc: 'تحتاج إلى اشتراك نشط لإنشاء المستأجرين.',
+        viewPlans: 'عرض الخطط',
+        projectsUsage: 'استخدام المشاريع',
+        tenantLimitReached: 'لقد وصلت إلى الحد الأقصى لخطتك. قم بالترقية لإنشاء المزيد.',
+        needSubscription: 'تحتاج إلى اشتراك نشط لإنشاء مستأجر. يرجى الاشتراك في خطة أولاً.',
       },
       // Admin
       admin: {
