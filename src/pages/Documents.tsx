@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import { api } from '../services/api';
-import type { Document, Tenant } from '../types';
+import type { Document, Tenant, CrawlOptions } from '../types';
 import {
   Upload,
   FileText,
@@ -15,6 +15,10 @@ import {
   FileCode,
   FileType2,
   ArrowLeft,
+  ChevronDown,
+  ChevronUp,
+  Globe,
+  Settings,
 } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { AnimatedButton, IconButton } from '../components/ui/AnimatedButton';
@@ -33,6 +37,17 @@ const Documents: React.FC = () => {
   const [showUrlModal, setShowUrlModal] = useState(false);
   const [urlInput, setUrlInput] = useState('');
   const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
+  const [crawlEnabled, setCrawlEnabled] = useState(false);
+  const [showCrawlOptions, setShowCrawlOptions] = useState(false);
+  const [crawlOptions, setCrawlOptions] = useState<CrawlOptions>({
+    max_pages: 10,
+    max_depth: 1,
+    include_sitemap: true,
+    include_hreflang: true,
+    same_domain_only: true,
+    excluded_paths: ['/api/', '/admin/', '/login', '/signup', '/logout', '/cart', '/checkout', '/account'],
+    allowed_paths: [],
+  });
 
   useEffect(() => {
     if (!tenantId) {
@@ -114,12 +129,25 @@ const Documents: React.FC = () => {
   const handleIngestUrl = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tenantId || !urlInput) return;
-    
+
     try {
       setIsUploading(true);
-      await api.ingestUrl(tenantId, { url: urlInput });
+      const data = crawlEnabled
+        ? { url: urlInput, crawl: true, options: crawlOptions }
+        : { url: urlInput };
+
+      const response = await api.ingestUrl(tenantId, data);
       setShowUrlModal(false);
       setUrlInput('');
+      setCrawlEnabled(false);
+      setShowCrawlOptions(false);
+
+      // Show appropriate message based on response
+      if (crawlEnabled && response.data.pages_crawled) {
+        // TODO: Show toast with pages crawled info
+        console.log(`Crawled ${response.data.pages_crawled} pages`);
+      }
+
       await loadData();
     } catch (error) {
       console.error('Error ingesting URL:', error);
@@ -365,9 +393,14 @@ const Documents: React.FC = () => {
       {/* URL Ingest Modal */}
       <Modal
         isOpen={showUrlModal}
-        onClose={() => setShowUrlModal(false)}
+        onClose={() => {
+          setShowUrlModal(false);
+          setCrawlEnabled(false);
+          setShowCrawlOptions(false);
+          setUrlInput('');
+        }}
         title={t('documents.ingestUrl')}
-        size="sm"
+        size="lg"
       >
         <form onSubmit={handleIngestUrl} className="space-y-4">
           <div>
@@ -380,19 +413,176 @@ const Documents: React.FC = () => {
                 type="url"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50
                          text-white placeholder-slate-500
-                         focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 
+                         focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20
                          outline-none transition-all duration-300"
                 placeholder="https://..."
                 required
               />
             </div>
           </div>
+
+          {/* Crawl Toggle */}
+          <div className="flex items-center justify-between p-3 rounded-xl bg-slate-800/50 border border-slate-700/50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-purple-500/20">
+                <Globe size={18} className="text-purple-400" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-white">{t('documents.enableCrawl', 'Enable Multi-Page Crawling')}</label>
+                <p className="text-xs text-slate-400">{t('documents.crawlDesc', 'Crawl multiple pages from the website')}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setCrawlEnabled(!crawlEnabled);
+                if (!crawlEnabled) setShowCrawlOptions(true);
+              }}
+              className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
+                crawlEnabled ? 'bg-purple-500' : 'bg-slate-600'
+              }`}
+            >
+              <span
+                className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ${
+                  crawlEnabled ? 'translate-x-6' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Crawl Options */}
+          {crawlEnabled && (
+            <div className="space-y-4 p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-white flex items-center gap-2">
+                  <Settings size={16} className="text-slate-400" />
+                  {t('documents.crawlOptions', 'Crawl Options')}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowCrawlOptions(!showCrawlOptions)}
+                  className="text-slate-400 hover:text-white transition-colors"
+                >
+                  {showCrawlOptions ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                </button>
+              </div>
+
+              {showCrawlOptions && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1.5">
+                        {t('documents.maxPages', 'Max Pages')}
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={crawlOptions.max_pages}
+                        onChange={(e) => setCrawlOptions({ ...crawlOptions, max_pages: Math.min(Number(e.target.value), 100) })}
+                        className="w-full px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50
+                                 text-white text-sm
+                                 focus:border-purple-500/50 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1.5">
+                        {t('documents.maxDepth', 'Max Depth')}
+                      </label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={5}
+                        value={crawlOptions.max_depth}
+                        onChange={(e) => setCrawlOptions({ ...crawlOptions, max_depth: Math.min(Number(e.target.value), 5) })}
+                        className="w-full px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50
+                                 text-white text-sm
+                                 focus:border-purple-500/50 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Toggle Options */}
+                  <div className="space-y-3">
+                    <label className="flex items-center justify-between cursor-pointer">
+                      <span className="text-sm text-slate-300">{t('documents.includeSitemap', 'Include Sitemap')}</span>
+                      <input
+                        type="checkbox"
+                        checked={crawlOptions.include_sitemap}
+                        onChange={(e) => setCrawlOptions({ ...crawlOptions, include_sitemap: e.target.checked })}
+                        className="w-5 h-5 rounded border-slate-600 bg-slate-800 text-purple-500 focus:ring-purple-500"
+                      />
+                    </label>
+                    <label className="flex items-center justify-between cursor-pointer">
+                      <span className="text-sm text-slate-300">{t('documents.includeHreflang', 'Include Hreflang')}</span>
+                      <input
+                        type="checkbox"
+                        checked={crawlOptions.include_hreflang}
+                        onChange={(e) => setCrawlOptions({ ...crawlOptions, include_hreflang: e.target.checked })}
+                        className="w-5 h-5 rounded border-slate-600 bg-slate-800 text-purple-500 focus:ring-purple-500"
+                      />
+                    </label>
+                    <label className="flex items-center justify-between cursor-pointer">
+                      <span className="text-sm text-slate-300">{t('documents.sameDomainOnly', 'Same Domain Only')}</span>
+                      <input
+                        type="checkbox"
+                        checked={crawlOptions.same_domain_only}
+                        onChange={(e) => setCrawlOptions({ ...crawlOptions, same_domain_only: e.target.checked })}
+                        className="w-5 h-5 rounded border-slate-600 bg-slate-800 text-purple-500 focus:ring-purple-500"
+                      />
+                    </label>
+                  </div>
+
+                  {/* Path Filters */}
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">
+                      {t('documents.excludedPaths', 'Excluded Paths')}
+                    </label>
+                    <textarea
+                      value={crawlOptions.excluded_paths?.join(', ') || ''}
+                      onChange={(e) => setCrawlOptions({
+                        ...crawlOptions,
+                        excluded_paths: e.target.value.split(',').map(p => p.trim()).filter(Boolean)
+                      })}
+                      className="w-full px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50
+                               text-white text-sm placeholder-slate-500
+                               focus:border-purple-500/50 outline-none resize-none"
+                      rows={2}
+                      placeholder="/api/, /admin/, /login"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1.5">
+                      {t('documents.allowedPaths', 'Allowed Paths')}
+                    </label>
+                    <textarea
+                      value={crawlOptions.allowed_paths?.join(', ') || ''}
+                      onChange={(e) => setCrawlOptions({
+                        ...crawlOptions,
+                        allowed_paths: e.target.value.split(',').map(p => p.trim()).filter(Boolean)
+                      })}
+                      className="w-full px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50
+                               text-white text-sm placeholder-slate-500
+                               focus:border-purple-500/50 outline-none resize-none"
+                      rows={2}
+                      placeholder="/blog/, /docs/"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex gap-3">
             <AnimatedButton
               variant="ghost"
-              onClick={() => setShowUrlModal(false)}
+              onClick={() => {
+                setShowUrlModal(false);
+                setCrawlEnabled(false);
+                setShowCrawlOptions(false);
+              }}
               fullWidth
             >
               {t('common.cancel')}
@@ -403,7 +593,7 @@ const Documents: React.FC = () => {
               isLoading={isUploading}
               fullWidth
             >
-              {t('common.create')}
+              {crawlEnabled ? t('documents.startCrawl', 'Start Crawling') : t('common.create')}
             </AnimatedButton>
           </div>
         </form>

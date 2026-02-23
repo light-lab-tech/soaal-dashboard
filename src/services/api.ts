@@ -16,6 +16,7 @@ import type {
   CreateApiKeyData,
   Document,
   IngestUrlData,
+  IngestUrlResponse,
   PendingQuestion,
   AnswerData,
   FeedbackStats,
@@ -232,8 +233,8 @@ class ApiClient {
     return response.data;
   }
 
-  async ingestUrl(tenantId: string, data: IngestUrlData): Promise<ApiResponse<{ document_id: string; url: string; status: string }>> {
-    const response = await this.client.post<ApiResponse<{ document_id: string; url: string; status: string }>>(`/tenants/${tenantId}/documents/ingest-url`, data);
+  async ingestUrl(tenantId: string, data: IngestUrlData): Promise<ApiResponse<IngestUrlResponse>> {
+    const response = await this.client.post<ApiResponse<IngestUrlResponse>>(`/tenants/${tenantId}/documents/ingest-url`, data);
     return response.data;
   }
 

@@ -97,7 +97,27 @@ export interface Document {
   created_at: string;
 }
 
+export interface CrawlOptions {
+  max_pages?: number;
+  max_depth?: number;
+  include_sitemap?: boolean;
+  include_hreflang?: boolean;
+  same_domain_only?: boolean;
+  excluded_paths?: string[];
+  allowed_paths?: string[];
+}
+
 export interface IngestUrlData {
+  url: string;
+  crawl?: boolean;
+  options?: CrawlOptions;
+}
+
+export interface IngestUrlResponse {
+  document_ids: string[];
+  pages_found?: number;
+  pages_crawled?: number;
+  status: string;
   url: string;
 }
 

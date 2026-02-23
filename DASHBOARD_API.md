@@ -1093,11 +1093,13 @@ POST /tenants/{tenant_id}/documents
 
 ### Ingest URL
 
-Scrape and ingest content from a website URL.
+Scrape and ingest content from a website URL. Use `crawl: true` for multi-page crawling or omit it for single-page ingestion.
 
 ```
 POST /tenants/{tenant_id}/documents/ingest-url
 ```
+
+**Single-Page Ingestion (Default):**
 
 **Request Body:**
 ```json
@@ -1115,9 +1117,69 @@ POST /tenants/{tenant_id}/documents/ingest-url
     "url": "https://example.com/about",
     "status": "processing"
   },
-  "message": "URL ingestion started"
+  "message": "URL ingestion started successfully"
 }
 ```
+
+**Multi-Page Crawling:**
+
+**Request Body:**
+```json
+{
+  "url": "https://example.com",
+  "crawl": true,
+  "options": {
+    "max_pages": 50,
+    "max_depth": 2,
+    "include_sitemap": true,
+    "include_hreflang": true,
+    "same_domain_only": true,
+    "excluded_paths": ["/api/", "/admin/", "/login"],
+    "allowed_paths": []
+  }
+}
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| url | string | Required | The starting URL to crawl |
+| crawl | boolean | false | Set `true` to enable multi-page crawling |
+| options | object | See defaults | Crawl options (used when `crawl: true`) |
+| options.max_pages | int | 10 | Maximum pages to crawl (max 100) |
+| options.max_depth | int | 1 | Maximum link depth to follow (max 5) |
+| options.include_sitemap | bool | true | Parse sitemap.xml for URLs |
+| options.include_hreflang | bool | true | Include hreflang localized URLs |
+| options.same_domain_only | bool | true | Only crawl same domain pages |
+| options.excluded_paths | array | ["/api/", "/admin/", "/login", ...] | Skip these path prefixes |
+| options.allowed_paths | array | [] | Only crawl paths matching these (empty = all) |
+
+**Crawl Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "document_ids": ["uuid-1", "uuid-2", "uuid-3"],
+    "pages_found": 47,
+    "pages_crawled": 50,
+    "status": "processing",
+    "url": "https://example.com"
+  },
+  "message": "URL crawling started successfully - 50 pages queued for processing"
+}
+```
+
+**Crawl Features:**
+- **Sitemap Discovery**: Automatically finds and parses `/sitemap.xml`, `/sitemap_index.xml`, and WordPress sitemaps
+- **Hreflang Detection**: Discovers localized versions of pages (e.g., `/en/`, `/fr/`, `/de/`)
+- **Link Discovery**: Follows internal links up to the specified depth
+- **Smart Filtering**: Excludes common non-content paths (API, admin, login, cart, checkout)
+- **Domain Restriction**: By default, only crawls pages from the same domain
+
+**Plan Limits:**
+- Each page crawled counts against your `max_urls_ingest_per_month` limit
+- Free plan: 10 URL ingests/month
+- Pro plan: 500 URL ingests/month
+- Enterprise: Unlimited
 
 ---
 
