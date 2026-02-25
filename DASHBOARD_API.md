@@ -806,8 +806,40 @@ GET /tenants/{tenant_id}/chats/{chat_id}/messages
         "tenant_id": "uuid",
         "chat_id": "uuid",
         "role": "user",
-        "content": "Message text",
+        "content": "What are your pricing plans?",
         "token_usage": {},
+        "created_at": "2026-01-24T10:00:00Z"
+      },
+      {
+        "id": "uuid",
+        "tenant_id": "uuid",
+        "chat_id": "uuid",
+        "role": "assistant",
+        "content": "We offer three plans: Basic at $19/month, Premium at $49/month, and Enterprise at $99/month.",
+        "token_usage": {
+          "sources": [
+            {
+              "document_id": "doc-uuid",
+              "document_name": "pricing.md",
+              "chunk_index": 2,
+              "score": 0.92,
+              "snippet": "Basic Plan: $19/month\nPremium Plan: $49/month"
+            }
+          ],
+          "confidence": 0.92
+        },
+        "entities": {
+          "products": [
+            {"name": "Basic Plan", "price": "$19/month"},
+            {"name": "Premium Plan", "price": "$49/month"},
+            {"name": "Enterprise Plan", "price": "$99/month"}
+          ],
+          "pricing": [
+            {"product": "Basic Plan", "price": "$19", "period": "monthly"},
+            {"product": "Premium Plan", "price": "$49", "period": "monthly"},
+            {"product": "Enterprise Plan", "price": "$99", "period": "monthly"}
+          ]
+        },
         "created_at": "2026-01-24T10:00:00Z"
       }
     ],
@@ -817,6 +849,21 @@ GET /tenants/{tenant_id}/chats/{chat_id}/messages
   }
 }
 ```
+
+**Structured Entities:**
+
+Assistant messages include an `entities` field with structured data extracted from the response and knowledge base:
+
+| Entity Type | Description | Example Fields |
+|-------------|-------------|----------------|
+| `products` | Products mentioned | name, price, description, url, image_url |
+| `services` | Services offered | name, description, features[] |
+| `urls` | Links found | url, title, anchor_text |
+| `contacts` | Contact info | type (email/phone), value, label |
+| `pricing` | Pricing details | product, price, currency, period |
+| `locations` | Addresses | name, address, city, country |
+
+> **Note:** Entities are only extracted for SDK/API calls. Webhook endpoints (Telegram, etc.) receive plain text only.
 
 ---
 
@@ -1057,6 +1104,28 @@ These endpoints are called by Stripe and CryptoCloud when payment events occur. 
 ## Document Management
 
 Manage knowledge base documents for your tenant.
+
+> **Structured Entity Extraction:** Chat responses automatically include structured entities extracted from your knowledge base:
+> - **Products** with pricing, descriptions, URLs, and image URLs
+> - **URLs** and links found in documents (including image URLs)
+> - **Contact information** (emails, phones) with inferred labels
+> - **Pricing details** with associated plan/product URLs
+> - **Services** with feature lists
+> - **Locations** and addresses
+>
+> Product entities include optional `url` and `image_url` fields when available. Pricing entities are automatically linked to products, and URLs near product names are associated with those products. Images are extracted from content and stored in the URLs entity with `title: "image"`.
+>
+> These entities are returned in the `entities` field of message responses for SDK/API calls, enabling rich UI rendering in web clients while webhooks (Telegram, etc.) receive plain text only.
+
+> **Internal Scraper Enhancements:** The URL ingestion feature is powered by a production-grade scraper with the following built-in capabilities:
+> - **robots.txt Compliance** - Respects website robots.txt rules with per-host caching (24h TTL)
+> - **Content Deduplication** - SHA256 hashing + ETag/Last-Modified caching to avoid re-downloading unchanged content
+> - **Circuit Breaker** - Per-host circuit breakers with exponential backoff to handle failing servers gracefully
+> - **Structured Extraction** - Extracts metadata, headings (h1-h6), tables, code blocks, and links from HTML
+> - **Metrics & Observability** - Tracks requests, latency, errors, dedup stats, and circuit breaker events
+> - **Sitemap Discovery** - Automatically parses sitemap.xml for URL discovery during crawls
+>
+> These enhancements work transparently - no API changes are required.
 
 ### Upload Document
 
@@ -1309,6 +1378,110 @@ POST /tenants/{tenant_id}/pending-questions/{pending_question_id}/answer
 ```
 
 > **Note:** If `is_faq: true`, similar questions will instantly return this answer without calling the AI.
+
+---
+
+## Structured Entity Extraction
+
+Chat responses automatically include structured entities extracted from your knowledge base and AI responses. This enables rich UI rendering in web clients while maintaining plain text compatibility for webhooks.
+
+### How Entity Extraction Works
+
+1. **During RAG Search**: Entities are extracted from source document chunks (links, contacts, pricing from tables)
+2. **From AI Response**: Entities are extracted from the generated response (URLs, emails, phone numbers)
+3. **Both sources are merged** and returned in the `entities` field
+
+### Entity Types
+
+| Entity Type | Description | Example Fields |
+|-------------|-------------|----------------|
+| `products` | Products mentioned | name, price, description, url, image_url |
+| `services` | Services offered | name, description, features[] |
+| `urls` | Links found (including images) | url, title, anchor_text |
+| `contacts` | Contact information | type (email/phone), value, label |
+| `pricing` | Pricing details | product, price, currency, period, url |
+| `locations` | Addresses | name, address, city, country |
+
+### Response Format
+
+**SDK/API Response (includes entities):**
+```json
+{
+  "success": true,
+  "data": {
+    "response": "Our Premium Plan costs $99/month and includes 24/7 support.",
+    "sources": [...],
+    "entities": {
+      "products": [
+        {
+          "name": "Premium Plan",
+          "price": "$99/month",
+          "description": "24/7 support",
+          "url": "https://example.com/premium",
+          "image_url": "https://example.com/images/premium.png"
+        }
+      ],
+      "pricing": [
+        {
+          "product": "Premium Plan",
+          "price": "$99",
+          "period": "monthly",
+          "url": "https://example.com/premium"
+        }
+      ],
+      "contacts": [
+        {"type": "email", "value": "support@example.com", "label": "support"}
+      ],
+      "urls": [
+        {
+          "url": "https://example.com/premium",
+          "title": "Premium Plan",
+          "anchor_text": "View Premium Plan"
+        }
+      ]
+    }
+  }
+}
+```
+
+**Webhook Response (plain text only):**
+```json
+{
+  "success": true,
+  "data": {
+    "response": "Our Premium Plan costs $99/month and includes 24/7 support."
+  }
+}
+```
+
+### Channel Behavior
+
+| Channel | Entities | Description |
+|---------|----------|-------------|
+| **SDK** (Web/Mobile) | ✅ Yes | Full entities for rich UI rendering |
+| **API** (Direct calls) | ✅ Yes | Full entities for JSON consumers |
+| **Webhook** (Telegram/Facebook) | ❌ No | Plain text only (performance) |
+
+### Viewing Entities in Messages
+
+When you retrieve chat messages via the dashboard APIs, assistant messages include the `entities` field:
+
+```json
+{
+  "id": "msg-uuid",
+  "role": "assistant",
+  "content": "Our Premium Plan costs $99/month...",
+  "token_usage": {
+    "sources": [...],
+    "confidence": 0.92
+  },
+  "entities": {
+    "products": [...],
+    "pricing": [...]
+  },
+  "created_at": "2026-01-24T10:00:00Z"
+}
+```
 
 ---
 

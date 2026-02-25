@@ -170,13 +170,78 @@ export interface Chat {
   updated_at: string;
 }
 
+// Structured Entity Types for Chat Messages
+export interface MessageProduct {
+  name: string;
+  price?: string;
+  description?: string;
+  url?: string;
+  image_url?: string;
+}
+
+export interface MessageService {
+  name: string;
+  description?: string;
+  features?: string[];
+}
+
+export interface MessageUrl {
+  url: string;
+  title?: string;
+  anchor_text?: string;
+}
+
+export interface MessageContact {
+  type: 'email' | 'phone';
+  value: string;
+  label?: string;
+}
+
+export interface MessagePricing {
+  product: string;
+  price: string;
+  currency?: string;
+  period?: string;
+  url?: string;
+}
+
+export interface MessageLocation {
+  name: string;
+  address?: string;
+  city?: string;
+  country?: string;
+}
+
+export interface MessageEntities {
+  products?: MessageProduct[];
+  services?: MessageService[];
+  urls?: MessageUrl[];
+  contacts?: MessageContact[];
+  pricing?: MessagePricing[];
+  locations?: MessageLocation[];
+}
+
+export interface TokenUsageSources {
+  document_id: string;
+  document_name: string;
+  chunk_index: number;
+  score: number;
+  snippet: string;
+}
+
+export interface TokenUsage {
+  sources?: TokenUsageSources[];
+  confidence?: number;
+}
+
 export interface ChatMessage {
   id: string;
   tenant_id: string;
   chat_id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
-  token_usage?: Record<string, unknown>;
+  token_usage?: TokenUsage;
+  entities?: MessageEntities;
   created_at: string;
 }
 
