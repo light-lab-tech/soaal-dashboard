@@ -83,6 +83,9 @@ const resources = {
         searchPlaceholder: 'Search tenants...',
         noSearchResults: 'No tenants found',
         created: 'Created',
+        createTenantDesc: 'Set up a new tenant workspace',
+        uploadDocumentDesc: 'Add documents to knowledge base',
+        viewAnalyticsDesc: 'View performance insights',
       },
       // Tenants
       tenants: {
@@ -481,6 +484,9 @@ const resources = {
         searchPlaceholder: 'البحث في المستأجرين...',
         noSearchResults: 'لا يوجد مستأجرين',
         created: 'تم الإنشاء',
+        createTenantDesc: 'إنشاء مساحة عمل جديدة للمستأجر',
+        uploadDocumentDesc: 'إضافة مستندات إلى قاعدة المعرفة',
+        viewAnalyticsDesc: 'عرض رؤى الأداء',
       },
       // Tenants
       tenants: {

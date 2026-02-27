@@ -92,27 +92,27 @@ const Dashboard: React.FC = () => {
 
   // Quick actions with enhanced colors
   const quickActions = [
-    { 
-      icon: Building2, 
-      label: t('dashboard.createTenant'), 
-      onClick: () => navigate('/tenants'), 
+    {
+      icon: Building2,
+      label: t('dashboard.createTenant'),
+      onClick: () => navigate('/tenants'),
       color: 'purple' as const,
-      description: 'Set up a new tenant workspace',
+      description: t('dashboard.createTenantDesc'),
     },
-    { 
-      icon: FileText, 
-      label: t('dashboard.uploadDocument'), 
-      onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/documents`), 
+    {
+      icon: FileText,
+      label: t('dashboard.uploadDocument'),
+      onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/documents`),
       color: 'cyan' as const,
-      description: 'Add documents to knowledge base',
+      description: t('dashboard.uploadDocumentDesc'),
       disabled: tenants.length === 0,
     },
-    { 
-      icon: BarChart3, 
-      label: t('dashboard.viewAnalytics'), 
-      onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/analytics`), 
+    {
+      icon: BarChart3,
+      label: t('dashboard.viewAnalytics'),
+      onClick: () => tenants.length > 0 && navigate(`/tenants/${tenants[0].id}/analytics`),
       color: 'emerald' as const,
-      description: 'View performance insights',
+      description: t('dashboard.viewAnalyticsDesc'),
       disabled: tenants.length === 0,
     },
   ];
