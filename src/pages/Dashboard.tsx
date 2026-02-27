@@ -188,7 +188,7 @@ const Dashboard: React.FC = () => {
                 </span>
               </h1>
               <p className="text-slate-400 max-w-md">
-                t('dashboard.manageDescription')
+                {t('dashboard.manageDescription')}
               </p>
             </div>
             

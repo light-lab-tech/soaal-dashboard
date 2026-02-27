@@ -1,4 +1,5 @@
 import React, { useEffect, useState, ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -85,15 +86,16 @@ export const Modal: React.FC<ModalProps> = ({
     }, 200);
   };
 
-  const handleBackdropClick = () => {
-    if (closeOnBackdropClick) {
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // Only close if clicking the backdrop directly, not its children
+    if (e.target === e.currentTarget && closeOnBackdropClick) {
       handleClose();
     }
   };
 
   if (!isMounted && !isOpen) return null;
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
@@ -110,8 +112,8 @@ export const Modal: React.FC<ModalProps> = ({
           'relative w-full bg-slate-900/95 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-2xl',
           'transition-all duration-200',
           sizeConfig[size],
-          isClosing 
-            ? 'opacity-0 scale-95 translate-y-4' 
+          isClosing
+            ? 'opacity-0 scale-95 translate-y-4'
             : 'opacity-100 scale-100 translate-y-0',
           className
         )}
@@ -142,6 +144,7 @@ export const Modal: React.FC<ModalProps> = ({
             </div>
             {showCloseButton && (
               <button
+                type="button"
                 onClick={handleClose}
                 className="p-2 rounded-lg hover:bg-slate-800/50 text-slate-400 hover:text-white transition-colors"
               >
@@ -168,6 +171,8 @@ export const Modal: React.FC<ModalProps> = ({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 // Confirmation modal preset
