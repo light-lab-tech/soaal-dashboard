@@ -268,19 +268,23 @@ const Questions: React.FC = () => {
               {t('common.cancel')}
             </AnimatedButton>
             <AnimatedButton
-              type="submit"
+              type="button"
               variant="gradient"
               isLoading={isSubmitting}
               isDisabled={!answer.trim()}
               fullWidth
               icon={<Send size={16} />}
+              onClick={() => {
+                const form = document.querySelector('#answer-form') as HTMLFormElement;
+                if (form) form.requestSubmit();
+              }}
             >
               {t('questions.submitAnswer')}
             </AnimatedButton>
           </>
         )}
       >
-        <form onSubmit={handleSubmitAnswer} className="space-y-4">
+        <form id="answer-form" onSubmit={handleSubmitAnswer} className="space-y-4">
           {/* Question */}
           <GlassCard variant="outlined" className="p-4">
             <div className="flex items-center gap-2 mb-2">

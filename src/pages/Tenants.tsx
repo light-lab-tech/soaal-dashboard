@@ -332,17 +332,21 @@ const Tenants: React.FC = () => {
               {t('common.cancel')}
             </AnimatedButton>
             <AnimatedButton
-              type="submit"
+              type="button"
               variant="gradient"
               fullWidth
               isDisabled={!hasActiveSubscription && !currentPlan}
+              onClick={() => {
+                const form = document.querySelector('#create-tenant-form') as HTMLFormElement;
+                if (form) form.requestSubmit();
+              }}
             >
               {t('common.create')}
             </AnimatedButton>
           </>
         )}
       >
-        <form onSubmit={handleCreateTenant} className="space-y-4">
+        <form id="create-tenant-form" onSubmit={handleCreateTenant} className="space-y-4">
           {/* Plan/Limit Warning */}
           {!hasActiveSubscription && !currentPlan && (
             <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">

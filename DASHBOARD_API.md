@@ -7,6 +7,7 @@ This documentation covers all APIs used by company owners (tenants) to manage th
 ## Table of Contents
 
 0. [Plan Limitations](#plan-limitations)
+0.5. [Localization](#localization)
 1. [Authentication](#authentication)
    - [Register](#register), [Verify Email](#verify-email), [Resend Verification Email](#resend-verification-email), [Login](#login), [Logout](#logout), [Forgot Password](#forgot-password), [Reset Password](#reset-password)
 2. [Tenant Management](#tenant-management)
@@ -130,6 +131,73 @@ When a limit is reached, the API returns a **403 Forbidden** response with an er
 ### Checking Your Plan
 
 Use the **[Get My Subscription](#get-my-subscription)** endpoint to check your current plan and limits.
+
+---
+
+## Localization
+
+The API supports localization for plan-related content. You can request plan names, descriptions, and features in different languages by sending the `Accept-Language` header.
+
+### Accept-Language Header
+
+```
+Accept-Language: ar
+```
+
+**Supported Languages:**
+
+| Code | Language |
+|------|----------|
+| `en` | English (default) |
+| `ar` | Arabic |
+| `es` | Spanish |
+| `fr` | French |
+| `de` | German |
+| `it` | Italian |
+| `pt` | Portuguese |
+| `ru` | Russian |
+| `zh` | Chinese |
+| `ja` | Japanese |
+| `ko` | Korean |
+| `tr` | Turkish |
+
+### How It Works
+
+1. Send the `Accept-Language` header with your preferred language code
+2. The API returns localized `name`, `description`, and `features_summary` for plans
+3. If a localization doesn't exist for the requested language, English content is returned as fallback
+
+### Example Request
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" \
+     -H "Accept-Language: ar" \
+     https://your-domain.com/api/v1/billing/plans
+```
+
+### Example Response (Arabic)
+
+```json
+{
+  "success": true,
+  "data": {
+    "plans": [
+      {
+        "id": "uuid",
+        "name": "المحترف",
+        "slug": "pro",
+        "description": "للفرق المتنامية",
+        "features_summary": "10 مشاريع، 50 ألف رسالة شهرياً",
+        ...
+      }
+    ]
+  }
+}
+```
+
+### Managing Localizations (Admin)
+
+Plan localizations are managed at the database level. Contact your administrator to add localizations for new languages.
 
 ---
 
@@ -894,6 +962,16 @@ Get all active plans for the pricing page or dashboard.
 GET /billing/plans
 ```
 
+**Headers:**
+| Header | Type | Required | Description |
+|--------|------|----------|-------------|
+| Authorization | string | Yes | Bearer JWT token |
+| Accept-Language | string | No | Language code for localized plan content (e.g., `en`, `ar`, `es`, `fr`). Default: `en` |
+
+**Supported Languages:** `en` (English), `ar` (Arabic), `es` (Spanish), `fr` (French), `de` (German), `it` (Italian), `pt` (Portuguese), `ru` (Russian), `zh` (Chinese), `ja` (Japanese), `ko` (Korean), `tr` (Turkish)
+
+**Localization:** Plan `name`, `description`, and `features_summary` fields are returned in the requested language if available. If no localization exists for the requested language, English content is returned as fallback.
+
 **Response:**
 ```json
 {
@@ -974,6 +1052,14 @@ Get the current subscription for the authenticated user.
 ```
 GET /billing/subscription
 ```
+
+**Headers:**
+| Header | Type | Required | Description |
+|--------|------|----------|-------------|
+| Authorization | string | Yes | Bearer JWT token |
+| Accept-Language | string | No | Language code for localized plan content (e.g., `ar`, `en`). Default: `en` |
+
+The `plan` object in the response includes localized `name`, `description`, and `features_summary` based on the `Accept-Language` header.
 
 **Response (has subscription):**
 ```json

@@ -662,17 +662,21 @@ const Documents: React.FC = () => {
               {t('common.cancel')}
             </AnimatedButton>
             <AnimatedButton
-              type="submit"
+              type="button"
               variant="gradient"
               isLoading={isUploading}
               fullWidth
+              onClick={() => {
+                const form = document.querySelector('#url-ingest-form') as HTMLFormElement;
+                if (form) form.requestSubmit();
+              }}
             >
               {crawlEnabled ? t('documents.startCrawl', 'Start Crawling') : t('common.create')}
             </AnimatedButton>
           </>
         )}
       >
-        <form onSubmit={handleIngestUrl} className="space-y-4">
+        <form id="url-ingest-form" onSubmit={handleIngestUrl} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-2">
               {t('documents.url')}
@@ -922,17 +926,21 @@ const Documents: React.FC = () => {
               {t('common.cancel')}
             </AnimatedButton>
             <AnimatedButton
-              type="submit"
+              type="button"
               variant="gradient"
               isLoading={isUploading}
               fullWidth
+              onClick={() => {
+                const form = document.querySelector('#replace-url-form') as HTMLFormElement;
+                if (form) form.requestSubmit();
+              }}
             >
               {t('documents.replace', 'Replace')}
             </AnimatedButton>
           </>
         )}
       >
-        <form onSubmit={handleReplaceUrl} className="space-y-4">
+        <form id="replace-url-form" onSubmit={handleReplaceUrl} className="space-y-4">
           <p className="text-sm text-slate-400">
             {t('documents.replaceUrlDesc', 'This will replace the existing URL with a new one. The old content will be removed.')}
           </p>
