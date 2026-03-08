@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
@@ -15,17 +15,22 @@ import {
   FileJson,
   FileCode,
   FileType2,
+  FileSpreadsheet,
   ArrowLeft,
   ChevronDown,
   ChevronUp,
   Globe,
   Settings,
+  RefreshCw,
+  Edit,
+  ExternalLink,
 } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { AnimatedButton, IconButton } from '../components/ui/AnimatedButton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Modal } from '../components/ui/Modal';
 import { Badge } from '../components/ui/Badge';
+import { ConfirmModal } from '../components/ui/Modal';
 
 const Documents: React.FC = () => {
   const { t } = useTranslation();
@@ -37,10 +42,21 @@ const Documents: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [showUrlModal, setShowUrlModal] = useState(false);
+  const [showReplaceModal, setShowReplaceModal] = useState(false);
+  const [showReplaceUrlModal, setShowReplaceUrlModal] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState<Document | null>(null);
   const [urlInput, setUrlInput] = useState('');
+  const [replaceUrlInput, setReplaceUrlInput] = useState('');
   const [uploadProgress, setUploadProgress] = useState<{[key: string]: number}>({});
   const [crawlEnabled, setCrawlEnabled] = useState(false);
   const [showCrawlOptions, setShowCrawlOptions] = useState(false);
+  const [pollingDocs, setPollingDocs] = useState<Set<string>>(new Set());
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [docToDelete, setDocToDelete] = useState<Document | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const [crawlOptions, setCrawlOptions] = useState<CrawlOptions>({
     max_pages: 10,
     max_depth: 1,
@@ -51,6 +67,15 @@ const Documents: React.FC = () => {
     allowed_paths: [],
   });
 
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (!tenantId) {
       navigate('/tenants');
@@ -58,6 +83,76 @@ const Documents: React.FC = () => {
     }
     loadData();
   }, [tenantId]);
+
+  // Auto-poll for documents in processing status
+  useEffect(() => {
+    const processingDocs = documents.filter(d => d.status === 'processing');
+
+    if (processingDocs.length === 0) {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+      setPollingDocs(new Set());
+      return;
+    }
+
+    // Start polling if not already running
+    if (!pollIntervalRef.current) {
+      pollIntervalRef.current = setInterval(async () => {
+        if (!tenantId) return;
+
+        try {
+          const updatedDocs = [...documents];
+          let hasChanges = false;
+          const stillProcessing = new Set<string>();
+
+          for (const doc of processingDocs) {
+            try {
+              const response = await api.getDocumentStatus(tenantId, doc.id);
+              const updatedDoc = response.data.document;
+
+              const index = updatedDocs.findIndex(d => d.id === updatedDoc.id);
+              if (index !== -1) {
+                updatedDocs[index] = updatedDoc;
+                hasChanges = true;
+
+                if (updatedDoc.status === 'processing') {
+                  stillProcessing.add(updatedDoc.id);
+                } else if (updatedDoc.status === 'completed') {
+                  showToast(
+                    t('documents.documentReady', '{{name}} is now ready', { name: updatedDoc.name }),
+                    'success'
+                  );
+                } else if (updatedDoc.status === 'failed') {
+                  showToast(
+                    t('documents.documentFailed', '{{name}} processing failed', { name: updatedDoc.name }),
+                    'error'
+                  );
+                }
+              }
+            } catch (error) {
+              console.error('Error polling document status:', error);
+            }
+          }
+
+          if (hasChanges) {
+            setDocuments(updatedDocs);
+          }
+
+          setPollingDocs(stillProcessing);
+
+          // Stop polling if no more processing documents
+          if (stillProcessing.size === 0) {
+            clearInterval(pollIntervalRef.current!);
+            pollIntervalRef.current = null;
+          }
+        } catch (error) {
+          console.error('Error polling documents:', error);
+        }
+      }, 3000); // Poll every 3 seconds
+    }
+  }, [documents, tenantId, showToast, t]);
 
   const loadData = async () => {
     if (!tenantId) return;
@@ -86,7 +181,7 @@ const Documents: React.FC = () => {
     },
     onDrop: async (acceptedFiles) => {
       if (!tenantId) return;
-      
+
       for (const file of acceptedFiles) {
         await uploadDocument(file);
       }
@@ -98,20 +193,19 @@ const Documents: React.FC = () => {
     try {
       setIsUploading(true);
       setUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
-      
-      // Simulate progress
+
       const interval = setInterval(() => {
         setUploadProgress(prev => ({
           ...prev,
           [file.name]: Math.min((prev[file.name] || 0) + 10, 90)
         }));
       }, 200);
-      
+
       await api.uploadDocument(tenantId, file);
-      
+
       clearInterval(interval);
       setUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
-      
+
       setTimeout(() => {
         setUploadProgress(prev => {
           const newProgress = { ...prev };
@@ -119,10 +213,13 @@ const Documents: React.FC = () => {
           return newProgress;
         });
       }, 500);
-      
+
       await loadData();
-    } catch (error) {
+      showToast(t('documents.uploadSuccess', 'Document uploaded successfully'), 'success');
+    } catch (error: any) {
       console.error('Error uploading document:', error);
+      const errorMessage = error?.response?.data?.error || error?.message || t('common.error', 'An error occurred');
+      showToast(errorMessage, 'error');
     } finally {
       setIsUploading(false);
     }
@@ -144,7 +241,6 @@ const Documents: React.FC = () => {
       setCrawlEnabled(false);
       setShowCrawlOptions(false);
 
-      // Show appropriate message based on response
       if (crawlEnabled && response.data.pages_crawled) {
         showToast(
           t('documents.crawlSuccess', 'Crawled {{count}} pages successfully', { count: response.data.pages_crawled }),
@@ -167,30 +263,111 @@ const Documents: React.FC = () => {
     }
   };
 
-  const handleDeleteDocument = async (documentId: string) => {
-    if (!tenantId) return;
-    if (!confirm('Are you sure you want to delete this document?')) return;
+  const handleReplaceDocument = async (file: File) => {
+    if (!tenantId || !selectedDoc) return;
 
     try {
-      await api.deleteDocument(tenantId, documentId);
-      setDocuments(documents.filter((doc) => doc.id !== documentId));
-    } catch (error) {
+      setIsUploading(true);
+      await api.replaceDocument(tenantId, selectedDoc.id, file);
+      setShowReplaceModal(false);
+      setSelectedDoc(null);
+      showToast(t('documents.replaceSuccess', 'Document replaced successfully'), 'success');
+      await loadData();
+    } catch (error: any) {
+      console.error('Error replacing document:', error);
+      const errorMessage = error?.response?.data?.error || error?.message || t('common.error', 'Failed to replace document');
+      showToast(errorMessage, 'error');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleReplaceUrl = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tenantId || !selectedDoc || !replaceUrlInput) return;
+
+    try {
+      setIsUploading(true);
+      await api.replaceDocumentUrl(tenantId, selectedDoc.id, replaceUrlInput);
+      setShowReplaceUrlModal(false);
+      setSelectedDoc(null);
+      setReplaceUrlInput('');
+      showToast(t('documents.replaceUrlSuccess', 'Document URL replaced successfully'), 'success');
+      await loadData();
+    } catch (error: any) {
+      console.error('Error replacing document URL:', error);
+      const errorMessage = error?.response?.data?.error || error?.message || t('documents.ingestError', 'Failed to replace URL');
+      showToast(errorMessage, 'error');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeleteDocument = async (doc: Document) => {
+    setDocToDelete(doc);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteDocument = async () => {
+    if (!tenantId || !docToDelete) return;
+
+    try {
+      setIsDeleting(true);
+      await api.deleteDocument(tenantId, docToDelete.id);
+      setDocuments(documents.filter((doc) => doc.id !== docToDelete.id));
+      setShowDeleteModal(false);
+      setDocToDelete(null);
+      showToast(t('documents.deleteSuccess', 'Document deleted successfully'), 'success');
+    } catch (error: any) {
       console.error('Error deleting document:', error);
+      const errorMessage = error?.response?.data?.error || error?.message || t('common.error', 'Failed to delete document');
+      showToast(errorMessage, 'error');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleRefreshDocument = async (documentId: string) => {
+    if (!tenantId) return;
+    try {
+      const response = await api.getDocumentStatus(tenantId, documentId);
+      const updatedDoc = response.data.document;
+      setDocuments(docs => docs.map(d => d.id === updatedDoc.id ? updatedDoc : d));
+    } catch (error) {
+      console.error('Error refreshing document:', error);
     }
   };
 
   const getFileIcon = (fileType: string) => {
-    switch (fileType) {
-      case 'json':
-        return <FileJson size={20} className="text-cyan-400" />;
-      case 'html':
-        return <FileCode size={20} className="text-orange-400" />;
-      case 'md':
-        return <FileType2 size={20} className="text-blue-400" />;
-      case 'txt':
-      default:
-        return <FileText size={20} className="text-purple-400" />;
+    const type = fileType?.toLowerCase() || '';
+    if (type.includes('json') || type === 'application/json') {
+      return <FileJson size={20} className="text-cyan-400" />;
     }
+    if (type.includes('html') || type === 'text/html') {
+      return <FileCode size={20} className="text-orange-400" />;
+    }
+    if (type.includes('sheet') || type.includes('excel') || type.includes('xls') || type.includes('csv')) {
+      return <FileSpreadsheet size={20} className="text-green-400" />;
+    }
+    if (type.includes('word') || type.includes('docx') || type.includes('doc')) {
+      return <FileText size={20} className="text-blue-400" />;
+    }
+    if (type.includes('md') || type.includes('markdown')) {
+      return <FileType2 size={20} className="text-purple-400" />;
+    }
+    return <FileText size={20} className="text-slate-400" />;
+  };
+
+  const getFileTypeDisplay = (fileType: string) => {
+    const type = fileType?.toLowerCase() || '';
+    if (type.includes('pdf')) return 'PDF';
+    if (type.includes('json') || type === 'application/json') return 'JSON';
+    if (type.includes('html') || type === 'text/html') return 'HTML';
+    if (type.includes('sheet') || type.includes('excel') || type.includes('xls')) return 'Spreadsheet';
+    if (type.includes('word') || type.includes('docx') || type.includes('doc')) return 'Word';
+    if (type.includes('md') || type.includes('markdown')) return 'Markdown';
+    if (type.includes('txt') || type.includes('text')) return 'Text';
+    return 'Document';
   };
 
   const getStatusBadge = (status: string) => {
@@ -198,7 +375,12 @@ const Documents: React.FC = () => {
       case 'completed':
         return <Badge variant="success" size="sm" dot>{t('documents.completed')}</Badge>;
       case 'processing':
-        return <Badge variant="warning" size="sm" dot pulse>{t('documents.processing')}</Badge>;
+        return (
+          <div className="flex items-center gap-2">
+            <Badge variant="warning" size="sm" dot pulse>{t('documents.processing')}</Badge>
+            <RefreshCw size={12} className="text-purple-400 animate-spin" />
+          </div>
+        );
       case 'failed':
         return <Badge variant="danger" size="sm" dot>{t('documents.failed')}</Badge>;
       default:
@@ -212,6 +394,10 @@ const Documents: React.FC = () => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
+  const isUrlBasedDoc = (doc: Document) => {
+    return doc.name.startsWith('http://') || doc.name.startsWith('https://');
   };
 
   if (isLoading) {
@@ -243,7 +429,7 @@ const Documents: React.FC = () => {
               {t('documents.title')}
             </h1>
             <p className="text-slate-400">
-              {tenant?.name} • {documents.length} documents
+              {tenant?.name} • {documents.length} {t('documents.documents', 'documents')}
             </p>
           </div>
         </div>
@@ -270,8 +456,8 @@ const Documents: React.FC = () => {
         {...getRootProps()}
         className={`
           relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer
-          ${isDragActive 
-            ? 'border-purple-500 bg-purple-500/10 scale-[1.02]' 
+          ${isDragActive
+            ? 'border-purple-500 bg-purple-500/10 scale-[1.02]'
             : isDragReject
               ? 'border-red-500 bg-red-500/10'
               : 'border-slate-700/50 bg-slate-800/30 hover:border-slate-600/50 hover:bg-slate-800/50'
@@ -279,36 +465,35 @@ const Documents: React.FC = () => {
         `}
       >
         <input {...getInputProps()} id="file-upload" />
-        
-        {/* Animated background */}
+
         <div className={`
-          absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 
+          absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0
           transition-transform duration-1000
           ${isDragActive ? 'translate-x-full' : '-translate-x-full'}
         `} />
-        
+
         <div className="relative p-10 text-center">
           <div className={`
             w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center
             transition-all duration-300
-            ${isDragActive 
-              ? 'bg-purple-500 shadow-lg shadow-purple-500/40 scale-110' 
+            ${isDragActive
+              ? 'bg-purple-500 shadow-lg shadow-purple-500/40 scale-110'
               : 'bg-slate-700/50'
             }
           `}>
-            <Upload 
-              size={28} 
-              className={`transition-colors ${isDragActive ? 'text-white' : 'text-purple-400'}`} 
+            <Upload
+              size={28}
+              className={`transition-colors ${isDragActive ? 'text-white' : 'text-purple-400'}`}
             />
           </div>
-          
+
           <p className="text-lg font-medium text-white mb-2">
             {isDragActive ? t('documents.dropFilesHere') : t('documents.dragDrop')}
           </p>
           <p className="text-sm text-slate-400">
             {t('documents.supportedFormats')}
           </p>
-          
+
           {isDragReject && (
             <p className="mt-3 text-sm text-red-400 flex items-center justify-center gap-1">
               <AlertCircle size={14} />
@@ -329,7 +514,7 @@ const Documents: React.FC = () => {
                 <span className="text-xs text-slate-400">{progress}%</span>
               </div>
               <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
@@ -351,33 +536,87 @@ const Documents: React.FC = () => {
               animate
             >
               <div className="p-5" style={{ animationDelay: `${index * 50}ms` }}>
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start gap-3 mb-4">
                   <div className="p-3 rounded-xl bg-slate-700/50">
-                    {getFileIcon(doc.file_type)}
+                    {isUrlBasedDoc(doc) ? <ExternalLink size={20} className="text-cyan-400" /> : getFileIcon(doc.file_type)}
                   </div>
-                  {getStatusBadge(doc.status)}
+                  <div className="flex flex-col gap-1">
+                    {getStatusBadge(doc.status)}
+                    {pollingDocs.has(doc.id) && (
+                      <span className="text-[10px] text-slate-500">{t('documents.polling', 'Checking...')}</span>
+                    )}
+                  </div>
                 </div>
 
                 <h3 className="font-medium text-white mb-1 truncate" title={doc.name}>
-                  {doc.name}
+                  {isUrlBasedDoc(doc) ? (
+                    <a
+                      href={doc.name}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-cyan-300 hover:text-cyan-200"
+                    >
+                      {doc.name.length > 40 ? doc.name.substring(0, 40) + '...' : doc.name}
+                    </a>
+                  ) : (
+                    doc.name
+                  )}
                 </h3>
-                
+
                 <p className="text-sm text-slate-400 mb-4">
-                  {doc.file_type.toUpperCase()}
+                  {isUrlBasedDoc(doc) ? 'Web Page' : getFileTypeDisplay(doc.file_type)}
                   {doc.file_size && ` • ${formatFileSize(doc.file_size)}`}
                 </p>
 
-                <div className="flex items-center justify-between pt-4 border-t border-slate-700/50">
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 pt-4 border-t border-slate-700/50">
                   <span className="text-xs text-slate-500">
                     {new Date(doc.created_at).toLocaleDateString()}
                   </span>
-                  <IconButton
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteDocument(doc.id)}
-                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                    icon={<Trash2 size={16} />}
-                  />
+                  <div className="flex gap-1 ml-auto">
+                    {/* Refresh button for processing documents */}
+                    {doc.status === 'processing' && (
+                      <IconButton
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRefreshDocument(doc.id)}
+                        className="text-purple-400 hover:text-purple-300"
+                        icon={<RefreshCw size={14} />}
+                      />
+                    )}
+
+                    {/* Replace button */}
+                    {doc.status !== 'processing' && (
+                      <IconButton
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedDoc(doc);
+                          if (isUrlBasedDoc(doc)) {
+                            setReplaceUrlInput(doc.name);
+                            setShowReplaceUrlModal(true);
+                          } else {
+                            // Reset file input and show modal
+                            if (fileInputRef.current) {
+                              fileInputRef.current.value = '';
+                            }
+                            setShowReplaceModal(true);
+                          }
+                        }}
+                        className="text-blue-400 hover:text-blue-300"
+                        icon={<Edit size={14} />}
+                      />
+                    )}
+
+                    {/* Delete button */}
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteDocument(doc)}
+                      className="text-red-400 hover:text-red-300"
+                      icon={<Trash2 size={14} />}
+                    />
+                  </div>
                 </div>
               </div>
             </GlassCard>
@@ -515,7 +754,6 @@ const Documents: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Toggle Options */}
                   <div className="space-y-3">
                     <label className="flex items-center justify-between cursor-pointer">
                       <span className="text-sm text-slate-300">{t('documents.includeSitemap', 'Include Sitemap')}</span>
@@ -546,7 +784,6 @@ const Documents: React.FC = () => {
                     </label>
                   </div>
 
-                  {/* Path Filters */}
                   <div>
                     <label className="block text-xs font-medium text-slate-400 mb-1.5">
                       {t('documents.excludedPaths', 'Excluded Paths')}
@@ -588,6 +825,7 @@ const Documents: React.FC = () => {
 
           <div className="flex gap-3">
             <AnimatedButton
+              type="button"
               variant="ghost"
               onClick={() => {
                 setShowUrlModal(false);
@@ -609,6 +847,144 @@ const Documents: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Replace Document Modal (File) */}
+      <Modal
+        isOpen={showReplaceModal}
+        onClose={() => {
+          setShowReplaceModal(false);
+          setSelectedDoc(null);
+        }}
+        title={t('documents.replaceDocument', 'Replace Document')}
+        size="md"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-slate-400">
+            {t('documents.replaceDocumentDesc', 'This will replace the existing document with a new file. The old content will be removed.')}
+          </p>
+
+          {selectedDoc && (
+            <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
+              <p className="text-xs text-slate-500 mb-1">{t('documents.currentFile', 'Current File')}</p>
+              <p className="text-sm text-white truncate">{selectedDoc.name}</p>
+            </div>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setShowReplaceModal(false);
+                handleReplaceDocument(file);
+              }
+            }}
+            className="hidden"
+            accept=".txt,.md,.json,.html,.docx,.pdf"
+          />
+
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className="flex flex-col items-center gap-3 p-6 rounded-xl border-2 border-dashed border-slate-600 hover:border-purple-500/50 hover:bg-slate-800/30 transition-all cursor-pointer"
+          >
+            <Upload size={32} className="text-purple-400" />
+            <span className="text-sm text-white">{t('documents.selectNewFile', 'Select New File')}</span>
+            <span className="text-xs text-slate-500">Supported: TXT, MD, JSON, HTML, DOCX, PDF</span>
+          </div>
+
+          <AnimatedButton
+            variant="ghost"
+            onClick={() => {
+              setShowReplaceModal(false);
+              setSelectedDoc(null);
+            }}
+            fullWidth
+          >
+            {t('common.cancel')}
+          </AnimatedButton>
+        </div>
+      </Modal>
+
+      {/* Replace URL Modal */}
+      <Modal
+        isOpen={showReplaceUrlModal}
+        onClose={() => {
+          setShowReplaceUrlModal(false);
+          setSelectedDoc(null);
+          setReplaceUrlInput('');
+        }}
+        title={t('documents.replaceUrl', 'Replace Document URL')}
+        size="md"
+      >
+        <form onSubmit={handleReplaceUrl} className="space-y-4">
+          <p className="text-sm text-slate-400">
+            {t('documents.replaceUrlDesc', 'This will replace the existing URL with a new one. The old content will be removed.')}
+          </p>
+
+          {selectedDoc && (
+            <div className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/50">
+              <p className="text-xs text-slate-500 mb-1">{t('documents.currentUrl', 'Current URL')}</p>
+              <p className="text-sm text-cyan-300 break-all">{selectedDoc.name}</p>
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">
+              {t('documents.newUrl', 'New URL')}
+            </label>
+            <input
+              type="url"
+              value={replaceUrlInput}
+              onChange={(e) => setReplaceUrlInput(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50
+                       text-white placeholder-slate-500
+                       focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20
+                       outline-none transition-all duration-300"
+              placeholder="https://..."
+              required
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <AnimatedButton
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setShowReplaceUrlModal(false);
+                setSelectedDoc(null);
+                setReplaceUrlInput('');
+              }}
+              fullWidth
+            >
+              {t('common.cancel')}
+            </AnimatedButton>
+            <AnimatedButton
+              type="submit"
+              variant="gradient"
+              isLoading={isUploading}
+              fullWidth
+            >
+              {t('documents.replace', 'Replace')}
+            </AnimatedButton>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDocToDelete(null);
+        }}
+        onConfirm={confirmDeleteDocument}
+        message={docToDelete ? t('documents.deleteConfirmMessage', 'Are you sure you want to delete "{{name}}"? This action cannot be undone.', { name: docToDelete.name }) : ''}
+        confirmLabel={t('documents.delete', 'Delete')}
+        cancelLabel={t('common.cancel', 'Cancel')}
+        variant="danger"
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

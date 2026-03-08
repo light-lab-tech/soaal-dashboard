@@ -27,10 +27,19 @@ This documentation covers all APIs used by company owners (tenants) to manage th
    - [Change Gateway](#change-gateway)
    - [Cancel Subscription](#cancel-subscription)
 4. [Document Management](#document-management)
+   - [Upload Document](#upload-document)
+   - [Ingest URL](#ingest-url)
+   - [List Documents](#list-documents)
+   - [Get Document Status](#get-document-status)
+   - [Replace Document](#replace-document)
+   - [Replace Document URL](#replace-document-url)
+   - [Delete Document](#delete-document)
 5. [Pending Questions](#pending-questions)
 6. [Feedback Analytics](#feedback-analytics)
 7. [Telegram Bot Integration](#telegram-bot-integration)
-8. [Admin APIs](#admin-apis-super-admin-only)
+8. [Custom System Prompt](#custom-system-prompt)
+9. [Structured Entity Extraction](#structured-entity-extraction)
+10. [Admin APIs](#admin-apis-super-admin-only)
    - [User Management](#admin-apis---user-management)
    - [Tenant Management](#admin-apis---tenant-management)
    - [User Subscription & Tenants](#admin-apis---user-subscription--tenants)
@@ -1105,6 +1114,13 @@ These endpoints are called by Stripe and CryptoCloud when payment events occur. 
 
 Manage knowledge base documents for your tenant.
 
+> **Asynchronous Processing:** Document uploads and URL ingestions are processed asynchronously. The initial response returns `status: "processing"` immediately. Use the **Get Document Status** endpoint to poll for completion.
+
+> **Processing Times:**
+> - Small files (< 10 pages): ~30 seconds
+> - Medium files (10-50 pages): ~1-2 minutes
+> - Large files (50-100 pages): ~2-5 minutes
+
 > **Structured Entity Extraction:** Chat responses automatically include structured entities extracted from your knowledge base:
 > - **Products** with pricing, descriptions, URLs, and image URLs
 > - **URLs** and links found in documents (including image URLs)
@@ -1147,16 +1163,14 @@ POST /tenants/{tenant_id}/documents
 {
   "success": true,
   "data": {
-    "document": {
-      "id": "uuid",
-      "name": "product-guide.md",
-      "file_type": "text/markdown",
-      "status": "processing"
-    }
+    "document_id": "uuid",
+    "status": "processing"
   },
   "message": "Document uploaded successfully"
 }
 ```
+
+> **Note:** For very large documents, content is truncated when stored in the vector database to stay within the 10KB metadata limit. Full content remains available in the database for RAG retrieval.
 
 ---
 
@@ -1279,6 +1293,73 @@ GET /tenants/{tenant_id}/documents
 }
 ```
 
+**Status Values:**
+| Status | Description |
+|--------|-------------|
+| `processing` | Document is being chunked and embedded |
+| `completed` | Document successfully processed and searchable |
+| `failed` | Processing failed (check logs for details) |
+
+---
+
+### Get Document Status
+
+Get the current status and details of a specific document. Use this to poll for processing completion.
+
+```
+GET /tenants/{tenant_id}/documents/{document_id}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "document": {
+      "id": "uuid",
+      "name": "product-guide.md",
+      "file_type": "text/markdown",
+      "file_size": 15420,
+      "status": "completed",
+      "created_at": "2026-01-24T10:00:00Z",
+      "updated_at": "2026-01-24T10:02:30Z"
+    }
+  }
+}
+```
+
+**Polling Example:**
+```javascript
+async function uploadAndPoll(file, tenantId) {
+  // 1. Upload document
+  const uploadRes = await fetch(`/api/v1/tenants/${tenantId}/documents`, {
+    method: 'POST',
+    body: formData
+  });
+  const { data: { document } } = await uploadRes.json();
+
+  // 2. Poll for completion
+  while (true) {
+    const statusRes = await fetch(
+      `/api/v1/tenants/${tenantId}/documents/${document.id}`
+    );
+    const { data: { document: doc } } = await statusRes.json();
+
+    if (doc.status === 'completed') {
+      console.log('Document ready!');
+      break;
+    }
+    if (doc.status === 'failed') {
+      console.error('Processing failed');
+      break;
+    }
+
+    // Wait 2 seconds before polling again
+    await new Promise(r => setTimeout(r, 2000));
+  }
+}
+```
+
 ---
 
 ### Delete Document
@@ -1294,6 +1375,58 @@ DELETE /tenants/{tenant_id}/documents/{document_id}
 {
   "success": true,
   "message": "Document deleted successfully"
+}
+```
+
+---
+
+### Replace Document
+
+Replace an existing document with a new file. This deletes the old chunks/vectors and processes the new content.
+
+```
+PUT /tenants/{tenant_id}/documents/{document_id}
+```
+
+**Content-Type:** `multipart/form-data`
+
+**Form Data:**
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| file | file | Yes | New document file |
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Document replaced successfully. It will be processed in the background."
+}
+```
+
+> **Note:** The document keeps the same ID. Old chunks are deleted from the vector database and replaced with new ones.
+
+---
+
+### Replace Document URL
+
+Replace an existing URL-based document with a new URL. This deletes the old chunks/vectors and processes the new URL content.
+
+```
+POST /tenants/{tenant_id}/documents/{document_id}/replace-url
+```
+
+**Request Body:**
+```json
+{
+  "url": "https://example.com/new-page"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "URL replaced successfully. It will be processed in the background."
 }
 ```
 
@@ -1630,6 +1763,89 @@ curl "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook?url=https://your-domain
 ```
 
 2. The bot will now respond to messages using your knowledge base.
+
+---
+
+## Custom System Prompt
+
+Customize the AI's behavior by setting a system prompt for your tenant. This feature requires a Pro plan or higher.
+
+> **Plan Requirement:** Custom system prompts require a Pro plan or Enterprise plan. Free plan users cannot set custom prompts.
+
+### Set System Prompt
+
+Set or update the custom system prompt for your tenant. Pass an empty string to clear and use the default prompt.
+
+```
+POST /tenants/{tenant_id}/system-prompt
+```
+
+**Request Body:**
+```json
+{
+  "system_prompt": "You are a helpful customer support assistant for Acme Inc. Always respond in a friendly and professional tone."
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| system_prompt | string | Yes | The custom system prompt. Empty string clears to default. |
+
+**Response (Set):**
+```json
+{
+  "success": true,
+  "message": "System prompt updated successfully"
+}
+```
+
+**Response (Cleared):**
+```json
+{
+  "success": true,
+  "message": "System prompt cleared (using default)"
+}
+```
+
+**Error (Free Plan):**
+```json
+{
+  "success": false,
+  "error": "Custom system prompts require a Pro plan or higher. Upgrade your plan to use this feature."
+}
+```
+
+---
+
+### Get System Prompt
+
+Retrieve the current system prompt for your tenant.
+
+```
+GET /tenants/{tenant_id}/system-prompt
+```
+
+**Response (Custom Prompt Set):**
+```json
+{
+  "success": true,
+  "data": {
+    "system_prompt": "You are a helpful customer support assistant for Acme Inc.",
+    "is_custom": true
+  }
+}
+```
+
+**Response (Using Default):**
+```json
+{
+  "success": true,
+  "data": {
+    "system_prompt": "",
+    "is_custom": false
+  }
+}
+```
 
 ---
 

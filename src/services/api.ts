@@ -243,6 +243,32 @@ class ApiClient {
     return response.data;
   }
 
+  async getDocumentStatus(tenantId: string, documentId: string): Promise<ApiResponse<{ document: Document }>> {
+    const response = await this.client.get<ApiResponse<{ document: Document }>>(`/tenants/${tenantId}/documents/${documentId}`);
+    return response.data;
+  }
+
+  async replaceDocument(tenantId: string, documentId: string, file: File): Promise<ApiResponse<void>> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await this.client.put<ApiResponse<void>>(
+      `/tenants/${tenantId}/documents/${documentId}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  }
+
+  async replaceDocumentUrl(tenantId: string, documentId: string, url: string): Promise<ApiResponse<void>> {
+    const response = await this.client.post<ApiResponse<void>>(`/tenants/${tenantId}/documents/${documentId}/replace-url`, { url });
+    return response.data;
+  }
+
   // Pending Questions Endpoints
   async getPendingQuestions(tenantId: string, params?: { status?: string; page?: number; limit?: number }): Promise<ApiResponse<{ questions: PendingQuestion[]; pagination: Pagination }>> {
     const response = await this.client.get<ApiResponse<{ questions: PendingQuestion[]; pagination: Pagination }>>(`/tenants/${tenantId}/pending-questions`, { params });
