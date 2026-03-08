@@ -147,6 +147,7 @@ const resources = {
         answerStylesGuide: 'Answer Style Guide',
         settingsSaved: 'Settings saved successfully',
         createError: 'Failed to create tenant',
+        searchPlaceholder: 'Search tenants...',
       },
       // Documents
       documents: {
@@ -565,6 +566,7 @@ const resources = {
         answerStylesGuide: 'دليل أنماط الإجابة',
         settingsSaved: 'تم حفظ الإعدادات بنجاح',
         createError: 'فشل إنشاء المستأجر',
+        searchPlaceholder: 'البحث في المستأجرين...',
       },
       // Documents
       documents: {
