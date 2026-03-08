@@ -255,6 +255,30 @@ const Questions: React.FC = () => {
         onClose={handleCloseModal}
         title={t('questions.answerQuestion')}
         size="lg"
+        footer={(close) => (
+          <>
+            <AnimatedButton
+              variant="ghost"
+              onClick={() => {
+                close();
+                handleCloseModal();
+              }}
+              fullWidth
+            >
+              {t('common.cancel')}
+            </AnimatedButton>
+            <AnimatedButton
+              type="submit"
+              variant="gradient"
+              isLoading={isSubmitting}
+              isDisabled={!answer.trim()}
+              fullWidth
+              icon={<Send size={16} />}
+            >
+              {t('questions.submitAnswer')}
+            </AnimatedButton>
+          </>
+        )}
       >
         <form onSubmit={handleSubmitAnswer} className="space-y-4">
           {/* Question */}
@@ -303,27 +327,6 @@ const Questions: React.FC = () => {
             <p className="text-xs text-slate-500">
               {t('questions.prioritizeForSimilar')}
             </p>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-3 pt-2">
-            <AnimatedButton
-              variant="ghost"
-              onClick={handleCloseModal}
-              fullWidth
-            >
-              {t('common.cancel')}
-            </AnimatedButton>
-            <AnimatedButton
-              type="submit"
-              variant="gradient"
-              isLoading={isSubmitting}
-              isDisabled={!answer.trim()}
-              fullWidth
-              icon={<Send size={16} />}
-            >
-              {t('questions.submitAnswer')}
-            </AnimatedButton>
           </div>
         </form>
       </Modal>

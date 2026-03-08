@@ -322,6 +322,25 @@ const Tenants: React.FC = () => {
         onClose={() => setShowCreateModal(false)}
         title={t('tenants.createTenant')}
         size="sm"
+        footer={(close) => (
+          <>
+            <AnimatedButton
+              variant="ghost"
+              onClick={close}
+              fullWidth
+            >
+              {t('common.cancel')}
+            </AnimatedButton>
+            <AnimatedButton
+              type="submit"
+              variant="gradient"
+              fullWidth
+              isDisabled={!hasActiveSubscription && !currentPlan}
+            >
+              {t('common.create')}
+            </AnimatedButton>
+          </>
+        )}
       >
         <form onSubmit={handleCreateTenant} className="space-y-4">
           {/* Plan/Limit Warning */}
@@ -393,23 +412,6 @@ const Tenants: React.FC = () => {
               required
               disabled={!hasActiveSubscription && !currentPlan}
             />
-          </div>
-          <div className="flex gap-3 pt-2">
-            <AnimatedButton
-              variant="ghost"
-              onClick={() => setShowCreateModal(false)}
-              fullWidth
-            >
-              {t('common.cancel')}
-            </AnimatedButton>
-            <AnimatedButton
-              type="submit"
-              variant="gradient"
-              fullWidth
-              isDisabled={!hasActiveSubscription && !currentPlan}
-            >
-              {t('common.create')}
-            </AnimatedButton>
           </div>
         </form>
       </Modal>

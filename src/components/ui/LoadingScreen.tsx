@@ -9,7 +9,7 @@ export interface LoadingScreenProps {
 }
 
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({
-  message = 'Loading...',
+  message = t('common.loading'),
   size = 'md',
   fullscreen = true,
   showLogo = true,
@@ -114,6 +114,7 @@ export const SkeletonGrid: React.FC<{ count?: number; className?: string }> = ({
 
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { t } from 'i18next';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

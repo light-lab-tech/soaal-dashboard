@@ -651,6 +651,26 @@ const Documents: React.FC = () => {
         }}
         title={t('documents.ingestUrl')}
         size="lg"
+        footer={(close) => (
+          <>
+            <AnimatedButton
+              type="button"
+              variant="ghost"
+              onClick={close}
+              fullWidth
+            >
+              {t('common.cancel')}
+            </AnimatedButton>
+            <AnimatedButton
+              type="submit"
+              variant="gradient"
+              isLoading={isUploading}
+              fullWidth
+            >
+              {crawlEnabled ? t('documents.startCrawl', 'Start Crawling') : t('common.create')}
+            </AnimatedButton>
+          </>
+        )}
       >
         <form onSubmit={handleIngestUrl} className="space-y-4">
           <div>
@@ -822,29 +842,6 @@ const Documents: React.FC = () => {
               )}
             </div>
           )}
-
-          <div className="flex gap-3">
-            <AnimatedButton
-              type="button"
-              variant="ghost"
-              onClick={() => {
-                setShowUrlModal(false);
-                setCrawlEnabled(false);
-                setShowCrawlOptions(false);
-              }}
-              fullWidth
-            >
-              {t('common.cancel')}
-            </AnimatedButton>
-            <AnimatedButton
-              type="submit"
-              variant="gradient"
-              isLoading={isUploading}
-              fullWidth
-            >
-              {crawlEnabled ? t('documents.startCrawl', 'Start Crawling') : t('common.create')}
-            </AnimatedButton>
-          </div>
         </form>
       </Modal>
 
@@ -857,6 +854,15 @@ const Documents: React.FC = () => {
         }}
         title={t('documents.replaceDocument', 'Replace Document')}
         size="md"
+        footer={(close) => (
+          <AnimatedButton
+            variant="ghost"
+            onClick={close}
+            fullWidth
+          >
+            {t('common.cancel')}
+          </AnimatedButton>
+        )}
       >
         <div className="space-y-4">
           <p className="text-sm text-slate-400">
@@ -892,17 +898,6 @@ const Documents: React.FC = () => {
             <span className="text-sm text-white">{t('documents.selectNewFile', 'Select New File')}</span>
             <span className="text-xs text-slate-500">Supported: TXT, MD, JSON, HTML, DOCX, PDF</span>
           </div>
-
-          <AnimatedButton
-            variant="ghost"
-            onClick={() => {
-              setShowReplaceModal(false);
-              setSelectedDoc(null);
-            }}
-            fullWidth
-          >
-            {t('common.cancel')}
-          </AnimatedButton>
         </div>
       </Modal>
 
@@ -916,6 +911,26 @@ const Documents: React.FC = () => {
         }}
         title={t('documents.replaceUrl', 'Replace Document URL')}
         size="md"
+        footer={(close) => (
+          <>
+            <AnimatedButton
+              type="button"
+              variant="ghost"
+              onClick={close}
+              fullWidth
+            >
+              {t('common.cancel')}
+            </AnimatedButton>
+            <AnimatedButton
+              type="submit"
+              variant="gradient"
+              isLoading={isUploading}
+              fullWidth
+            >
+              {t('documents.replace', 'Replace')}
+            </AnimatedButton>
+          </>
+        )}
       >
         <form onSubmit={handleReplaceUrl} className="space-y-4">
           <p className="text-sm text-slate-400">
@@ -944,29 +959,6 @@ const Documents: React.FC = () => {
               placeholder="https://..."
               required
             />
-          </div>
-
-          <div className="flex gap-3">
-            <AnimatedButton
-              type="button"
-              variant="ghost"
-              onClick={() => {
-                setShowReplaceUrlModal(false);
-                setSelectedDoc(null);
-                setReplaceUrlInput('');
-              }}
-              fullWidth
-            >
-              {t('common.cancel')}
-            </AnimatedButton>
-            <AnimatedButton
-              type="submit"
-              variant="gradient"
-              isLoading={isUploading}
-              fullWidth
-            >
-              {t('documents.replace', 'Replace')}
-            </AnimatedButton>
           </div>
         </form>
       </Modal>

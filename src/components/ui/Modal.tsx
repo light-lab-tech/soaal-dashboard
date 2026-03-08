@@ -15,7 +15,7 @@ export interface ModalProps {
   title?: string;
   description?: string;
   children: ReactNode;
-  footer?: ReactNode;
+  footer?: ReactNode | ((close: () => void) => ReactNode);
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'fullscreen';
   showCloseButton?: boolean;
   closeOnBackdropClick?: boolean;
@@ -165,7 +165,7 @@ export const Modal: React.FC<ModalProps> = ({
             'px-6 py-4 border-t border-slate-700/50 flex items-center justify-end gap-3',
             footerClassName
           )}>
-            {footer}
+            {typeof footer === 'function' ? footer(handleClose) : footer}
           </div>
         )}
       </div>
@@ -208,11 +208,11 @@ export const ConfirmModal: React.FC<
       {...props}
       onClose={onClose}
       size="sm"
-      footer={
+      footer={(close) => (
         <>
           <AnimatedButton
             variant="ghost"
-            onClick={onClose}
+            onClick={close}
             isDisabled={isLoading}
           >
             {cancelLabel}
@@ -225,7 +225,7 @@ export const ConfirmModal: React.FC<
             {confirmLabel}
           </AnimatedButton>
         </>
-      }
+      )}
     >
       <div className="flex items-start gap-4">
         <span className="text-2xl">{config.icon}</span>
