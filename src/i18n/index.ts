@@ -161,6 +161,13 @@ const resources = {
         faqThresholdDesc: 'Similarity score (0.1-1.0) to match questions to FAQs',
         minChunkScore: 'Min Chunk Score',
         minChunkScoreDesc: 'Minimum relevance score (0.1-1.0) for content retrieval',
+        enableHybridSearch: 'Hybrid Search',
+        enableHybridSearchDesc: 'Re-rank vector matches with lexical keywords',
+        enableQueryRewrite: 'Query Rewrite',
+        enableQueryRewriteDesc: 'Expand short questions for better retrieval',
+        enablePhraseMatch: 'Phrase Match',
+        enablePhraseMatchDesc: 'Boost exact phrase matches in content',
+        retrievalDebug: 'Retrieval Debug',
       },
       // Documents
       documents: {
@@ -597,6 +604,13 @@ const resources = {
         faqThresholdDesc: 'درجة التشابه (0.1-1.0) لمطابقة الأسئلة بالأسئلة الشائعة',
         minChunkScore: 'أدنى درجة للجزء',
         minChunkScoreDesc: 'أدنى درجة الصلة (0.1-1.0) لاسترجاع المحتوى',
+        enableHybridSearch: 'البحث الهجين',
+        enableHybridSearchDesc: 'إعادة ترتيب المطابقات باستخدام الكلمات المفتاحية',
+        enableQueryRewrite: 'إعادة صياغة الاستعلام',
+        enableQueryRewriteDesc: 'توسيع الأسئلة القصيرة لاسترجاج أفضل',
+        enablePhraseMatch: 'مطابقة العبارات',
+        enablePhraseMatchDesc: 'تعزيز المطابقات الدقيقة في المحتوى',
+        retrievalDebug: 'تصحيح الاسترجاع',
       },
       // Documents
       documents: {

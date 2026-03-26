@@ -35,6 +35,8 @@ import type {
   TenantAnalytics,
   TenantSettings,
   UpdateTenantSettingsData,
+  RetrievalDebugRequest,
+  RetrievalDebugResponse,
 } from '../types';
 
 class ApiClient {
@@ -180,6 +182,11 @@ class ApiClient {
 
   async updateTenantSettings(tenantId: string, data: UpdateTenantSettingsData): Promise<ApiResponse<void>> {
     const response = await this.client.put<ApiResponse<void>>(`/tenants/${tenantId}/settings`, data);
+    return response.data;
+  }
+
+  async retrievalDebug(tenantId: string, data: RetrievalDebugRequest): Promise<ApiResponse<RetrievalDebugResponse>> {
+    const response = await this.client.post<ApiResponse<RetrievalDebugResponse>>(`/tenants/${tenantId}/retrieval/debug`, data);
     return response.data;
   }
 

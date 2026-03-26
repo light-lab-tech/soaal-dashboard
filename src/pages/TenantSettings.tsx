@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import type { Tenant, TenantSettings as TenantSettingsType } from '../types';
+import RetrievalDebug from '../components/RetrievalDebug';
 import {
   Settings as SettingsIcon,
   ArrowLeft,
@@ -30,6 +31,9 @@ const TenantSettings: React.FC = () => {
     settings: {},
     answer_quality: {
       quality_profile: 'balanced',
+      enable_hybrid_search: true,
+      enable_query_rewrite: true,
+      enable_phrase_match: true,
       faq_threshold: 0.5,
       min_chunk_score: 0.5,
     },
@@ -422,7 +426,127 @@ const TenantSettings: React.FC = () => {
               {t('tenants.minChunkScoreDesc')}
             </p>
           </div>
+
+          {/* Toggle Settings */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Enable Hybrid Search */}
+            <div className="glass-card-surface p-4 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="block text-sm font-medium text-glass-text">
+                    {t('tenants.enableHybridSearch')}
+                  </label>
+                  <p className="text-xs text-glass-textSecondary mt-1">
+                    {t('tenants.enableHybridSearchDesc')}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setSettings({
+                      ...settings,
+                      answer_quality: {
+                        ...settings.answer_quality!,
+                        enable_hybrid_search: !settings.answer_quality?.enable_hybrid_search,
+                      },
+                    });
+                    setHasChanges(true);
+                  }}
+                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                    settings.answer_quality?.enable_hybrid_search ? 'bg-[#8B00E8]' : 'bg-slate-600'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      settings.answer_quality?.enable_hybrid_search ? 'translate-x-7' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Enable Query Rewrite */}
+            <div className="glass-card-surface p-4 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="block text-sm font-medium text-glass-text">
+                    {t('tenants.enableQueryRewrite')}
+                  </label>
+                  <p className="text-xs text-glass-textSecondary mt-1">
+                    {t('tenants.enableQueryRewriteDesc')}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setSettings({
+                      ...settings,
+                      answer_quality: {
+                        ...settings.answer_quality!,
+                        enable_query_rewrite: !settings.answer_quality?.enable_query_rewrite,
+                      },
+                    });
+                    setHasChanges(true);
+                  }}
+                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                    settings.answer_quality?.enable_query_rewrite ? 'bg-[#8B00E8]' : 'bg-slate-600'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      settings.answer_quality?.enable_query_rewrite ? 'translate-x-7' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Enable Phrase Match */}
+            <div className="glass-card-surface p-4 rounded-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="block text-sm font-medium text-glass-text">
+                    {t('tenants.enablePhraseMatch')}
+                  </label>
+                  <p className="text-xs text-glass-textSecondary mt-1">
+                    {t('tenants.enablePhraseMatchDesc')}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setSettings({
+                      ...settings,
+                      answer_quality: {
+                        ...settings.answer_quality!,
+                        enable_phrase_match: !settings.answer_quality?.enable_phrase_match,
+                      },
+                    });
+                    setHasChanges(true);
+                  }}
+                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                    settings.answer_quality?.enable_phrase_match ? 'bg-[#8B00E8]' : 'bg-slate-600'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      settings.answer_quality?.enable_phrase_match ? 'translate-x-7' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Retrieval Debug */}
+      <div className="glass-card p-4">
+        <h2 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
+          <Brain size={18} className="text-[#8B00E8]" />
+          {t('tenants.retrievalDebug')}
+        </h2>
+        <RetrievalDebug
+          tenantId={tenantId!}
+          currentSettings={settings.answer_quality}
+        />
       </div>
     </div>
   );

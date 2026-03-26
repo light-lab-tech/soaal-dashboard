@@ -77,6 +77,9 @@ export interface CreateApiKeyData {
 // Tenant Settings Types
 export interface AnswerQualitySettings {
   quality_profile?: 'balanced' | 'precise' | 'exploratory';
+  enable_hybrid_search?: boolean;
+  enable_query_rewrite?: boolean;
+  enable_phrase_match?: boolean;
   faq_threshold?: number; // 0.1 - 1.0
   min_chunk_score?: number; // 0.1 - 1.0
 }
@@ -93,6 +96,57 @@ export interface UpdateTenantSettingsData {
   message_limit_per_chat?: number | null;
   settings?: Record<string, any>;
   answer_quality?: AnswerQualitySettings;
+}
+
+// Retrieval Debug Types
+export interface RetrievalDebugOptions {
+  quality_profile?: 'balanced' | 'precise' | 'exploratory';
+  enable_hybrid_search?: boolean;
+  enable_query_rewrite?: boolean;
+  enable_phrase_match?: boolean;
+  faq_threshold?: number;
+  min_chunk_score?: number;
+}
+
+export interface RetrievalDebugRequest {
+  query: string;
+  options?: RetrievalDebugOptions;
+}
+
+export interface RetrievalScoreBreakdown {
+  vector_score: number;
+  lexical_score: number;
+  phrase_score: number;
+  title_boost: number;
+  heading_boost: number;
+  url_boost: number;
+}
+
+export interface RetrievalCandidate {
+  id: string;
+  type: 'faq' | 'document';
+  score: number;
+  matched_terms: string[];
+  debug_reason?: string;
+  faq_eligible?: boolean;
+  payload?: {
+    document_name?: string;
+    source_url?: string;
+  };
+}
+
+export interface RetrievalDebugData {
+  query: string;
+  query_variants: string[];
+  options: RetrievalDebugOptions;
+  faq_fast_lane_hit: boolean;
+  winning_faq?: RetrievalCandidate;
+  faq_candidates: RetrievalCandidate[];
+  document_candidates: RetrievalCandidate[];
+}
+
+export interface RetrievalDebugResponse {
+  debug: RetrievalDebugData;
 }
 
 // Document Types
