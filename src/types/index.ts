@@ -149,6 +149,46 @@ export interface RetrievalDebugResponse {
   debug: RetrievalDebugData;
 }
 
+// Background Job Types
+export type JobStatus = 'queued' | 'retry' | 'running' | 'completed' | 'failed' | 'canceled';
+export type JobType = 'scrape_document_url' | 'process_document' | 'reindex_document' | 'recrawl_document';
+
+export interface JobPayloadSummary {
+  url?: string;
+  document_id?: string;
+  file_name?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface BackgroundJob {
+  id: string;
+  tenant_id: string;
+  document_id: string;
+  document_name: string;
+  type: JobType;
+  status: JobStatus;
+  attempts: number;
+  max_attempts: number;
+  last_error?: string;
+  run_at: string;
+  started_at?: string;
+  finished_at?: string;
+  created_at: string;
+  updated_at: string;
+  payload_summary?: JobPayloadSummary;
+  available_actions: string[];
+}
+
+export interface ListJobsParams {
+  status?: JobStatus | 'all';
+  limit?: number;
+}
+
+export interface ListJobsResponse {
+  jobs: BackgroundJob[];
+  total: number;
+}
+
 // Document Types
 export interface DocumentMetadata {
   source_kind?: 'upload' | 'url' | 'crawl';

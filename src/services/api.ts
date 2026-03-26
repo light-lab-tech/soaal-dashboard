@@ -37,6 +37,9 @@ import type {
   UpdateTenantSettingsData,
   RetrievalDebugRequest,
   RetrievalDebugResponse,
+  BackgroundJob,
+  ListJobsParams,
+  ListJobsResponse,
 } from '../types';
 
 class ApiClient {
@@ -187,6 +190,32 @@ class ApiClient {
 
   async retrievalDebug(tenantId: string, data: RetrievalDebugRequest): Promise<ApiResponse<RetrievalDebugResponse>> {
     const response = await this.client.post<ApiResponse<RetrievalDebugResponse>>(`/tenants/${tenantId}/retrieval/debug`, data);
+    return response.data;
+  }
+
+  // Background Jobs Endpoints
+  async listBackgroundJobs(tenantId: string, params?: ListJobsParams): Promise<ApiResponse<ListJobsResponse>> {
+    const response = await this.client.get<ApiResponse<ListJobsResponse>>(`/tenants/${tenantId}/jobs`, { params });
+    return response.data;
+  }
+
+  async listDocumentJobs(tenantId: string, documentId: string, params?: ListJobsParams): Promise<ApiResponse<ListJobsResponse>> {
+    const response = await this.client.get<ApiResponse<ListJobsResponse>>(`/tenants/${tenantId}/documents/${documentId}/jobs`, { params });
+    return response.data;
+  }
+
+  async getBackgroundJob(tenantId: string, jobId: string): Promise<ApiResponse<{ job: BackgroundJob }>> {
+    const response = await this.client.get<ApiResponse<{ job: BackgroundJob }>>(`/tenants/${tenantId}/jobs/${jobId}`);
+    return response.data;
+  }
+
+  async retryBackgroundJob(tenantId: string, jobId: string): Promise<ApiResponse<void>> {
+    const response = await this.client.post<ApiResponse<void>>(`/tenants/${tenantId}/jobs/${jobId}/retry`);
+    return response.data;
+  }
+
+  async cancelBackgroundJob(tenantId: string, jobId: string): Promise<ApiResponse<void>> {
+    const response = await this.client.post<ApiResponse<void>>(`/tenants/${tenantId}/jobs/${jobId}/cancel`);
     return response.data;
   }
 

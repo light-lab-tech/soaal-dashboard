@@ -33,6 +33,7 @@ import { EmptyState } from '../components/ui/EmptyState';
 import { Modal } from '../components/ui/Modal';
 import { Badge } from '../components/ui/Badge';
 import { ConfirmModal } from '../components/ui/Modal';
+import BackgroundJobs from '../components/BackgroundJobs';
 
 const Documents: React.FC = () => {
   const { t } = useTranslation();
@@ -768,6 +769,15 @@ const Documents: React.FC = () => {
           color="purple"
         />
       )}
+
+      {/* Background Jobs Section */}
+      <div className="glass-card p-4">
+        <h2 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
+          <RefreshCw size={18} className="text-[#8B00E8]" />
+          Background Jobs
+        </h2>
+        <BackgroundJobs tenantId={tenantId!} />
+      </div>
 
       {/* URL Ingest Modal */}
       <Modal

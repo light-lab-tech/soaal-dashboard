@@ -38,6 +38,11 @@ This documentation covers all APIs used by company owners (tenants) to manage th
    - [Replace Document URL](#replace-document-url)
    - [Reindex Document](#reindex-document)
    - [Recrawl Document](#recrawl-document)
+   - [List Background Jobs](#list-background-jobs)
+   - [List Document Jobs](#list-document-jobs)
+   - [Get Background Job](#get-background-job)
+   - [Retry Background Job](#retry-background-job)
+   - [Cancel Background Job](#cancel-background-job)
    - [Delete Document](#delete-document)
 5. [Pending Questions](#pending-questions)
 6. [Feedback Analytics](#feedback-analytics)
@@ -791,6 +796,7 @@ GET /tenants/{tenant_id}/settings
         "quality_profile": "balanced",
         "enable_hybrid_search": true,
         "enable_query_rewrite": true,
+        "enable_phrase_match": true,
         "faq_threshold": 0.62,
         "min_chunk_score": 0.5
       }
@@ -856,6 +862,16 @@ PUT /tenants/{tenant_id}/settings
 - `quality_profile` must be one of `balanced`, `precise`, `exploratory`
 - `faq_threshold` must be between `0.1` and `1.0`
 - `min_chunk_score` must be between `0.1` and `1.0`
+
+When a chat reaches `message_limit_per_chat`, the API returns an error and the user must start a new chat or the tenant can increase the limit.
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Tenant settings updated"
+}
+```
 
 ---
 
@@ -947,16 +963,6 @@ Use this endpoint to:
 - see candidate FAQs separately from document chunks
 - understand score composition from vector, lexical, phrase, title, heading, and URL signals
 - debug why an FAQ was selected immediately
-
-When a chat reaches `message_limit_per_chat`, the API returns an error and the user must start a new chat or the tenant can increase the limit.
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Tenant settings updated"
-}
-```
 
 ---
 
@@ -1764,6 +1770,156 @@ POST /tenants/{tenant_id}/documents/{document_id}/recrawl
 ```
 
 > **Note:** This endpoint only works for documents created from a URL or crawl source.
+
+---
+
+### List Background Jobs
+
+List background jobs for a tenant across document processing, scraping, and reindexing.
+
+```
+GET /tenants/{tenant_id}/jobs
+```
+
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| status | string | all | Optional job status filter: `queued`, `retry`, `running`, `completed`, `failed`, `canceled` |
+| limit | int | 20 | Maximum jobs to return (1-100) |
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "jobs": [
+      {
+        "id": "job-uuid",
+        "tenant_id": "tenant-uuid",
+        "document_id": "doc-uuid",
+        "document_name": "Website: Refund Policy - https://example.com/refund-policy",
+        "type": "scrape_document_url",
+        "status": "retry",
+        "attempts": 1,
+        "max_attempts": 3,
+        "last_error": "request timed out",
+        "run_at": "2026-03-27T10:05:00Z",
+        "started_at": "2026-03-27T10:04:10Z",
+        "finished_at": null,
+        "created_at": "2026-03-27T10:04:00Z",
+        "updated_at": "2026-03-27T10:04:12Z",
+        "payload_summary": {
+          "url": "https://example.com/refund-policy",
+          "document_id": "doc-uuid",
+          "metadata": {
+            "source_kind": "url",
+            "source_url": "https://example.com/refund-policy"
+          }
+        },
+        "available_actions": ["cancel"]
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+---
+
+### List Document Jobs
+
+List background jobs for a specific document.
+
+```
+GET /tenants/{tenant_id}/documents/{document_id}/jobs
+```
+
+**Query Parameters:**
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| status | string | all | Optional job status filter |
+| limit | int | 20 | Maximum jobs to return (1-100) |
+
+**Response:** Same job shape as [List Background Jobs](#list-background-jobs), scoped to one document.
+
+---
+
+### Get Background Job
+
+Get the latest state and payload summary for a single background job.
+
+```
+GET /tenants/{tenant_id}/jobs/{job_id}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "job": {
+      "id": "job-uuid",
+      "tenant_id": "tenant-uuid",
+      "document_id": "doc-uuid",
+      "document_name": "Refund Policy",
+      "type": "reindex_document",
+      "status": "failed",
+      "attempts": 3,
+      "max_attempts": 3,
+      "last_error": "failed to create embeddings",
+      "run_at": "2026-03-27T10:04:00Z",
+      "started_at": "2026-03-27T10:04:10Z",
+      "finished_at": "2026-03-27T10:04:40Z",
+      "created_at": "2026-03-27T10:04:00Z",
+      "updated_at": "2026-03-27T10:04:40Z",
+      "payload_summary": {
+        "document_id": "doc-uuid"
+      },
+      "available_actions": ["retry"]
+    }
+  }
+}
+```
+
+---
+
+### Retry Background Job
+
+Reset a failed or canceled job back to `queued` so the worker can try it again.
+
+```
+POST /tenants/{tenant_id}/jobs/{job_id}/retry
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Background job retried successfully."
+}
+```
+
+> **Note:** Only jobs in `failed` or `canceled` status can be retried.
+
+---
+
+### Cancel Background Job
+
+Cancel a queued background job before it starts running.
+
+```
+POST /tenants/{tenant_id}/jobs/{job_id}/cancel
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Background job canceled successfully."
+}
+```
+
+> **Note:** This first version only cancels jobs in `queued` or `retry` status. Running jobs cannot be interrupted yet.
 
 ---
 
