@@ -291,6 +291,13 @@ export interface UpdateUserRoleData {
 }
 
 // Billing & Plans Types
+export interface PlanLocalization {
+  language_code: string;
+  name: string;
+  description?: string;
+  features_summary?: string;
+}
+
 export interface Plan {
   id: string;
   name: string;
@@ -299,22 +306,33 @@ export interface Plan {
   currency: string;
   price_monthly_cents: number;
   price_yearly_cents?: number;
+  discount_monthly_cents?: number;
+  discount_yearly_cents?: number;
   is_active?: boolean;
   sort_order?: number;
   features_summary?: string;
+  // Localizations for multi-language support
+  localizations?: PlanLocalization[];
   // Plan limits (applied at user level, across all tenants)
   max_projects?: number;
   max_messages_per_month?: number;
   max_documents?: number;
   max_document_size_mb?: number;
   max_urls_ingest_per_month?: number;
+  max_pending_questions_per_month?: number;
+  max_telegram_bots?: number;
   max_api_keys_per_tenant?: number;
   max_feedback_events_per_month?: number;
   // Feature flags
   enable_telegram_integration?: boolean;
   enable_feedback?: boolean;
+  enable_hil?: boolean;
   enable_custom_system_prompt?: boolean;
   enable_rag_enhancements?: boolean;
+  enable_analytics_dashboard?: boolean;
+  enable_priority_support?: boolean;
+  enable_custom_domain?: boolean;
+  enable_webhook_integrations?: boolean;
   // Stripe price IDs
   gateway_one_price_id?: string;
   gateway_one_yearly_price_id?: string;
@@ -346,28 +364,35 @@ export interface CheckoutData {
 }
 
 export interface CreatePlanData {
-  name: string;
   slug: string;
-  description?: string;
   currency: string;
   price_monthly_cents: number;
   price_yearly_cents?: number;
+  discount_monthly_cents?: number;
+  discount_yearly_cents?: number;
   is_active?: boolean;
   sort_order?: number;
-  features_summary?: string;
+  localizations: PlanLocalization[];
   // Plan limits (applied at user level, across all tenants)
   max_projects?: number;
   max_messages_per_month?: number;
   max_documents?: number;
   max_document_size_mb?: number;
   max_urls_ingest_per_month?: number;
+  max_pending_questions_per_month?: number;
+  max_telegram_bots?: number;
   max_api_keys_per_tenant?: number;
   max_feedback_events_per_month?: number;
   // Feature flags
   enable_telegram_integration?: boolean;
   enable_feedback?: boolean;
+  enable_hil?: boolean;
   enable_custom_system_prompt?: boolean;
   enable_rag_enhancements?: boolean;
+  enable_analytics_dashboard?: boolean;
+  enable_priority_support?: boolean;
+  enable_custom_domain?: boolean;
+  enable_webhook_integrations?: boolean;
 }
 
 // Generic API Response

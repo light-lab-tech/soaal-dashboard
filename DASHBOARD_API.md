@@ -197,7 +197,18 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 ### Managing Localizations (Admin)
 
-Plan localizations are managed at the database level. Contact your administrator to add localizations for new languages.
+Plan localizations are managed through plan management APIs:
+
+1. `POST /admin/plans` with `localizations[]` to create localized content
+2. `PUT /admin/plans/{plan_id}` with `localizations[]` to replace/update localized content
+
+Each localization entry includes:
+- `language_code` (e.g. `en`, `ar`)
+- `name`
+- `description` (optional)
+- `features_summary` (optional)
+
+At least one localization is required (typically English).
 
 ---
 
@@ -2519,6 +2530,8 @@ Same as user-facing `GET /billing/plans`; returns all active plans.
 GET /admin/plans
 ```
 
+Supports `Accept-Language` header exactly like [List Plans](#list-plans).
+
 **Response:** Same as [List Plans](#list-plans) (user billing).
 
 ---
@@ -2534,38 +2547,65 @@ POST /admin/plans
 **Request Body:**
 ```json
 {
-  "name": "Pro",
   "slug": "pro",
-  "description": "For growing teams",
   "currency": "USD",
   "price_monthly_cents": 2900,
   "price_yearly_cents": 29000,
+  "discount_monthly_cents": 0,
+  "discount_yearly_cents": 5000,
   "is_active": true,
   "sort_order": 1,
-  "features_summary": "10 projects, 50k messages/mo",
   "max_projects": 10,
   "max_messages_per_month": 50000,
   "max_documents": 500,
   "max_document_size_mb": 10,
+  "max_urls_ingest_per_month": 300,
+  "max_pending_questions_per_month": 1000,
+  "max_telegram_bots": 5,
+  "max_api_keys_per_tenant": 10,
+  "max_feedback_events_per_month": 10000,
   "enable_telegram_integration": true,
   "enable_feedback": true,
+  "enable_hil": true,
   "enable_custom_system_prompt": true,
-  "enable_rag_enhancements": true
+  "enable_rag_enhancements": true,
+  "enable_analytics_dashboard": true,
+  "enable_priority_support": false,
+  "enable_custom_domain": false,
+  "enable_webhook_integrations": false,
+  "localizations": [
+    {
+      "language_code": "en",
+      "name": "Pro",
+      "description": "For growing teams",
+      "features_summary": "10 projects, 50k messages/mo"
+    },
+    {
+      "language_code": "ar",
+      "name": "المحترف",
+      "description": "للفرق المتنامية",
+      "features_summary": "10 مشاريع، 50 ألف رسالة شهرياً"
+    }
+  ]
 }
 ```
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| name | string | Yes | Plan display name |
 | slug | string | Yes | Unique slug (e.g. `pro`) |
 | currency | string | Yes | e.g. `USD` |
 | price_monthly_cents | int | Yes | Monthly price in cents |
 | price_yearly_cents | int | No | Yearly price in cents |
+| discount_monthly_cents, discount_yearly_cents | int | No | Discount values in cents |
 | is_active | bool | No | Default `true` |
 | sort_order | int | No | Display order |
-| description, features_summary | string | No | For display |
-| max_projects, max_messages_per_month, max_documents, max_document_size_mb | int | No | Plan limits |
-| enable_* | bool | No | Feature flags |
+| max_* fields | int | No | Plan limits (projects/messages/documents/size/URLs/pending questions/bots/API keys/feedback events) |
+| enable_* fields | bool | No | Feature flags |
+| localizations | array | Yes | Localized content list (at least one entry required) |
+| localizations[].language_code | string | Yes | Language code (e.g. `en`, `ar`) |
+| localizations[].name | string | Yes | Localized plan name |
+| localizations[].description | string | No | Localized description |
+| localizations[].features_summary | string | No | Localized feature summary |
 
 **Response:**
 ```json
@@ -2607,6 +2647,8 @@ GET /admin/plans/{plan_id}
 |-----------|------|-------------|
 | plan_id | uuid | The plan's ID |
 
+Supports `Accept-Language` header for localized `name`, `description`, and `features_summary`.
+
 **Response:**
 ```json
 {
@@ -2644,7 +2686,7 @@ PUT /admin/plans/{plan_id}
 |-----------|------|-------------|
 | plan_id | uuid | The plan's ID |
 
-**Request Body:** Same fields as [Create Plan](#create-plan) (partial update supported).
+**Request Body:** Same fields as [Create Plan](#create-plan). Send a full payload, including `localizations[]` (required).
 
 **Response:**
 ```json
@@ -2782,13 +2824,20 @@ curl -X POST http://localhost:8080/api/v1/admin/plans \
   -H "Authorization: Bearer $SUPER_ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Pro",
     "slug": "pro",
     "currency": "USD",
     "price_monthly_cents": 2900,
     "price_yearly_cents": 29000,
     "is_active": true,
-    "sort_order": 1
+    "sort_order": 1,
+    "localizations": [
+      {
+        "language_code": "en",
+        "name": "Pro",
+        "description": "For growing teams",
+        "features_summary": "10 projects, 50k messages/mo"
+      }
+    ]
   }'
 ```
 
