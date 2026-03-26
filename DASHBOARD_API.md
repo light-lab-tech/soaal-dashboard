@@ -30,10 +30,13 @@ This documentation covers all APIs used by company owners (tenants) to manage th
 4. [Document Management](#document-management)
    - [Upload Document](#upload-document)
    - [Ingest URL](#ingest-url)
+   - [Preview Crawl](#preview-crawl)
    - [List Documents](#list-documents)
    - [Get Document Status](#get-document-status)
    - [Replace Document](#replace-document)
    - [Replace Document URL](#replace-document-url)
+   - [Reindex Document](#reindex-document)
+   - [Recrawl Document](#recrawl-document)
    - [Delete Document](#delete-document)
 5. [Pending Questions](#pending-questions)
 6. [Feedback Analytics](#feedback-analytics)
@@ -782,7 +785,15 @@ GET /tenants/{tenant_id}/settings
   "data": {
     "answer_style": "formal",
     "message_limit_per_chat": 100,
-    "settings": {}
+    "settings": {
+      "answer_quality": {
+        "quality_profile": "balanced",
+        "enable_hybrid_search": true,
+        "enable_query_rewrite": true,
+        "faq_threshold": 0.62,
+        "min_chunk_score": 0.5
+      }
+    }
   }
 }
 ```
@@ -791,7 +802,17 @@ GET /tenants/{tenant_id}/settings
 |-------|------|-------------|
 | answer_style | string \| null | `short`, `formal`, `friendly`, `detailed`, or null for default |
 | message_limit_per_chat | number \| null | Max messages per chat; null = no limit |
-| settings | object | Extra key-value settings (e.g. language, max_tokens) |
+| settings | object | Extra key-value settings |
+
+**`settings.answer_quality` fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| quality_profile | string | Retrieval profile: `balanced`, `precise`, `exploratory` |
+| enable_hybrid_search | boolean | Re-rank vector matches using lexical keyword overlap |
+| enable_query_rewrite | boolean | Expand short or weak user questions into additional retrieval queries |
+| faq_threshold | number | Score threshold for returning a stored FAQ answer directly |
+| min_chunk_score | number | Minimum reranked score for chunk context to be used in an answer |
 
 ---
 
@@ -808,7 +829,15 @@ PUT /tenants/{tenant_id}/settings
 {
   "answer_style": "short",
   "message_limit_per_chat": 50,
-  "settings": {}
+  "settings": {
+    "answer_quality": {
+      "quality_profile": "precise",
+      "enable_hybrid_search": true,
+      "enable_query_rewrite": true,
+      "faq_threshold": 0.7,
+      "min_chunk_score": 0.58
+    }
+  }
 }
 ```
 
@@ -819,6 +848,11 @@ PUT /tenants/{tenant_id}/settings
 | settings | object | No | Extra key-value; use `{}` to clear |
 
 **Answer styles:** `short` = brief answers; `formal` = professional tone; `friendly` = warm tone; `detailed` = thorough when possible.
+
+**Validation for `settings.answer_quality`:**
+- `quality_profile` must be one of `balanced`, `precise`, `exploratory`
+- `faq_threshold` must be between `0.1` and `1.0`
+- `min_chunk_score` must be between `0.1` and `1.0`
 
 When a chat reaches `message_limit_per_chat`, the API returns an error and the user must start a new chat or the tenant can increase the limit.
 
@@ -1354,6 +1388,7 @@ POST /tenants/{tenant_id}/documents/ingest-url
 - **Link Discovery**: Follows internal links up to the specified depth
 - **Smart Filtering**: Excludes common non-content paths (API, admin, login, cart, checkout)
 - **Domain Restriction**: By default, only crawls pages from the same domain
+- **Stored Web Metadata**: Crawled pages now preserve source URL, page title, description, crawl source, host, links, and processing errors in document metadata for better retrieval/citations
 
 **Plan Limits:**
 - Each page crawled counts against your `max_urls_ingest_per_month` limit
@@ -1383,6 +1418,9 @@ GET /tenants/{tenant_id}/documents
         "file_type": "text/markdown",
         "file_size": 15420,
         "status": "completed",
+        "metadata": {
+          "source_kind": "upload"
+        },
         "created_at": "2026-01-24T10:00:00Z"
       }
     ]
@@ -1395,7 +1433,7 @@ GET /tenants/{tenant_id}/documents
 |--------|-------------|
 | `processing` | Document is being chunked and embedded |
 | `completed` | Document successfully processed and searchable |
-| `failed` | Processing failed (check logs for details) |
+| `failed` | Processing failed (check `metadata.processing_error`) |
 
 ---
 
@@ -1418,6 +1456,16 @@ GET /tenants/{tenant_id}/documents/{document_id}
       "file_type": "text/markdown",
       "file_size": 15420,
       "status": "completed",
+      "metadata": {
+        "source_kind": "crawl",
+        "source_url": "https://example.com/about",
+        "page_title": "About",
+        "page_description": "About Example Inc",
+        "crawl_source": "link",
+        "source_host": "example.com",
+        "processed_chunks": 6,
+        "processing_error": null
+      },
       "created_at": "2026-01-24T10:00:00Z",
       "updated_at": "2026-01-24T10:02:30Z"
     }
@@ -1453,6 +1501,62 @@ async function uploadAndPoll(file, tenantId) {
 
     // Wait 2 seconds before polling again
     await new Promise(r => setTimeout(r, 2000));
+  }
+}
+```
+
+Useful metadata keys:
+- `source_kind`: `upload`, `url`, or `crawl`
+- `source_url`: original page URL for web-ingested documents
+- `page_title`, `page_description`
+- `crawl_source`: `seed`, `sitemap`, `link`, or `hreflang`
+- `source_host`
+- `processed_chunks`, `chunk_count`
+- `processing_error`, `last_failed_at`
+
+---
+
+### Preview Crawl
+
+Preview which pages a crawl would ingest before starting the actual job.
+
+```
+POST /tenants/{tenant_id}/documents/crawl-preview
+```
+
+**Request Body:**
+```json
+{
+  "url": "https://example.com",
+  "options": {
+    "max_pages": 10,
+    "max_depth": 1,
+    "include_sitemap": true,
+    "include_hreflang": true,
+    "same_domain_only": true,
+    "excluded_paths": ["/api/", "/admin/"],
+    "allowed_paths": ["/docs", "/blog"]
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "seed_url": "https://example.com",
+    "pages_found": 4,
+    "pages_preview": [
+      {
+        "url": "https://example.com/docs/getting-started",
+        "title": "Getting Started",
+        "description": "Setup guide",
+        "depth": 1,
+        "source": "link"
+      }
+    ],
+    "errors": []
   }
 }
 ```
@@ -1526,6 +1630,46 @@ POST /tenants/{tenant_id}/documents/{document_id}/replace-url
   "message": "URL replaced successfully. It will be processed in the background."
 }
 ```
+
+---
+
+### Reindex Document
+
+Delete the current vectors/chunks for a document and queue fresh indexing from the document’s stored source.
+
+```
+POST /tenants/{tenant_id}/documents/{document_id}/reindex
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Document reindex queued successfully."
+}
+```
+
+> **Note:** For uploaded files, reindexing uses the currently stored chunk content. For URL-based documents, the server re-fetches the latest source URL.
+
+---
+
+### Recrawl Document
+
+Queue a fresh scrape for a URL-based document using its stored `metadata.source_url`.
+
+```
+POST /tenants/{tenant_id}/documents/{document_id}/recrawl
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Document recrawl queued successfully."
+}
+```
+
+> **Note:** This endpoint only works for documents created from a URL or crawl source.
 
 ---
 

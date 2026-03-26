@@ -75,25 +75,47 @@ export interface CreateApiKeyData {
 }
 
 // Tenant Settings Types
+export interface AnswerQualitySettings {
+  quality_profile?: 'balanced' | 'precise' | 'exploratory';
+  faq_threshold?: number; // 0.1 - 1.0
+  min_chunk_score?: number; // 0.1 - 1.0
+}
+
 export interface TenantSettings {
   answer_style?: 'short' | 'formal' | 'friendly' | 'detailed' | null;
   message_limit_per_chat?: number | null;
   settings: Record<string, any>;
+  answer_quality?: AnswerQualitySettings;
 }
 
 export interface UpdateTenantSettingsData {
   answer_style?: string;
   message_limit_per_chat?: number | null;
   settings?: Record<string, any>;
+  answer_quality?: AnswerQualitySettings;
 }
 
 // Document Types
+export interface DocumentMetadata {
+  source_kind?: 'upload' | 'url' | 'crawl';
+  source_url?: string;
+  page_title?: string;
+  page_description?: string;
+  crawl_source?: 'seed' | 'sitemap' | 'link' | 'hreflang';
+  source_host?: string;
+  processed_chunks?: number;
+  chunk_count?: number;
+  processing_error?: string;
+  last_failed_at?: string;
+}
+
 export interface Document {
   id: string;
   name: string;
   file_type: string;
   file_size?: number;
   status: 'processing' | 'completed' | 'failed';
+  metadata?: DocumentMetadata;
   created_at: string;
 }
 

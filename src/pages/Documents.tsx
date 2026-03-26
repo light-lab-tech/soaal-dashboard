@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import { useToast } from '../context/ToastContext';
 import { api } from '../services/api';
-import type { Document, Tenant, CrawlOptions } from '../types';
+import type { Document, Tenant, CrawlOptions, DocumentMetadata } from '../types';
 import {
   Upload,
   FileText,
@@ -24,6 +24,8 @@ import {
   RefreshCw,
   Edit,
   ExternalLink,
+  Database,
+  RotateCcw,
 } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { AnimatedButton, IconButton } from '../components/ui/AnimatedButton';
@@ -338,6 +340,32 @@ const Documents: React.FC = () => {
     }
   };
 
+  const handleReindexDocument = async (documentId: string) => {
+    if (!tenantId) return;
+    try {
+      await api.reindexDocument(tenantId, documentId);
+      showToast(t('documents.reindexStarted', 'Document reindex started'), 'success');
+      // Update document status to processing
+      setDocuments(docs => docs.map(d => d.id === documentId ? { ...d, status: 'processing' as const } : d));
+    } catch (error) {
+      console.error('Error reindexing document:', error);
+      showToast(t('common.error'), 'error');
+    }
+  };
+
+  const handleRecrawlDocument = async (documentId: string) => {
+    if (!tenantId) return;
+    try {
+      await api.recrawlDocument(tenantId, documentId);
+      showToast(t('documents.recrawlStarted', 'Document recrawl started'), 'success');
+      // Update document status to processing
+      setDocuments(docs => docs.map(d => d.id === documentId ? { ...d, status: 'processing' as const } : d));
+    } catch (error) {
+      console.error('Error recrawling document:', error);
+      showToast(t('common.error'), 'error');
+    }
+  };
+
   const getFileIcon = (fileType: string) => {
     const type = fileType?.toLowerCase() || '';
     if (type.includes('json') || type === 'application/json') {
@@ -398,6 +426,82 @@ const Documents: React.FC = () => {
 
   const isUrlBasedDoc = (doc: Document) => {
     return doc.name.startsWith('http://') || doc.name.startsWith('https://');
+  };
+
+  const getSourceKindBadge = (metadata?: DocumentMetadata) => {
+    if (!metadata?.source_kind) return null;
+    const kind = metadata.source_kind;
+    const kindConfig = {
+      upload: { label: 'Upload', color: 'bg-blue-500/20 text-blue-300' },
+      url: { label: 'URL', color: 'bg-cyan-500/20 text-cyan-300' },
+      crawl: { label: 'Crawl', color: 'bg-purple-500/20 text-purple-300' },
+    }[kind];
+    return kindConfig ? (
+      <span className={`px-2 py-0.5 rounded text-xs font-medium ${kindConfig.color}`}>
+        {kindConfig.label}
+      </span>
+    ) : null;
+  };
+
+  const renderMetadata = (metadata?: DocumentMetadata) => {
+    if (!metadata) return null;
+
+    const items: React.ReactNode[] = [];
+
+    // Source kind
+    if (metadata.source_kind) {
+      items.push(getSourceKindBadge(metadata));
+    }
+
+    // Crawl source
+    if (metadata.crawl_source) {
+      const crawlLabel = {
+        seed: 'Seed',
+        sitemap: 'Sitemap',
+        link: 'Link',
+        hreflang: 'Hreflang',
+      }[metadata.crawl_source] || metadata.crawl_source;
+      items.push(
+        <span key="crawl" className="px-2 py-0.5 rounded text-xs font-medium bg-slate-700/50 text-slate-300">
+          {crawlLabel}
+        </span>
+      );
+    }
+
+    // Chunks count
+    if (metadata.chunk_count) {
+      items.push(
+        <span key="chunks" className="px-2 py-0.5 rounded text-xs font-medium bg-slate-700/50 text-slate-300">
+          {metadata.chunk_count} chunks
+        </span>
+      );
+    }
+
+    // Source host
+    if (metadata.source_host) {
+      items.push(
+        <span key="host" className="px-2 py-0.5 rounded text-xs font-medium bg-slate-700/50 text-slate-400" title={metadata.source_host}>
+          🌐 {metadata.source_host.length > 20 ? metadata.source_host.substring(0, 20) + '...' : metadata.source_host}
+        </span>
+      );
+    }
+
+    // Processing error
+    if (metadata.processing_error) {
+      items.push(
+        <span key="error" className="px-2 py-0.5 rounded text-xs font-medium bg-red-500/20 text-red-300" title={metadata.processing_error}>
+          ⚠️ Error
+        </span>
+      );
+    }
+
+    if (items.length === 0) return null;
+
+    return (
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        {items}
+      </div>
+    );
   };
 
   if (isLoading) {
@@ -563,10 +667,13 @@ const Documents: React.FC = () => {
                   )}
                 </h3>
 
-                <p className="text-sm text-slate-400 mb-4">
+                <p className="text-sm text-slate-400 mb-2">
                   {isUrlBasedDoc(doc) ? 'Web Page' : getFileTypeDisplay(doc.file_type)}
                   {doc.file_size && ` • ${formatFileSize(doc.file_size)}`}
                 </p>
+
+                {/* Document Metadata */}
+                {renderMetadata(doc.metadata)}
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2 pt-4 border-t border-slate-700/50">
@@ -605,6 +712,28 @@ const Documents: React.FC = () => {
                         }}
                         className="text-blue-400 hover:text-blue-300"
                         icon={<Edit size={14} />}
+                      />
+                    )}
+
+                    {/* Reindex button - for all documents */}
+                    {doc.status !== 'processing' && (
+                      <IconButton
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleReindexDocument(doc.id)}
+                        className="text-emerald-400 hover:text-emerald-300"
+                        icon={<Database size={14} />}
+                      />
+                    )}
+
+                    {/* Recrawl button - only for URL/crawl documents */}
+                    {doc.status !== 'processing' && doc.metadata?.source_kind && ['url', 'crawl'].includes(doc.metadata.source_kind) && (
+                      <IconButton
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRecrawlDocument(doc.id)}
+                        className="text-orange-400 hover:text-orange-300"
+                        icon={<RotateCcw size={14} />}
                       />
                     )}
 

@@ -148,6 +148,19 @@ const resources = {
         settingsSaved: 'Settings saved successfully',
         createError: 'Failed to create tenant',
         searchPlaceholder: 'Search tenants...',
+        // Answer Quality Settings
+        answerQuality: 'Answer Quality',
+        qualityProfile: 'Quality Profile',
+        balanced: 'Balanced',
+        balancedDesc: 'Balanced between speed and accuracy',
+        precise: 'Precise',
+        preciseDesc: 'Prioritizes accurate, fact-based answers',
+        exploratory: 'Exploratory',
+        exploratoryDesc: 'Provides more comprehensive, detailed responses',
+        faqThreshold: 'FAQ Threshold',
+        faqThresholdDesc: 'Similarity score (0.1-1.0) to match questions to FAQs',
+        minChunkScore: 'Min Chunk Score',
+        minChunkScoreDesc: 'Minimum relevance score (0.1-1.0) for content retrieval',
       },
       // Documents
       documents: {
@@ -209,6 +222,10 @@ const resources = {
         currentFile: 'Current File',
         currentUrl: 'Current URL',
         newUrl: 'New URL',
+        reindexStarted: 'Document reindex started',
+        recrawlStarted: 'Document recrawl started',
+        reindex: 'Reindex',
+        recrawl: 'Recrawl',
       },
       // Pending Questions
       questions: {
@@ -567,6 +584,19 @@ const resources = {
         settingsSaved: 'تم حفظ الإعدادات بنجاح',
         createError: 'فشل إنشاء المستأجر',
         searchPlaceholder: 'البحث في المستأجرين...',
+        // Answer Quality Settings
+        answerQuality: 'جودة الإجابة',
+        qualityProfile: 'ملف الجودة',
+        balanced: 'متوازن',
+        balancedDesc: 'توازن بين السرعة والدقة',
+        precise: 'دقيق',
+        preciseDesc: 'يعطي أولوية للإجابات الدقيقة القائمة على الحقائق',
+        exploratory: 'استكشافي',
+        exploratoryDesc: 'يوفر ردوداً أكثر شمولاً وتفصيلاً',
+        faqThreshold: 'حد الأسئلة الشائعة',
+        faqThresholdDesc: 'درجة التشابه (0.1-1.0) لمطابقة الأسئلة بالأسئلة الشائعة',
+        minChunkScore: 'أدنى درجة للجزء',
+        minChunkScoreDesc: 'أدنى درجة الصلة (0.1-1.0) لاسترجاع المحتوى',
       },
       // Documents
       documents: {
@@ -628,6 +658,10 @@ const resources = {
         currentFile: 'الملف الحالي',
         currentUrl: 'الرابط الحالي',
         newUrl: 'الرابط الجديد',
+        reindexStarted: 'تم بدء إعادة فهرسة المستند',
+        recrawlStarted: 'تم بدء إعادة الزحف للمستند',
+        reindex: 'إعادة الفهرسة',
+        recrawl: 'إعادة الزحف',
       },
       // Pending Questions
       questions: {

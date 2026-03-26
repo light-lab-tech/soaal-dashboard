@@ -13,6 +13,9 @@ import {
   MessageSquare,
   Brain,
   Shield,
+  Sliders,
+  Scale,
+  Target,
 } from 'lucide-react';
 
 const TenantSettings: React.FC = () => {
@@ -25,6 +28,11 @@ const TenantSettings: React.FC = () => {
     answer_style: null,
     message_limit_per_chat: null,
     settings: {},
+    answer_quality: {
+      quality_profile: 'balanced',
+      faq_threshold: 0.5,
+      min_chunk_score: 0.5,
+    },
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -64,6 +72,7 @@ const TenantSettings: React.FC = () => {
         answer_style: settings.answer_style || undefined,
         message_limit_per_chat: settings.message_limit_per_chat,
         settings: settings.settings || {},
+        answer_quality: settings.answer_quality,
       });
       setHasChanges(false);
       showToast(t('tenants.settingsSaved'), 'success');
@@ -237,6 +246,180 @@ const TenantSettings: React.FC = () => {
             <p className="text-xs text-glass-textSecondary mt-2 flex items-center gap-1">
               <Shield size={12} />
               {t('tenants.messageLimitDesc')}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Answer Quality Settings Card */}
+      <div className="glass-card p-4">
+        <h2 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
+          <Sliders size={18} className="text-[#8B00E8]" />
+          {t('tenants.answerQuality')}
+        </h2>
+
+        <div className="space-y-6">
+          {/* Quality Profile */}
+          <div>
+            <label className="block text-sm font-medium text-glass-text mb-3">
+              {t('tenants.qualityProfile')}
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                {
+                  value: 'balanced' as const,
+                  label: t('tenants.balanced'),
+                  desc: t('tenants.balancedDesc'),
+                  icon: Scale,
+                },
+                {
+                  value: 'precise' as const,
+                  label: t('tenants.precise'),
+                  desc: t('tenants.preciseDesc'),
+                  icon: Target,
+                },
+                {
+                  value: 'exploratory' as const,
+                  label: t('tenants.exploratory'),
+                  desc: t('tenants.exploratoryDesc'),
+                  icon: Brain,
+                },
+              ].map((profile) => {
+                const Icon = profile.icon;
+                const isSelected = settings.answer_quality?.quality_profile === profile.value;
+                return (
+                  <button
+                    key={profile.value}
+                    onClick={() => {
+                      setSettings({
+                        ...settings,
+                        answer_quality: {
+                          ...settings.answer_quality!,
+                          quality_profile: profile.value,
+                        },
+                      });
+                      setHasChanges(true);
+                    }}
+                    className={`glass-card p-3 text-left transition-all duration-200 ${
+                      isSelected ? 'ring-2 ring-[#8B00E8]/50' : ''
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-[#8B00E8] to-[#7C3AED]">
+                        <Icon size={18} className="text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-white mb-1">
+                          {profile.label}
+                        </h3>
+                        <p className="text-xs text-glass-textSecondary">
+                          {profile.desc}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* FAQ Threshold */}
+          <div className="glass-card-surface p-4 rounded-xl">
+            <label className="block text-sm font-medium text-glass-text mb-3">
+              {t('tenants.faqThreshold')}
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="number"
+                step="0.1"
+                min="0.1"
+                max="1.0"
+                value={settings.answer_quality?.faq_threshold ?? 0.5}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  setSettings({
+                    ...settings,
+                    answer_quality: {
+                      ...settings.answer_quality!,
+                      faq_threshold: Math.max(0.1, Math.min(1.0, value)),
+                    },
+                  });
+                  setHasChanges(true);
+                }}
+                className="glass-input flex-1 px-3 py-2 rounded-lg text-sm"
+              />
+              <input
+                type="range"
+                min="0.1"
+                max="1.0"
+                step="0.1"
+                value={settings.answer_quality?.faq_threshold ?? 0.5}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  setSettings({
+                    ...settings,
+                    answer_quality: {
+                      ...settings.answer_quality!,
+                      faq_threshold: value,
+                    },
+                  });
+                  setHasChanges(true);
+                }}
+                className="w-32 accent-[#8B00E8]"
+              />
+            </div>
+            <p className="text-xs text-glass-textSecondary mt-2">
+              {t('tenants.faqThresholdDesc')}
+            </p>
+          </div>
+
+          {/* Min Chunk Score */}
+          <div className="glass-card-surface p-4 rounded-xl">
+            <label className="block text-sm font-medium text-glass-text mb-3">
+              {t('tenants.minChunkScore')}
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="number"
+                step="0.1"
+                min="0.1"
+                max="1.0"
+                value={settings.answer_quality?.min_chunk_score ?? 0.5}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  setSettings({
+                    ...settings,
+                    answer_quality: {
+                      ...settings.answer_quality!,
+                      min_chunk_score: Math.max(0.1, Math.min(1.0, value)),
+                    },
+                  });
+                  setHasChanges(true);
+                }}
+                className="glass-input flex-1 px-3 py-2 rounded-lg text-sm"
+              />
+              <input
+                type="range"
+                min="0.1"
+                max="1.0"
+                step="0.1"
+                value={settings.answer_quality?.min_chunk_score ?? 0.5}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  setSettings({
+                    ...settings,
+                    answer_quality: {
+                      ...settings.answer_quality!,
+                      min_chunk_score: value,
+                    },
+                  });
+                  setHasChanges(true);
+                }}
+                className="w-32 accent-[#8B00E8]"
+              />
+            </div>
+            <p className="text-xs text-glass-textSecondary mt-2">
+              {t('tenants.minChunkScoreDesc')}
             </p>
           </div>
         </div>

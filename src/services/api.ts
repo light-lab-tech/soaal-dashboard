@@ -272,6 +272,16 @@ class ApiClient {
     return response.data;
   }
 
+  async reindexDocument(tenantId: string, documentId: string): Promise<ApiResponse<void>> {
+    const response = await this.client.post<ApiResponse<void>>(`/tenants/${tenantId}/documents/${documentId}/reindex`);
+    return response.data;
+  }
+
+  async recrawlDocument(tenantId: string, documentId: string): Promise<ApiResponse<void>> {
+    const response = await this.client.post<ApiResponse<void>>(`/tenants/${tenantId}/documents/${documentId}/recrawl`);
+    return response.data;
+  }
+
   // Pending Questions Endpoints
   async getPendingQuestions(tenantId: string, params?: { status?: string; page?: number; limit?: number }): Promise<ApiResponse<{ questions: PendingQuestion[]; pagination: Pagination }>> {
     const response = await this.client.get<ApiResponse<{ questions: PendingQuestion[]; pagination: Pagination }>>(`/tenants/${tenantId}/pending-questions`, { params });
