@@ -29,14 +29,13 @@ const TenantSettings: React.FC = () => {
     answer_style: null,
     message_limit_per_chat: null,
     settings: {},
-    answer_quality: {
-      quality_profile: 'balanced',
-      enable_hybrid_search: true,
-      enable_query_rewrite: true,
-      enable_phrase_match: true,
-      faq_threshold: 0.5,
-      min_chunk_score: 0.5,
-    },
+    // Answer quality fields at top level
+    quality_profile: 'balanced',
+    enable_hybrid_search: true,
+    enable_query_rewrite: true,
+    enable_phrase_match: true,
+    faq_threshold: 0.5,
+    min_chunk_score: 0.5,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,6 +58,7 @@ const TenantSettings: React.FC = () => {
         api.getTenantSettings(tenantId),
       ]);
       setTenant(tenantResponse.data.tenant);
+      // API returns answer quality fields at top level now
       setSettings(settingsResponse.data);
     } catch (error) {
       console.error('Error loading tenant settings:', error);
@@ -76,7 +76,13 @@ const TenantSettings: React.FC = () => {
         answer_style: settings.answer_style || undefined,
         message_limit_per_chat: settings.message_limit_per_chat,
         settings: settings.settings || {},
-        answer_quality: settings.answer_quality,
+        // Answer quality fields at top level (not nested in settings)
+        quality_profile: settings.quality_profile,
+        enable_hybrid_search: settings.enable_hybrid_search,
+        enable_query_rewrite: settings.enable_query_rewrite,
+        enable_phrase_match: settings.enable_phrase_match,
+        faq_threshold: settings.faq_threshold,
+        min_chunk_score: settings.min_chunk_score,
       });
       setHasChanges(false);
       showToast(t('tenants.settingsSaved'), 'success');
@@ -290,17 +296,14 @@ const TenantSettings: React.FC = () => {
                 },
               ].map((profile) => {
                 const Icon = profile.icon;
-                const isSelected = settings.answer_quality?.quality_profile === profile.value;
+                const isSelected = settings.quality_profile === profile.value;
                 return (
                   <button
                     key={profile.value}
                     onClick={() => {
                       setSettings({
                         ...settings,
-                        answer_quality: {
-                          ...settings.answer_quality!,
-                          quality_profile: profile.value,
-                        },
+                        quality_profile: profile.value,
                       });
                       setHasChanges(true);
                     }}
@@ -338,15 +341,12 @@ const TenantSettings: React.FC = () => {
                 step="0.1"
                 min="0.1"
                 max="1.0"
-                value={settings.answer_quality?.faq_threshold ?? 0.5}
+                value={settings.faq_threshold ?? 0.5}
                 onChange={(e) => {
                   const value = parseFloat(e.target.value);
                   setSettings({
                     ...settings,
-                    answer_quality: {
-                      ...settings.answer_quality!,
-                      faq_threshold: Math.max(0.1, Math.min(1.0, value)),
-                    },
+                    faq_threshold: Math.max(0.1, Math.min(1.0, value)),
                   });
                   setHasChanges(true);
                 }}
@@ -357,15 +357,12 @@ const TenantSettings: React.FC = () => {
                 min="0.1"
                 max="1.0"
                 step="0.1"
-                value={settings.answer_quality?.faq_threshold ?? 0.5}
+                value={settings.faq_threshold ?? 0.5}
                 onChange={(e) => {
                   const value = parseFloat(e.target.value);
                   setSettings({
                     ...settings,
-                    answer_quality: {
-                      ...settings.answer_quality!,
-                      faq_threshold: value,
-                    },
+                    faq_threshold: value,
                   });
                   setHasChanges(true);
                 }}
@@ -388,15 +385,12 @@ const TenantSettings: React.FC = () => {
                 step="0.1"
                 min="0.1"
                 max="1.0"
-                value={settings.answer_quality?.min_chunk_score ?? 0.5}
+                value={settings.min_chunk_score ?? 0.5}
                 onChange={(e) => {
                   const value = parseFloat(e.target.value);
                   setSettings({
                     ...settings,
-                    answer_quality: {
-                      ...settings.answer_quality!,
-                      min_chunk_score: Math.max(0.1, Math.min(1.0, value)),
-                    },
+                    min_chunk_score: Math.max(0.1, Math.min(1.0, value)),
                   });
                   setHasChanges(true);
                 }}
@@ -407,15 +401,12 @@ const TenantSettings: React.FC = () => {
                 min="0.1"
                 max="1.0"
                 step="0.1"
-                value={settings.answer_quality?.min_chunk_score ?? 0.5}
+                value={settings.min_chunk_score ?? 0.5}
                 onChange={(e) => {
                   const value = parseFloat(e.target.value);
                   setSettings({
                     ...settings,
-                    answer_quality: {
-                      ...settings.answer_quality!,
-                      min_chunk_score: value,
-                    },
+                    min_chunk_score: value,
                   });
                   setHasChanges(true);
                 }}
@@ -444,20 +435,17 @@ const TenantSettings: React.FC = () => {
                   onClick={() => {
                     setSettings({
                       ...settings,
-                      answer_quality: {
-                        ...settings.answer_quality!,
-                        enable_hybrid_search: !settings.answer_quality?.enable_hybrid_search,
-                      },
+                      enable_hybrid_search: !settings.enable_hybrid_search,
                     });
                     setHasChanges(true);
                   }}
                   className={`relative w-12 h-6 rounded-full transition-colors ${
-                    settings.answer_quality?.enable_hybrid_search ? 'bg-[#8B00E8]' : 'bg-slate-600'
+                    settings.enable_hybrid_search ? 'bg-[#8B00E8]' : 'bg-slate-600'
                   }`}
                 >
                   <span
                     className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings.answer_quality?.enable_hybrid_search ? 'translate-x-7' : 'translate-x-1'
+                      settings.enable_hybrid_search ? 'translate-x-7' : 'translate-x-1'
                     }`}
                   />
                 </button>
@@ -479,20 +467,17 @@ const TenantSettings: React.FC = () => {
                   onClick={() => {
                     setSettings({
                       ...settings,
-                      answer_quality: {
-                        ...settings.answer_quality!,
-                        enable_query_rewrite: !settings.answer_quality?.enable_query_rewrite,
-                      },
+                      enable_query_rewrite: !settings.enable_query_rewrite,
                     });
                     setHasChanges(true);
                   }}
                   className={`relative w-12 h-6 rounded-full transition-colors ${
-                    settings.answer_quality?.enable_query_rewrite ? 'bg-[#8B00E8]' : 'bg-slate-600'
+                    settings.enable_query_rewrite ? 'bg-[#8B00E8]' : 'bg-slate-600'
                   }`}
                 >
                   <span
                     className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings.answer_quality?.enable_query_rewrite ? 'translate-x-7' : 'translate-x-1'
+                      settings.enable_query_rewrite ? 'translate-x-7' : 'translate-x-1'
                     }`}
                   />
                 </button>
@@ -514,20 +499,17 @@ const TenantSettings: React.FC = () => {
                   onClick={() => {
                     setSettings({
                       ...settings,
-                      answer_quality: {
-                        ...settings.answer_quality!,
-                        enable_phrase_match: !settings.answer_quality?.enable_phrase_match,
-                      },
+                      enable_phrase_match: !settings.enable_phrase_match,
                     });
                     setHasChanges(true);
                   }}
                   className={`relative w-12 h-6 rounded-full transition-colors ${
-                    settings.answer_quality?.enable_phrase_match ? 'bg-[#8B00E8]' : 'bg-slate-600'
+                    settings.enable_phrase_match ? 'bg-[#8B00E8]' : 'bg-slate-600'
                   }`}
                 >
                   <span
                     className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings.answer_quality?.enable_phrase_match ? 'translate-x-7' : 'translate-x-1'
+                      settings.enable_phrase_match ? 'translate-x-7' : 'translate-x-1'
                     }`}
                   />
                 </button>
@@ -545,7 +527,14 @@ const TenantSettings: React.FC = () => {
         </h2>
         <RetrievalDebug
           tenantId={tenantId!}
-          currentSettings={settings.answer_quality}
+          currentSettings={{
+            quality_profile: settings.quality_profile,
+            enable_hybrid_search: settings.enable_hybrid_search,
+            enable_query_rewrite: settings.enable_query_rewrite,
+            enable_phrase_match: settings.enable_phrase_match,
+            faq_threshold: settings.faq_threshold,
+            min_chunk_score: settings.min_chunk_score,
+          }}
         />
       </div>
     </div>

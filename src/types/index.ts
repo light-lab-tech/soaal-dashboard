@@ -88,14 +88,26 @@ export interface TenantSettings {
   answer_style?: 'short' | 'formal' | 'friendly' | 'detailed' | null;
   message_limit_per_chat?: number | null;
   settings: Record<string, any>;
-  answer_quality?: AnswerQualitySettings;
+  // Answer quality fields at top level (not nested in settings)
+  quality_profile?: 'balanced' | 'precise' | 'exploratory';
+  enable_hybrid_search?: boolean;
+  enable_query_rewrite?: boolean;
+  enable_phrase_match?: boolean;
+  faq_threshold?: number;
+  min_chunk_score?: number;
 }
 
 export interface UpdateTenantSettingsData {
   answer_style?: string;
   message_limit_per_chat?: number | null;
   settings?: Record<string, any>;
-  answer_quality?: AnswerQualitySettings;
+  // Answer quality fields at top level (not nested in settings)
+  quality_profile?: 'balanced' | 'precise' | 'exploratory';
+  enable_hybrid_search?: boolean;
+  enable_query_rewrite?: boolean;
+  enable_phrase_match?: boolean;
+  faq_threshold?: number;
+  min_chunk_score?: number;
 }
 
 // Retrieval Debug Types

@@ -778,7 +778,7 @@ curl http://localhost:8080/api/v1/tenants/{tenant_id}/api-keys/{key_id} \
 
 ### Get Tenant Settings
 
-Get per-tenant answer and chat settings (answer style, message limit per chat, extra settings). These affect how the assistant responds and how many messages are allowed per chat.
+Get per-tenant answer and chat settings. These affect how the assistant responds and how many messages are allowed per chat.
 
 ```
 GET /tenants/{tenant_id}/settings
@@ -791,16 +791,13 @@ GET /tenants/{tenant_id}/settings
   "data": {
     "answer_style": "formal",
     "message_limit_per_chat": 100,
-    "settings": {
-      "answer_quality": {
-        "quality_profile": "balanced",
-        "enable_hybrid_search": true,
-        "enable_query_rewrite": true,
-        "enable_phrase_match": true,
-        "faq_threshold": 0.62,
-        "min_chunk_score": 0.5
-      }
-    }
+    "settings": {},
+    "quality_profile": "balanced",
+    "enable_hybrid_search": true,
+    "enable_query_rewrite": true,
+    "enable_phrase_match": true,
+    "faq_threshold": 0.62,
+    "min_chunk_score": 0.5
   }
 }
 ```
@@ -809,24 +806,19 @@ GET /tenants/{tenant_id}/settings
 |-------|------|-------------|
 | answer_style | string \| null | `short`, `formal`, `friendly`, `detailed`, or null for default |
 | message_limit_per_chat | number \| null | Max messages per chat; null = no limit |
-| settings | object | Extra key-value settings |
-
-**`settings.answer_quality` fields:**
-
-| Field | Type | Description |
-|-------|------|-------------|
+| settings | object | Extra key-value settings (reserved for future use) |
 | quality_profile | string | Retrieval profile: `balanced`, `precise`, `exploratory` |
 | enable_hybrid_search | boolean | Re-rank vector matches using lexical keyword overlap |
 | enable_query_rewrite | boolean | Expand short or weak user questions into additional retrieval queries |
 | enable_phrase_match | boolean | Boost exact phrase matches in titles, headings, URLs, and content |
-| faq_threshold | number | Score threshold for returning a stored FAQ answer directly |
-| min_chunk_score | number | Minimum reranked score for chunk context to be used in an answer |
+| faq_threshold | number | Score threshold for returning a stored FAQ answer directly (0.1-1.0) |
+| min_chunk_score | number | Minimum reranked score for chunk context to be used in an answer (0.1-1.0) |
 
 ---
 
 ### Update Tenant Settings
 
-Set answer style, message limit per chat, and optional extra settings. Affects all chats for this tenant.
+Set answer style, message limit per chat, and answer quality options. Affects all chats for this tenant.
 
 ```
 PUT /tenants/{tenant_id}/settings
@@ -837,16 +829,12 @@ PUT /tenants/{tenant_id}/settings
 {
   "answer_style": "short",
   "message_limit_per_chat": 50,
-  "settings": {
-    "answer_quality": {
-      "quality_profile": "precise",
-      "enable_hybrid_search": true,
-      "enable_query_rewrite": true,
-      "enable_phrase_match": true,
-      "faq_threshold": 0.7,
-      "min_chunk_score": 0.58
-    }
-  }
+  "quality_profile": "precise",
+  "enable_hybrid_search": true,
+  "enable_query_rewrite": true,
+  "enable_phrase_match": true,
+  "faq_threshold": 0.7,
+  "min_chunk_score": 0.58
 }
 ```
 
@@ -854,11 +842,16 @@ PUT /tenants/{tenant_id}/settings
 |-------|------|----------|-------------|
 | answer_style | string | No | One of: `short`, `formal`, `friendly`, `detailed`; empty string = default |
 | message_limit_per_chat | number \| null | No | Max messages per chat; null = no limit. Must be ≥ 1 if set. |
-| settings | object | No | Extra key-value; use `{}` to clear |
+| quality_profile | string | No | One of: `balanced`, `precise`, `exploratory` |
+| enable_hybrid_search | boolean \| null | No | Re-rank vector matches using lexical keyword overlap |
+| enable_query_rewrite | boolean \| null | No | Expand short or weak user questions into additional retrieval queries |
+| enable_phrase_match | boolean \| null | No | Boost exact phrase matches in titles, headings, URLs, and content |
+| faq_threshold | number | No | Score threshold for returning a stored FAQ answer directly (0.1-1.0) |
+| min_chunk_score | number | No | Minimum reranked score for chunk context (0.1-1.0) |
 
 **Answer styles:** `short` = brief answers; `formal` = professional tone; `friendly` = warm tone; `detailed` = thorough when possible.
 
-**Validation for `settings.answer_quality`:**
+**Validation:**
 - `quality_profile` must be one of `balanced`, `precise`, `exploratory`
 - `faq_threshold` must be between `0.1` and `1.0`
 - `min_chunk_score` must be between `0.1` and `1.0`
