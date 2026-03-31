@@ -122,15 +122,36 @@ const BackgroundJobs: React.FC<BackgroundJobsProps> = ({ tenantId, documentId })
   const getJobTypeLabel = (type: string) => {
     switch (type) {
       case 'scrape_document_url':
-        return 'URL Ingest';
+        return t('tenants.jobTypeUrlIngest', 'URL Ingest');
       case 'process_document':
-        return 'Process Document';
+        return t('tenants.jobTypeProcessDocument', 'Process Document');
       case 'reindex_document':
-        return 'Reindex';
+        return t('tenants.jobTypeReindex', 'Reindex');
       case 'recrawl_document':
-        return 'Recrawl';
+        return t('tenants.jobTypeRecrawl', 'Recrawl');
       default:
         return type;
+    }
+  };
+
+  const getStatusLabel = (status: JobStatus | 'all') => {
+    switch (status) {
+      case 'all':
+        return t('tenants.allJobs', 'All');
+      case 'queued':
+        return t('tenants.jobStatusQueued', 'Queued');
+      case 'retry':
+        return t('tenants.jobStatusRetry', 'Retry');
+      case 'running':
+        return t('tenants.jobStatusRunning', 'Running');
+      case 'completed':
+        return t('tenants.jobStatusCompleted', 'Completed');
+      case 'failed':
+        return t('tenants.jobStatusFailed', 'Failed');
+      case 'canceled':
+        return t('tenants.jobStatusCanceled', 'Canceled');
+      default:
+        return status;
     }
   };
 
@@ -147,7 +168,7 @@ const BackgroundJobs: React.FC<BackgroundJobsProps> = ({ tenantId, documentId })
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-glass-text">
-          Background Jobs ({jobs.length})
+          {t('tenants.backgroundJobs', 'Background Jobs')} ({jobs.length})
         </h3>
         <button
           onClick={() => {
@@ -173,7 +194,7 @@ const BackgroundJobs: React.FC<BackgroundJobsProps> = ({ tenantId, documentId })
                 : 'glass-card-surface text-glass-text hover:bg-slate-700/50'
             }`}
           >
-            {s.charAt(0).toUpperCase() + s.slice(1)}
+            {getStatusLabel(s)}
           </button>
         ))}
       </div>
@@ -182,7 +203,7 @@ const BackgroundJobs: React.FC<BackgroundJobsProps> = ({ tenantId, documentId })
       {jobs.length === 0 ? (
         <div className="text-center py-8">
           <FileText size={32} className="mx-auto text-slate-600 mb-2" />
-          <p className="text-sm text-glass-textSecondary">No background jobs found</p>
+          <p className="text-sm text-glass-textSecondary">{t('tenants.noBackgroundJobs', 'No background jobs found')}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -201,7 +222,7 @@ const BackgroundJobs: React.FC<BackgroundJobsProps> = ({ tenantId, documentId })
                       {job.document_name}
                     </span>
                     <span className={`px-2 py-0.5 rounded text-xs ${getStatusBadge(job.status)}`}>
-                      {job.status}
+                      {getStatusLabel(job.status)}
                     </span>
                   </div>
 
@@ -212,13 +233,13 @@ const BackgroundJobs: React.FC<BackgroundJobsProps> = ({ tenantId, documentId })
                     </span>
                     <span>•</span>
                     <span>
-                      Attempt {job.attempts}/{job.max_attempts}
+                      {t('tenants.attempt', 'Attempt')} {job.attempts}/{job.max_attempts}
                     </span>
                     {job.last_error && (
                       <>
                         <span>•</span>
                         <span className="text-red-400" title={job.last_error}>
-                          Error: {job.last_error.length > 30 ? job.last_error.substring(0, 30) + '...' : job.last_error}
+                          {t('tenants.errorLabel', 'Error')}: {job.last_error.length > 30 ? job.last_error.substring(0, 30) + '...' : job.last_error}
                         </span>
                       </>
                     )}
@@ -227,12 +248,12 @@ const BackgroundJobs: React.FC<BackgroundJobsProps> = ({ tenantId, documentId })
                   {/* Payload Summary */}
                   {job.payload_summary?.url && (
                     <div className="mt-2 text-xs text-glass-textSecondary truncate">
-                      URL: {job.payload_summary.url}
+                      {t('documents.url', 'URL')}: {job.payload_summary.url}
                     </div>
                   )}
                   {job.payload_summary?.metadata?.source_url && (
                     <div className="mt-2 text-xs text-glass-textSecondary truncate">
-                      Source: {job.payload_summary.metadata.source_url}
+                      {t('tenants.source', 'Source')}: {job.payload_summary.metadata.source_url}
                     </div>
                   )}
                 </div>
@@ -243,7 +264,7 @@ const BackgroundJobs: React.FC<BackgroundJobsProps> = ({ tenantId, documentId })
                     <button
                       onClick={() => handleRetry(job.id)}
                       className="p-2 rounded-lg glass-button-secondary text-orange-400 hover:text-orange-300"
-                      title="Retry"
+                      title={t('tenants.retryJob', 'Retry')}
                     >
                       <RotateCcw size={14} />
                     </button>
@@ -252,7 +273,7 @@ const BackgroundJobs: React.FC<BackgroundJobsProps> = ({ tenantId, documentId })
                     <button
                       onClick={() => handleCancel(job.id)}
                       className="p-2 rounded-lg glass-button-secondary text-red-400 hover:text-red-300"
-                      title="Cancel"
+                      title={t('tenants.cancelJob', 'Cancel')}
                     >
                       <Ban size={14} />
                     </button>
@@ -262,9 +283,9 @@ const BackgroundJobs: React.FC<BackgroundJobsProps> = ({ tenantId, documentId })
 
               {/* Timestamps */}
               <div className="flex items-center gap-4 mt-2 pt-2 border-t border-slate-700/50 text-xs text-glass-textSecondary">
-                <span>Created: {new Date(job.created_at).toLocaleString()}</span>
-                {job.run_at && <span>Run: {new Date(job.run_at).toLocaleString()}</span>}
-                {job.finished_at && <span>Finished: {new Date(job.finished_at).toLocaleString()}</span>}
+                <span>{t('tenants.created', 'Created')}: {new Date(job.created_at).toLocaleString()}</span>
+                {job.run_at && <span>{t('tenants.run', 'Run')}: {new Date(job.run_at).toLocaleString()}</span>}
+                {job.finished_at && <span>{t('tenants.finished', 'Finished')}: {new Date(job.finished_at).toLocaleString()}</span>}
               </div>
             </div>
           ))}

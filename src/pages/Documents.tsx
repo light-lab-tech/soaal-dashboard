@@ -774,7 +774,7 @@ const Documents: React.FC = () => {
       <div className="glass-card p-4">
         <h2 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
           <RefreshCw size={18} className="text-[#8B00E8]" />
-          Background Jobs
+          {t('tenants.backgroundJobs', 'Background Jobs')}
         </h2>
         <BackgroundJobs tenantId={tenantId!} />
       </div>
