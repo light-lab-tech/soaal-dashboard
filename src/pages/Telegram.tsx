@@ -7,7 +7,6 @@ import {
   Send,
   Bot,
   CheckCircle2,
-  Copy,
   ExternalLink,
 } from 'lucide-react';
 
@@ -55,12 +54,6 @@ const Telegram: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const copyWebhookCommand = () => {
-    if (!botInfo) return;
-    const command = `curl "https://api.telegram.org/bot${tenant?.name}/setWebhook?url=https://your-domain.com/webhooks/telegram?token=${botInfo.bot_username}"`;
-    navigator.clipboard.writeText(command);
   };
 
   if (isLoading) {
@@ -152,7 +145,7 @@ const Telegram: React.FC = () => {
           {t('telegram.instructions')}
         </h3>
         <ol className="space-y-2.5">
-          {[1, 2, 3, 4].map((step) => (
+          {[1, 2, 3].map((step) => (
             <li key={step} className="flex gap-2.5">
               <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-[11px]">
                 {step}
@@ -162,26 +155,6 @@ const Telegram: React.FC = () => {
           ))}
         </ol>
       </div>
-
-      {/* Webhook Command */}
-      {botInfo && (
-        <div className="glass-card p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">{t('telegram.webhookSetup')}</h3>
-          <div className="glass-input p-3 rounded-lg font-mono text-xs break-all mb-3">
-            curl "https://api.telegram.org/bot{'{BOT_TOKEN}'}/setWebhook?url=https://your-domain.com/webhooks/telegram?token={'{BOT_TOKEN}'}"
-          </div>
-          <p className="text-[10px] text-glass-textSecondary mb-3">
-            {t('telegram.replaceToken')}
-          </p>
-          <button
-            onClick={copyWebhookCommand}
-            className="glass-button-secondary w-full py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5"
-          >
-            <Copy size={14} />
-            {t('telegram.copyCommand')}
-          </button>
-        </div>
-      )}
 
       {/* Bot Info */}
       {botInfo && (
