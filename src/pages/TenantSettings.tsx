@@ -439,13 +439,16 @@ const TenantSettings: React.FC = () => {
                     });
                     setHasChanges(true);
                   }}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B00E8] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
                     settings.enable_hybrid_search ? 'bg-[#8B00E8]' : 'bg-slate-600'
                   }`}
                 >
                   <span
-                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings.enable_hybrid_search ? 'translate-x-7' : 'translate-x-1'
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-inout ${
+                      settings.enable_hybrid_search
+                        ? 'ltr:translate-x-6 rtl:-translate-x-6'
+                        : 'ltr:translate-x-0.5 rtl:-translate-x-0.5'
                     }`}
                   />
                 </button>
@@ -471,13 +474,16 @@ const TenantSettings: React.FC = () => {
                     });
                     setHasChanges(true);
                   }}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B00E8] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
                     settings.enable_query_rewrite ? 'bg-[#8B00E8]' : 'bg-slate-600'
                   }`}
                 >
                   <span
-                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings.enable_query_rewrite ? 'translate-x-7' : 'translate-x-1'
+                    aria-hidden="true"
+                    className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-inout ${
+                      settings.enable_query_rewrite
+                        ? 'ltr:translate-x-6 rtl:-translate-x-6'
+                        : 'ltr:translate-x-0.5 rtl:-translate-x-0.5'
                     }`}
                   />
                 </button>
@@ -503,13 +509,16 @@ const TenantSettings: React.FC = () => {
                     });
                     setHasChanges(true);
                   }}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B00E8] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
                     settings.enable_phrase_match ? 'bg-[#8B00E8]' : 'bg-slate-600'
                   }`}
                 >
                   <span
-                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings.enable_phrase_match ? 'translate-x-7' : 'translate-x-1'
+                    aria-hidden="true"
+                    className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-inout ${
+                      settings.enable_phrase_match
+                        ? 'ltr:translate-x-6 rtl:-translate-x-6'
+                        : 'ltr:translate-x-0.5 rtl:-translate-x-0.5'
                     }`}
                   />
                 </button>

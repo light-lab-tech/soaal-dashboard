@@ -853,13 +853,16 @@ const Documents: React.FC = () => {
                 setCrawlEnabled(!crawlEnabled);
                 if (!crawlEnabled) setShowCrawlOptions(true);
               }}
-              className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
                 crawlEnabled ? 'bg-purple-500' : 'bg-slate-600'
               }`}
             >
               <span
-                className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ${
-                  crawlEnabled ? 'translate-x-6' : ''
+                aria-hidden="true"
+                className={`pointer-events-none absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition duration-300 ease-inout ${
+                  crawlEnabled
+                    ? 'ltr:translate-x-6 rtl:-translate-x-6'
+                    : 'ltr:translate-x-0.5 rtl:-translate-x-0.5'
                 }`}
               />
             </button>

@@ -202,13 +202,16 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
           <div className="flex items-center gap-3">
             <button
               onClick={() => setUseCurrentSettings(!useCurrentSettings)}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B00E8] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
                 useCurrentSettings ? 'bg-[#8B00E8]' : 'bg-slate-600'
               }`}
             >
               <span
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                  useCurrentSettings ? 'translate-x-7' : 'translate-x-1'
+                aria-hidden="true"
+                className={`pointer-events-none absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-inout ${
+                  useCurrentSettings
+                    ? 'ltr:translate-x-6 rtl:-translate-x-6'
+                    : 'ltr:translate-x-0.5 rtl:-translate-x-0.5'
                 }`}
               />
             </button>
