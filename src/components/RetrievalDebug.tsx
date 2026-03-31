@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import type { RetrievalDebugData, RetrievalDebugOptions } from '../types';
 import {
@@ -18,6 +19,7 @@ interface RetrievalDebugProps {
 }
 
 const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettings }) => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [useCurrentSettings, setUseCurrentSettings] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -81,14 +83,14 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-sm font-medium text-white">
-                  {candidate.type === 'faq' ? 'FAQ' : 'Document'} #{index + 1}
+                  {candidate.type === 'faq' ? t('documents.faq', 'FAQ') : t('documents.document', 'Document')} #{index + 1}
                 </span>
                 <span className="px-2 py-0.5 rounded text-xs bg-slate-700 text-slate-300">
-                  Score: {candidate.score?.toFixed(4) || 'N/A'}
+                  {t('tenants.score', 'Score')}: {candidate.score?.toFixed(4) || 'N/A'}
                 </span>
                 {candidate.faq_eligible && (
                   <span className="px-2 py-0.5 rounded text-xs bg-green-500/20 text-green-300">
-                    FAQ Eligible
+                    {t('tenants.faqEligible', 'FAQ Eligible')}
                   </span>
                 )}
               </div>
@@ -114,45 +116,45 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
           <div className="mt-3 pt-3 border-t border-slate-700 space-y-2">
             {candidate.vector_score !== undefined && (
               <div>
-                <label className="text-xs text-slate-400">Vector Score</label>
+                <label className="text-xs text-slate-400">{t('tenants.vectorScore', 'Vector Score')}</label>
                 {renderScoreBar(candidate.vector_score)}
               </div>
             )}
             {candidate.lexical_score !== undefined && (
               <div>
-                <label className="text-xs text-slate-400">Lexical Score</label>
+                <label className="text-xs text-slate-400">{t('tenants.lexicalScore', 'Lexical Score')}</label>
                 {renderScoreBar(candidate.lexical_score)}
               </div>
             )}
             {candidate.phrase_score !== undefined && (
               <div>
-                <label className="text-xs text-slate-400">Phrase Score</label>
+                <label className="text-xs text-slate-400">{t('tenants.phraseScore', 'Phrase Score')}</label>
                 {renderScoreBar(candidate.phrase_score)}
               </div>
             )}
             <div className="grid grid-cols-3 gap-2 mt-2">
               {candidate.title_boost !== undefined && (
                 <div className="glass-card-surface p-2 rounded text-center">
-                  <div className="text-xs text-slate-400">Title</div>
+                  <div className="text-xs text-slate-400">{t('tenants.titleLabel', 'Title')}</div>
                   <div className="text-sm font-medium text-white">{(candidate.title_boost * 100).toFixed(1)}%</div>
                 </div>
               )}
               {candidate.heading_boost !== undefined && (
                 <div className="glass-card-surface p-2 rounded text-center">
-                  <div className="text-xs text-slate-400">Heading</div>
+                  <div className="text-xs text-slate-400">{t('tenants.headingLabel', 'Heading')}</div>
                   <div className="text-sm font-medium text-white">{(candidate.heading_boost * 100).toFixed(1)}%</div>
                 </div>
               )}
               {candidate.url_boost !== undefined && (
                 <div className="glass-card-surface p-2 rounded text-center">
-                  <div className="text-xs text-slate-400">URL</div>
+                  <div className="text-xs text-slate-400">{t('tenants.urlLabel', 'URL')}</div>
                   <div className="text-sm font-medium text-white">{(candidate.url_boost * 100).toFixed(1)}%</div>
                 </div>
               )}
             </div>
             {candidate.matched_terms && candidate.matched_terms.length > 0 && (
               <div>
-                <label className="text-xs text-slate-400">Matched Terms</label>
+                <label className="text-xs text-slate-400">{t('tenants.matchedTerms', 'Matched Terms')}</label>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {candidate.matched_terms.map((term: string, i: number) => (
                     <span key={i} className="px-2 py-0.5 rounded text-xs bg-[#8B00E8]/20 text-[#8B00E8]">
@@ -179,21 +181,21 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
       <div className="glass-card p-4">
         <h3 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
           <Search size={18} className="text-[#8B00E8]" />
-          Test Retrieval
+          {t('tenants.testRetrieval', 'Test Retrieval')}
         </h3>
 
         <div className="space-y-4">
           {/* Query Input */}
           <div>
             <label className="block text-sm font-medium text-glass-text mb-2">
-              Query
+              {t('tenants.query', 'Query')}
             </label>
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleDebug()}
-              placeholder="Enter a test query..."
+              placeholder={t('tenants.queryPlaceholder', 'Enter a test query...')}
               className="glass-input w-full px-4 py-2 rounded-lg text-sm"
             />
           </div>
@@ -215,7 +217,7 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
                 }`}
               />
             </button>
-            <span className="text-sm text-glass-text">Use current tenant settings</span>
+            <span className="text-sm text-glass-text">{t('tenants.useCurrentSettings', 'Use current tenant settings')}</span>
           </div>
 
           {/* Run Debug Button */}
@@ -229,12 +231,12 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
             {isLoading ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                Running...
+                {t('tenants.running', 'Running...')}
               </>
             ) : (
               <>
                 <Search size={16} />
-                Run Retrieval Debug
+                {t('tenants.runDebug', 'Run Retrieval Debug')}
               </>
             )}
           </button>
@@ -246,18 +248,18 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
         <div className="glass-card p-4">
           <h3 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
             <Code size={18} className="text-[#8B00E8]" />
-            Debug Results
+            {t('tenants.debugResults', 'Debug Results')}
           </h3>
 
           {/* Query Info */}
           <div className="glass-card-surface p-3 rounded-lg mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-slate-400">Query</span>
+              <span className="text-sm text-slate-400">{t('tenants.query', 'Query')}</span>
               <span className="text-sm text-white font-medium">"{result.query}"</span>
             </div>
             {result.query_variants && result.query_variants.length > 1 && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-400">Query Variants</span>
+                <span className="text-sm text-slate-400">{t('tenants.queryVariants', 'Query Variants')}</span>
                 <div className="flex flex-wrap gap-1 justify-end">
                   {result.query_variants.map((variant, i) => (
                     <span key={i} className="px-2 py-0.5 rounded text-xs bg-slate-700 text-slate-300">
@@ -273,7 +275,7 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
           {result.faq_fast_lane_hit && (
             <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/30 mb-4">
               <CheckCircle2 size={18} className="text-green-400" />
-              <span className="text-sm text-green-300">FAQ Fast Lane Hit - FAQ returned immediately</span>
+              <span className="text-sm text-green-300">{t('tenants.faqFastLaneHit', 'FAQ Fast Lane Hit - FAQ returned immediately')}</span>
             </div>
           )}
 
@@ -282,7 +284,7 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
             <div className="mb-4">
               <h4 className="text-sm font-medium text-white mb-2 flex items-center gap-2">
                 <CheckCircle2 size={16} className="text-green-400" />
-                Winning FAQ
+                {t('tenants.winningFaq', 'Winning FAQ')}
               </h4>
               {renderCandidate(result.winning_faq, 0)}
             </div>
@@ -291,7 +293,7 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
           {/* FAQ Candidates */}
           {result.faq_candidates && result.faq_candidates.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-sm font-medium text-white mb-2">FAQ Candidates ({result.faq_candidates.length})</h4>
+              <h4 className="text-sm font-medium text-white mb-2">{t('tenants.faqCandidates', 'FAQ Candidates')} ({result.faq_candidates.length})</h4>
               <div className="space-y-2">
                 {result.faq_candidates.map((candidate, index) => renderCandidate(candidate, index + 1))}
               </div>
@@ -301,7 +303,7 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
           {/* Document Candidates */}
           {result.document_candidates && result.document_candidates.length > 0 && (
             <div>
-              <h4 className="text-sm font-medium text-white mb-2">Document Candidates ({result.document_candidates.length})</h4>
+              <h4 className="text-sm font-medium text-white mb-2">{t('tenants.documentCandidates', 'Document Candidates')} ({result.document_candidates.length})</h4>
               <div className="space-y-2">
                 {result.document_candidates.map((candidate, index) => renderCandidate(candidate, index + 1))}
               </div>
@@ -312,7 +314,7 @@ const RetrievalDebug: React.FC<RetrievalDebugProps> = ({ tenantId, currentSettin
           {(!result.winning_faq && !result.faq_candidates?.length && !result.document_candidates?.length) && (
             <div className="flex items-center gap-2 p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
               <XCircle size={18} className="text-yellow-400" />
-              <span className="text-sm text-yellow-300">No candidates found for this query</span>
+              <span className="text-sm text-yellow-300">{t('tenants.noCandidatesFound', 'No candidates found for this query')}</span>
             </div>
           )}
         </div>
