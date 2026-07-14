@@ -54,6 +54,20 @@ export interface Tenant {
   updated_at: string;
 }
 
+export interface XIntegration {
+  connected: boolean;
+  account_user_id?: string;
+  account_username?: string;
+  webhook_env?: string;
+  webhook_url?: string;
+}
+
+export interface TenantDetailsResponse {
+  tenant: Tenant;
+  api_keys: ApiKey[];
+  x_integration?: XIntegration;
+}
+
 export interface ApiKey {
   key?: string;
   prefix: string;
@@ -382,6 +396,26 @@ export interface TelegramBotResponse {
   bot_username: string;
   bot_id: number;
   message: string;
+}
+
+export interface XConfigData {
+  api_key: string;
+  api_secret: string;
+  access_token: string;
+  access_token_secret: string;
+  webhook_env: string;
+  register_webhook?: boolean;
+}
+
+export interface XConfigResponse {
+  account_user_id: string;
+  account_username: string;
+  message: string;
+  webhook_url?: string;
+}
+
+export interface XConfigStatusResponse {
+  x_integration: XIntegration;
 }
 
 // Tenant Analytics Types (Admin)

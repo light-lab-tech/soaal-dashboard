@@ -35,7 +35,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         localStorage.removeItem('user');
       }
     }
+    
+    const handleAuthExpired = () => {
+      setToken(null);
+      setUser(null);
+    };
+    window.addEventListener('auth-expired', handleAuthExpired);
+
     setIsLoading(false);
+    
+    return () => window.removeEventListener('auth-expired', handleAuthExpired);
   }, []);
 
   const login = async (email: string, password: string) => {

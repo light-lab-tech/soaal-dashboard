@@ -25,6 +25,10 @@ import type {
   ChatMessage,
   TelegramBotData,
   TelegramBotResponse,
+  TenantDetailsResponse,
+  XConfigData,
+  XConfigResponse,
+  XConfigStatusResponse,
   AdminUser,
   UpdateUserRoleData,
   Pagination,
@@ -86,7 +90,7 @@ class ApiClient {
           if (!isAuthRequest) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            window.location.href = '/login';
+            window.dispatchEvent(new CustomEvent('auth-expired'));
           }
         }
         // Extract error message from API response if available
@@ -141,8 +145,13 @@ class ApiClient {
     return response.data;
   }
 
-  async getTenant(tenantId: string): Promise<ApiResponse<{ tenant: Tenant; api_keys: ApiKey[] }>> {
-    const response = await this.client.get<ApiResponse<{ tenant: Tenant; api_keys: ApiKey[] }>>(`/tenants/${tenantId}`);
+  async getDashboardStats(): Promise<ApiResponse<{ totalTenants: number; totalDocuments: number; pendingQuestions: number; satisfactionRate: number; totalUsers: number; totalPlans: number }>> {
+    const response = await this.client.get<ApiResponse<{ totalTenants: number; totalDocuments: number; pendingQuestions: number; satisfactionRate: number; totalUsers: number; totalPlans: number }>>('/tenants/dashboard/stats');
+    return response.data;
+  }
+
+  async getTenant(tenantId: string): Promise<ApiResponse<TenantDetailsResponse>> {
+    const response = await this.client.get<ApiResponse<TenantDetailsResponse>>(`/tenants/${tenantId}`);
     return response.data;
   }
 
@@ -348,6 +357,22 @@ class ApiClient {
   // Telegram Endpoints
   async setTelegramBotToken(tenantId: string, data: TelegramBotData): Promise<ApiResponse<TelegramBotResponse>> {
     const response = await this.client.post<ApiResponse<TelegramBotResponse>>(`/tenants/${tenantId}/telegram/bot-token`, data);
+    return response.data;
+  }
+
+  // X Endpoints
+  async getXConfig(tenantId: string): Promise<ApiResponse<XConfigStatusResponse>> {
+    const response = await this.client.get<ApiResponse<XConfigStatusResponse>>(`/tenants/${tenantId}/x/config`);
+    return response.data;
+  }
+
+  async setXConfig(tenantId: string, data: XConfigData): Promise<ApiResponse<XConfigResponse>> {
+    const response = await this.client.post<ApiResponse<XConfigResponse>>(`/tenants/${tenantId}/x/config`, data);
+    return response.data;
+  }
+
+  async deleteXConfig(tenantId: string): Promise<ApiResponse<void>> {
+    const response = await this.client.delete<ApiResponse<void>>(`/tenants/${tenantId}/x/config`);
     return response.data;
   }
 

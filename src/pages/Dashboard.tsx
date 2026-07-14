@@ -47,35 +47,20 @@ const Dashboard: React.FC = () => {
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
-      const tenantsResponse = await api.getTenants();
+      const [tenantsResponse, statsResponse] = await Promise.all([
+        api.getTenants(),
+        api.getDashboardStats()
+      ]);
+      
       setTenants(tenantsResponse.data.tenants);
-
-      let totalDocs = 0;
-      let pendingQs = 0;
-      let totalFeedback = 0;
-      let positiveFeedback = 0;
-
-      for (const tenant of tenantsResponse.data.tenants) {
-        try {
-          const docsResponse = await api.getDocuments(tenant.id);
-          totalDocs += docsResponse.data.documents.length;
-          const questionsResponse = await api.getPendingQuestions(tenant.id);
-          pendingQs += questionsResponse.data.questions.filter(q => q.status === 'pending').length;
-          const feedbackResponse = await api.getFeedbackStats(tenant.id);
-          totalFeedback += feedbackResponse.data.total_feedback;
-          positiveFeedback += feedbackResponse.data.positive_count;
-        } catch (error) {
-          console.error(`Error loading data for tenant ${tenant.id}:`, error);
-        }
-      }
-
+      
       setStats({
-        totalTenants: tenantsResponse.data.tenants.length,
-        totalDocuments: totalDocs,
-        pendingQuestions: pendingQs,
-        satisfactionRate: totalFeedback > 0 ? Math.round((positiveFeedback / totalFeedback) * 100) : 0,
-        totalUsers: 0,
-        totalPlans: 0,
+        totalTenants: statsResponse.data.totalTenants,
+        totalDocuments: statsResponse.data.totalDocuments,
+        pendingQuestions: statsResponse.data.pendingQuestions,
+        satisfactionRate: statsResponse.data.satisfactionRate,
+        totalUsers: statsResponse.data.totalUsers,
+        totalPlans: statsResponse.data.totalPlans,
       });
     } catch (error) {
       console.error('Error loading dashboard data:', error);

@@ -9,6 +9,7 @@ import {
   MessageSquare,
   BarChart3,
   Send,
+  AtSign,
   Key,
   ArrowLeft,
   Copy,
@@ -152,6 +153,15 @@ const TenantDetails: React.FC = () => {
       path: `/tenants/${tenantId}/telegram`,
       color: 'from-blue-400 via-indigo-500 to-blue-600',
       shadow: 'shadow-blue-500/30',
+    },
+    {
+      id: 'x',
+      icon: AtSign,
+      label: t('nav.x'),
+      description: t('tenants.xDesc'),
+      path: `/tenants/${tenantId}/x`,
+      color: 'from-slate-500 via-neutral-700 to-black',
+      shadow: 'shadow-slate-500/30',
     },
     {
       id: 'chats',
